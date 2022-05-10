@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
-import { Link, Redirect } from "react-router-dom";
-import { getDrugs } from "../../api/services";
-import MaterialTable, { MTableToolbar } from "material-table";
-import { FormControlLabel, Switch } from "@material-ui/core";
-import EditIcon from "@material-ui/icons/Edit";
-import Controls from "../../components/controls/Controls";
+import { FormControlLabel, Switch } from '@material-ui/core';
+import { Link, Redirect } from 'react-router-dom';
+import MaterialTable, { MTableToolbar } from 'material-table';
+import { useEffect, useState } from 'react';
+
+import Controls from '../../components/controls/Controls';
+import EditIcon from '@material-ui/icons/Edit';
+import { getDrugs } from '../../api/services';
 
 const Drugs = () => {
   const [drugs, setDrugs] = useState([]);
@@ -15,20 +16,20 @@ const Drugs = () => {
 
   const columns = [
     {
-      title: "Name",
-      field: "name"
+      title: 'Name',
+      field: 'name',
     },
     {
-      title: "Strength",
-      field: "strength"
-    }
+      title: 'Strength',
+      field: 'strength',
+    },
   ];
 
   const options = {
     pageSize: 3,
     pageSizeOptions: [3, 5, 10, 20],
     emptyRowsWhenPaging: false,
-    actionsColumnIndex: -1
+    actionsColumnIndex: -1,
   };
 
   useEffect(() => {
@@ -57,7 +58,7 @@ const Drugs = () => {
     Toolbar: (props) => (
       <div>
         <MTableToolbar {...props} />
-        <div class="text-end" style={{ padding: "0px 10px" }}>
+        <div class="text-end" style={{ padding: '0px 10px' }}>
           <FormControlLabel
             value="start"
             control={
@@ -67,7 +68,7 @@ const Drugs = () => {
                 checked={showRetired}
               />
             }
-            label={showRetired ? "Hide Retired" : "Show Retired"}
+            label={showRetired ? 'Hide Retired' : 'Show Retired'}
             labelPlacement="start"
           />
           <Link to="/drug/edit/add">
@@ -75,15 +76,15 @@ const Drugs = () => {
           </Link>
         </div>
       </div>
-    )
+    ),
   };
 
   const actions = [
     {
       icon: () => <EditIcon color="primary" />,
-      tooltip: "Edit",
-      onClick: (event, rowData) => setRedirect(`/drug/edit/${rowData.uuid}`)
-    }
+      tooltip: 'Edit',
+      onClick: (event, rowData) => setRedirect(`/drug/edit/${rowData.uuid}`),
+    },
   ];
 
   if (redirect) return <Redirect to={redirect} />;
@@ -92,7 +93,7 @@ const Drugs = () => {
 
   return (
     <>
-      <div style={{ maxWidth: "80%", margin: "auto" }}>
+      <div style={{ maxWidth: '80%', margin: 'auto' }}>
         <MaterialTable
           title="Drugs"
           data={filteredDrugsOnRetired}

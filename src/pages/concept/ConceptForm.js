@@ -1,6 +1,5 @@
-import React, { Fragment } from "react";
-import { Redirect, withRouter } from "react-router-dom";
-
+import React, { Fragment } from 'react';
+import { Redirect, withRouter } from 'react-router-dom';
 import {
   deleteConceptById,
   getConceptById,
@@ -8,27 +7,27 @@ import {
   getConceptDataTypes,
   getConceptMapTypes,
   getConceptNames,
-  getConceptReferenceTerms,
   getConceptReferenceSources,
+  getConceptReferenceTerms,
   getDrugs,
   postConcept,
-  putConceptById
-} from "../../api/services";
+  putConceptById,
+} from '../../api/services';
 
-import Select from "react-select";
-import { CONCEPT_COMPLEX_HANDLERS } from "../../constants/otherConstants";
+import { CONCEPT_COMPLEX_HANDLERS } from '../../constants/otherConstants';
+import Select from 'react-select';
 
 class ConceptForm extends React.Component {
   constructor(props) {
     super(props);
     const initialConceptState = {
-      shortName: "",
-      description: "",
+      shortName: '',
+      description: '',
       isSet: false,
       version: null,
       classId: 1,
       retired: false,
-      retireReason: "",
+      retireReason: '',
       conceptNumeric: {
         hiAbsolute: null,
         hiCritical: null,
@@ -38,47 +37,47 @@ class ConceptForm extends React.Component {
         lowNormal: null,
         units: null,
         precise: false,
-        displayPrecision: null
+        displayPrecision: null,
       },
       dataTypeId: {
-        conceptDataTypeId: 1
+        conceptDataTypeId: 1,
       },
       conceptNames: [
         {
-          name: "",
-          conceptNameType: "FULLY_SPECIFIED"
+          name: '',
+          conceptNameType: 'FULLY_SPECIFIED',
         },
         {
-          name: "",
-          conceptNameType: ""
-        }
+          name: '',
+          conceptNameType: '',
+        },
       ],
       conceptAnswers: [
         {
-          answerDrug: 20
+          answerDrug: 20,
         },
         {
-          answerConcept: 55
+          answerConcept: 55,
         },
         {
-          answerConcept: 40
+          answerConcept: 40,
         },
         {
-          answerDrug: 2
-        }
+          answerDrug: 2,
+        },
       ],
-      conceptComplex: "",
+      conceptComplex: '',
       mappings: [
         {
           conceptReferenceTermId: null,
-          conceptMapTypeId: 2
-        }
+          conceptMapTypeId: 2,
+        },
         // {
         //   conceptReferenceTermId: 4,
         //   conceptMapTypeId: 33
         // }
       ],
-      conceptSets: [{ conceptId: 4 }, { conceptId: 5 }]
+      conceptSets: [{ conceptId: 4 }, { conceptId: 5 }],
     };
 
     this.state = {
@@ -97,43 +96,38 @@ class ConceptForm extends React.Component {
       mapCodeOptions: [],
 
       synonyms: initialConceptState.conceptNames.filter(
-        (item) => item.conceptNameType !== "FULLY_SPECIFIED"
+        (item) => item.conceptNameType !== 'FULLY_SPECIFIED'
       ),
-      isLoading: true
+      isLoading: true,
     };
 
-    this.removeSynonymButtonHandler = this.removeSynonymButtonHandler.bind(
-      this
-    );
+    this.removeSynonymButtonHandler =
+      this.removeSynonymButtonHandler.bind(this);
     this.synonymNameChangeHandler = this.synonymNameChangeHandler.bind(this);
-    this.removeMappingButtonHandler = this.removeMappingButtonHandler.bind(
-      this
-    );
-    this.conceptMapTypeIdChangeHandler = this.conceptMapTypeIdChangeHandler.bind(
-      this
-    );
-    this.getDefaultConceptMapTypeId = this.getDefaultConceptMapTypeId.bind(
-      this
-    );
-    this.conceptSourceIdChangeHandler = this.conceptSourceIdChangeHandler.bind(
-      this
-    );
+    this.removeMappingButtonHandler =
+      this.removeMappingButtonHandler.bind(this);
+    this.conceptMapTypeIdChangeHandler =
+      this.conceptMapTypeIdChangeHandler.bind(this);
+    this.getDefaultConceptMapTypeId =
+      this.getDefaultConceptMapTypeId.bind(this);
+    this.conceptSourceIdChangeHandler =
+      this.conceptSourceIdChangeHandler.bind(this);
     this.mapCodeChangeHandler = this.mapCodeChangeHandler.bind(this);
   }
 
   mergeConceptnames() {
     const { synonyms, concept } = this.state;
     const fullySpecifiedName = concept.conceptNames.find(
-      (item) => item.conceptNameType === "FULLY_SPECIFIED"
+      (item) => item.conceptNameType === 'FULLY_SPECIFIED'
     );
-    const syns = synonyms.filter((item) => item.name.trim() !== "");
+    const syns = synonyms.filter((item) => item.name.trim() !== '');
 
     concept.conceptNames = [fullySpecifiedName, ...syns];
     this.setState({ concept });
   }
 
   getValueFor(field) {
-    return field === null ? "" : field;
+    return field === null ? '' : field;
   }
 
   collectCodedInfo = (conceptAnswers) => {
@@ -188,7 +182,7 @@ class ConceptForm extends React.Component {
     this.mergeConceptnames();
 
     const { conceptId, concept } = this.state;
-    console.log("concept - save", concept);
+    console.log('concept - save', concept);
 
     // if (conceptId === "add") {
     //   postConcept(concept)
@@ -210,7 +204,7 @@ class ConceptForm extends React.Component {
     this.mergeConceptnames();
 
     const { conceptId, concept } = this.state;
-    if (conceptId === "add") {
+    if (conceptId === 'add') {
       postConcept(concept)
         .then((response) => {
           this.setState({ conceptId: response.data.name });
@@ -225,7 +219,7 @@ class ConceptForm extends React.Component {
 
   cancelConcept(event) {
     event.preventDefault();
-    this.setState({ redirect: "/concept/all" });
+    this.setState({ redirect: '/concept/all' });
   }
 
   deleteConcept(event) {
@@ -233,7 +227,7 @@ class ConceptForm extends React.Component {
     const { conceptId } = this.state;
     deleteConceptById(conceptId)
       .then(() => {
-        this.setState({ redirect: "/concept/all" });
+        this.setState({ redirect: '/concept/all' });
       })
       .catch((error) => console.log(error));
   }
@@ -275,7 +269,7 @@ class ConceptForm extends React.Component {
         lowNormal: null,
         units: null,
         precise: false,
-        displayPrecision: null
+        displayPrecision: null,
       };
     } else if (selectedOption.value === 13) {
       concept.conceptComplex = null;
@@ -318,11 +312,11 @@ class ConceptForm extends React.Component {
           Object.keys(response.data).forEach((key) => {
             classOptions.push({
               label: response.data[key].name,
-              value: response.data[key].conceptClassId
+              value: response.data[key].conceptClassId,
             });
           });
           this.setState({ classOptions }, () => {
-            resolve("success");
+            resolve('success');
           });
         })
         .catch((e) => reject(e));
@@ -337,11 +331,11 @@ class ConceptForm extends React.Component {
           Object.keys(response.data).forEach((key) => {
             conceptOptions.push({
               label: response.data[key].name,
-              value: response.data[key].conceptId
+              value: response.data[key].conceptId,
             });
           });
           this.setState({ conceptOptions }, () => {
-            resolve("success");
+            resolve('success');
           });
         })
         .catch((e) => reject(e));
@@ -356,11 +350,11 @@ class ConceptForm extends React.Component {
           Object.keys(response.data).forEach((key) => {
             drugOptions.push({
               label: response.data[key].name,
-              value: response.data[key].drugId
+              value: response.data[key].drugId,
             });
           });
           this.setState({ drugOptions }, () => {
-            resolve("success");
+            resolve('success');
           });
         })
         .catch((e) => reject(e));
@@ -375,11 +369,11 @@ class ConceptForm extends React.Component {
           Object.keys(response.data).forEach((key) => {
             dataTypeOptions.push({
               label: response.data[key].name,
-              value: response.data[key].conceptDatatypeId
+              value: response.data[key].conceptDatatypeId,
             });
           });
           this.setState({ dataTypeOptions }, () => {
-            resolve("success");
+            resolve('success');
           });
         })
         .catch((e) => reject(e));
@@ -394,11 +388,11 @@ class ConceptForm extends React.Component {
           Object.keys(response.data).forEach((key) => {
             mapRelationshipOptions.push({
               label: response.data[key].name,
-              value: response.data[key].conceptMapTypeId
+              value: response.data[key].conceptMapTypeId,
             });
           });
           this.setState({ mapRelationshipOptions }, () => {
-            resolve("success");
+            resolve('success');
           });
         })
         .catch((e) => reject(e));
@@ -411,17 +405,17 @@ class ConceptForm extends React.Component {
         .then((response) => {
           const mapSourceOptions = [];
           mapSourceOptions.push({
-            label: "Search All Sources",
-            value: 0
+            label: 'Search All Sources',
+            value: 0,
           });
           Object.keys(response.data).forEach((key) => {
             mapSourceOptions.push({
               label: response.data[key].name,
-              value: response.data[key].conceptSourceId
+              value: response.data[key].conceptSourceId,
             });
           });
           this.setState({ mapSourceOptions }, () => {
-            resolve("success");
+            resolve('success');
           });
         })
         .catch((e) => reject(e));
@@ -433,7 +427,7 @@ class ConceptForm extends React.Component {
       getConceptReferenceTerms()
         .then((response) => {
           this.setState({ mapReferenceTermOptions: response.data }, () => {
-            resolve("success");
+            resolve('success');
           });
         })
         .catch((e) => reject(e));
@@ -447,7 +441,7 @@ class ConceptForm extends React.Component {
           this.setState(
             { filteredMapReferenceTermOptions: response.data },
             () => {
-              resolve("success");
+              resolve('success');
             }
           );
         })
@@ -462,13 +456,13 @@ class ConceptForm extends React.Component {
       const mapCodeOptions = [];
       filteredMapReferenceTermOptions.forEach((item) => {
         mapCodeOptions.push({
-          label: item.conceptSourceId + " " + item.code,
-          value: item.conceptReferenceTermId
+          label: item.conceptSourceId + ' ' + item.code,
+          value: item.conceptReferenceTermId,
         });
       });
 
       this.setState({ mapCodeOptions }, () => {
-        resolve("success");
+        resolve('success');
       });
     });
   }
@@ -478,7 +472,7 @@ class ConceptForm extends React.Component {
 
     return new Promise((resolve) => {
       this.setState({ dataType: concept.dataTypeId.conceptDataTypeId }, () =>
-        resolve("success")
+        resolve('success')
       );
     });
   }
@@ -486,15 +480,15 @@ class ConceptForm extends React.Component {
   setFetchedConcept() {
     const { conceptId } = this.state;
     return new Promise((resolve, reject) => {
-      if (conceptId !== "add") {
+      if (conceptId !== 'add') {
         getConceptById(conceptId)
           .then((response) => {
             console.log(response.data);
-            this.setState({ concept: response.data }, () => resolve("success"));
+            this.setState({ concept: response.data }, () => resolve('success'));
           })
           .catch((e) => reject(e));
       } else {
-        resolve("success");
+        resolve('success');
       }
     });
   }
@@ -503,15 +497,15 @@ class ConceptForm extends React.Component {
     const { conceptNames } = this.state.concept;
     return new Promise((resolve) => {
       const synonyms = conceptNames.filter(
-        (item) => item.conceptNameType !== ("FULLY_SPECIFIED" || "SHORT")
+        (item) => item.conceptNameType !== ('FULLY_SPECIFIED' || 'SHORT')
       );
       if (synonyms.length === 0) {
         synonyms.push({
-          name: "",
-          conceptNameType: "INDEX_TERM"
+          name: '',
+          conceptNameType: 'INDEX_TERM',
         });
       }
-      this.setState({ synonyms }, () => resolve("success"));
+      this.setState({ synonyms }, () => resolve('success'));
     });
   }
 
@@ -546,7 +540,7 @@ class ConceptForm extends React.Component {
     if (selectedOption.value === 0) {
       this.setState(
         {
-          filteredMapReferenceTermOptions: mapReferenceTermOptions
+          filteredMapReferenceTermOptions: mapReferenceTermOptions,
         },
         () => {
           this.setMapCodeOptions();
@@ -557,7 +551,7 @@ class ConceptForm extends React.Component {
         {
           filteredMapReferenceTermOptions: mapReferenceTermOptions.filter(
             (item) => item.conceptSourceId === selectedOption.value
-          )
+          ),
         },
         () => {
           this.setMapCodeOptions();
@@ -611,7 +605,7 @@ class ConceptForm extends React.Component {
         );
         defaultAnswerConceptValue = [
           ...defaultAnswerConceptValue,
-          ...eachValueOptions
+          ...eachValueOptions,
         ];
       }
     });
@@ -630,7 +624,7 @@ class ConceptForm extends React.Component {
         );
         defaultAnswerDrugValue = [
           ...defaultAnswerDrugValue,
-          ...eachValueOptions
+          ...eachValueOptions,
         ];
       }
     });
@@ -650,7 +644,7 @@ class ConceptForm extends React.Component {
     this.setState({ concept });
   }
 
-  numericChangeHandler = (event, name, type = "value") => {
+  numericChangeHandler = (event, name, type = 'value') => {
     const { concept } = this.state;
     concept.conceptNumeric[`${name}`] = event.target[`${type}`];
     this.setState({ concept });
@@ -668,7 +662,7 @@ class ConceptForm extends React.Component {
   fullySpecifiedNameChangeHandler(event) {
     const { concept } = this.state;
     const fullySpecifiedNameIndex = concept.conceptNames.findIndex(
-      (item) => item.conceptNameType === "FULLY_SPECIFIED"
+      (item) => item.conceptNameType === 'FULLY_SPECIFIED'
     );
     concept.conceptNames[fullySpecifiedNameIndex].name = event.target.value;
     this.setState({ concept });
@@ -693,9 +687,9 @@ class ConceptForm extends React.Component {
     const syns = [
       ...synonyms,
       {
-        name: "",
-        conceptNameType: "INDEX_TERM"
-      }
+        name: '',
+        conceptNameType: 'INDEX_TERM',
+      },
     ];
     this.setState({ synonyms: syns });
   }
@@ -705,7 +699,7 @@ class ConceptForm extends React.Component {
     const maps = [...concept.mappings];
     maps.push({
       conceptReferenceTermId: null,
-      conceptMapTypeId: null
+      conceptMapTypeId: null,
     });
     concept.mappings = maps;
     this.setState({ concept });
@@ -765,7 +759,7 @@ class ConceptForm extends React.Component {
       conceptMapTypeIdChangeHandler,
       getDefaultConceptMapTypeId,
       conceptSourceIdChangeHandler,
-      mapCodeChangeHandler
+      mapCodeChangeHandler,
     } = this;
 
     const {
@@ -781,14 +775,14 @@ class ConceptForm extends React.Component {
       synonyms,
       mapRelationshipOptions,
       dataType,
-      mapCodeOptions
+      mapCodeOptions,
     } = this.state;
 
     const { conceptNumeric, conceptNames, mappings } = concept;
 
     const getFullySpecifiedName = () => {
       const fullySpecifiedNameObject = conceptNames.find(
-        (item) => item.conceptNameType === "FULLY_SPECIFIED"
+        (item) => item.conceptNameType === 'FULLY_SPECIFIED'
       );
       return fullySpecifiedNameObject.name;
     };
@@ -818,7 +812,7 @@ class ConceptForm extends React.Component {
         );
         defaultConceptSetsValue = [
           ...defaultConceptSetsValue,
-          ...eachValueOptions
+          ...eachValueOptions,
         ];
       });
       return defaultConceptSetsValue;
@@ -830,10 +824,10 @@ class ConceptForm extends React.Component {
       return <Redirect to={redirect} />;
     }
 
-    if (!isLoading || conceptId === "add") {
+    if (!isLoading || conceptId === 'add') {
       return (
         <Fragment>
-          {conceptId !== "add" && concept.retired && (
+          {conceptId !== 'add' && concept.retired && (
             <div>
               <p>
                 This concept is retired by (user) (retiredDate) - Retired from
@@ -858,13 +852,13 @@ class ConceptForm extends React.Component {
             {mappings.map((item, index) => (
               <div key={index}>
                 <div>
-                  <div style={{ width: "300px", display: "inline-block" }}>
+                  <div style={{ width: '300px', display: 'inline-block' }}>
                     <Select
                       id="conceptMapTypeId"
                       name="conceptMapTypeId"
                       defaultValue={
                         item.conceptMapTypeId === 1
-                          ? { label: "SAME-AS", value: 1 }
+                          ? { label: 'SAME-AS', value: 1 }
                           : getDefaultConceptMapTypeId(index)
                       }
                       // defaultValue={() => getDefaultConceptMapTypeId(index)}
@@ -874,7 +868,7 @@ class ConceptForm extends React.Component {
                       options={mapRelationshipOptions}
                     />
                   </div>
-                  <div style={{ width: "300px", display: "inline-block" }}>
+                  <div style={{ width: '300px', display: 'inline-block' }}>
                     <Select
                       id="conceptSourceId"
                       name="conceptSourceId"
@@ -886,7 +880,7 @@ class ConceptForm extends React.Component {
                       options={mapSourceOptions}
                     />
                   </div>
-                  <div style={{ width: "300px", display: "inline-block" }}>
+                  <div style={{ width: '300px', display: 'inline-block' }}>
                     <Select
                       id="code"
                       name="code"
@@ -1017,13 +1011,13 @@ class ConceptForm extends React.Component {
 
             <label htmlFor="classId">
               Class:
-              <div style={{ width: "300px", display: "inline-block" }}>
+              <div style={{ width: '300px', display: 'inline-block' }}>
                 <Select
                   id="classId"
                   name="classId"
                   defaultValue={
                     concept.classId === 1
-                      ? { label: "Test", value: 1 }
+                      ? { label: 'Test', value: 1 }
                       : getDefaultClassIdValue
                   }
                   onChange={classIdChangeHandler.bind(this)}
@@ -1049,7 +1043,7 @@ class ConceptForm extends React.Component {
               <div>
                 <label htmlFor="conceptSets">
                   Set Members:
-                  <div style={{ width: "500px", display: "inline-block" }}>
+                  <div style={{ width: '500px', display: 'inline-block' }}>
                     <Select
                       isMulti
                       id="conceptSets"
@@ -1066,13 +1060,13 @@ class ConceptForm extends React.Component {
 
             <label htmlFor="dataType">
               Datatype:
-              <div style={{ width: "300px", display: "inline-block" }}>
+              <div style={{ width: '300px', display: 'inline-block' }}>
                 <Select
                   id="dataType"
                   name="dataType"
                   defaultValue={
                     dataType === 1
-                      ? { label: "Numeric", value: 1 }
+                      ? { label: 'Numeric', value: 1 }
                       : getDefaultDataTypeValue
                   }
                   onChange={dataTypeChangeHandler.bind(this)}
@@ -1092,9 +1086,9 @@ class ConceptForm extends React.Component {
                     id="hiAbsolute"
                     name="hiAbsolute"
                     value={getValueFor(
-                      conceptNumeric === null ? "" : conceptNumeric.hiAbsolute
+                      conceptNumeric === null ? '' : conceptNumeric.hiAbsolute
                     )}
-                    onChange={(e) => numericChangeHandler(e, "hiAbsolute")}
+                    onChange={(e) => numericChangeHandler(e, 'hiAbsolute')}
                   />
                 </label>
                 <br />
@@ -1106,9 +1100,9 @@ class ConceptForm extends React.Component {
                     id="hiCritical"
                     name="hiCritical"
                     value={getValueFor(
-                      conceptNumeric === null ? "" : conceptNumeric.hiCritical
+                      conceptNumeric === null ? '' : conceptNumeric.hiCritical
                     )}
-                    onChange={(e) => numericChangeHandler(e, "hiCritical")}
+                    onChange={(e) => numericChangeHandler(e, 'hiCritical')}
                   />
                 </label>
                 <br />
@@ -1120,9 +1114,9 @@ class ConceptForm extends React.Component {
                     id="hiNormal"
                     name="hiNormal"
                     value={getValueFor(
-                      conceptNumeric === null ? "" : conceptNumeric.hiNormal
+                      conceptNumeric === null ? '' : conceptNumeric.hiNormal
                     )}
-                    onChange={(e) => numericChangeHandler(e, "hiNormal")}
+                    onChange={(e) => numericChangeHandler(e, 'hiNormal')}
                   />
                 </label>
                 <br />
@@ -1134,9 +1128,9 @@ class ConceptForm extends React.Component {
                     id="lowAbsolute"
                     name="lowAbsolute"
                     value={getValueFor(
-                      conceptNumeric === null ? "" : conceptNumeric.lowAbsolute
+                      conceptNumeric === null ? '' : conceptNumeric.lowAbsolute
                     )}
-                    onChange={(e) => numericChangeHandler(e, "lowAbsolute")}
+                    onChange={(e) => numericChangeHandler(e, 'lowAbsolute')}
                   />
                 </label>
                 <br />
@@ -1148,9 +1142,9 @@ class ConceptForm extends React.Component {
                     id="lowCritical"
                     name="lowCritical"
                     value={getValueFor(
-                      conceptNumeric === null ? "" : conceptNumeric.lowCritical
+                      conceptNumeric === null ? '' : conceptNumeric.lowCritical
                     )}
-                    onChange={(e) => numericChangeHandler(e, "lowCritical")}
+                    onChange={(e) => numericChangeHandler(e, 'lowCritical')}
                   />
                 </label>
                 <br />
@@ -1162,9 +1156,9 @@ class ConceptForm extends React.Component {
                     id="lowNormal"
                     name="lowNormal"
                     value={getValueFor(
-                      conceptNumeric === null ? "" : conceptNumeric.lowNormal
+                      conceptNumeric === null ? '' : conceptNumeric.lowNormal
                     )}
-                    onChange={(e) => numericChangeHandler(e, "lowNormal")}
+                    onChange={(e) => numericChangeHandler(e, 'lowNormal')}
                   />
                 </label>
                 <br />
@@ -1176,9 +1170,9 @@ class ConceptForm extends React.Component {
                     id="units"
                     name="units"
                     value={getValueFor(
-                      conceptNumeric === null ? "" : conceptNumeric.units
+                      conceptNumeric === null ? '' : conceptNumeric.units
                     )}
-                    onChange={(e) => numericChangeHandler(e, "units")}
+                    onChange={(e) => numericChangeHandler(e, 'units')}
                   />
                 </label>
                 <br />
@@ -1190,10 +1184,10 @@ class ConceptForm extends React.Component {
                     id="precise"
                     name="precise"
                     checked={getValueFor(
-                      conceptNumeric === null ? "" : conceptNumeric.precise
+                      conceptNumeric === null ? '' : conceptNumeric.precise
                     )}
                     onChange={(e) =>
-                      numericChangeHandler(e, "precise", "checked")
+                      numericChangeHandler(e, 'precise', 'checked')
                     }
                   />
                 </label>
@@ -1207,7 +1201,7 @@ class ConceptForm extends React.Component {
                     name="displayPrecision"
                     value={getValueFor(
                       conceptNumeric === null
-                        ? ""
+                        ? ''
                         : conceptNumeric.displayPrecision
                     )}
                     readOnly="true"
@@ -1223,7 +1217,7 @@ class ConceptForm extends React.Component {
                 <p>Answers</p>
 
                 <label htmlFor="answerConcept">Select Concepts: </label>
-                <div style={{ width: "80%", display: "inline-block" }}>
+                <div style={{ width: '80%', display: 'inline-block' }}>
                   <Select
                     isMulti
                     id="answerConcept"
@@ -1238,7 +1232,7 @@ class ConceptForm extends React.Component {
                 <br />
 
                 <label htmlFor="answerDrug">Select Concept Drugs: </label>
-                <div style={{ width: "80%", display: "inline-block" }}>
+                <div style={{ width: '80%', display: 'inline-block' }}>
                   <Select
                     isMulti
                     id="answerDrug"
@@ -1258,7 +1252,7 @@ class ConceptForm extends React.Component {
               <div>
                 <label htmlFor="conceptComplexHandler">
                   Handler:
-                  <div style={{ width: "300px", display: "inline-block" }}>
+                  <div style={{ width: '300px', display: 'inline-block' }}>
                     <Select
                       id="conceptComplex"
                       name="conceptComplex"
@@ -1292,14 +1286,14 @@ class ConceptForm extends React.Component {
             <button type="button" onClick={cancelConcept.bind(this)}>
               Cancel
             </button>
-            {conceptId !== "add" && (
+            {conceptId !== 'add' && (
               <button type="button" onClick={deleteConcept.bind(this)}>
                 Delete
               </button>
             )}
           </form>
 
-          {conceptId !== "add" && !concept.retired && (
+          {conceptId !== 'add' && !concept.retired && (
             <div>
               <hr />
               <p>Retire Concept</p>

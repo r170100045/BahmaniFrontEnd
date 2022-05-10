@@ -1,7 +1,7 @@
-import { useParams } from "react-router-dom";
-import CommonPage from "../../components/CommonPage";
-import VisitTypeForm from "./VisitTypeForm";
-import VisitTypes from "./VisitTypes";
+import CommonPage from '../../components/CommonPage';
+import VisitTypeForm from './VisitTypeForm';
+import VisitTypes from './VisitTypes';
+import { useParams } from 'react-router-dom';
 
 export default function VisitTypePage() {
   const { id, action } = useParams();

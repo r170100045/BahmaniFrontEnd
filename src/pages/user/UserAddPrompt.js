@@ -1,4 +1,9 @@
-import { Redirect, withRouter } from "react-router-dom";
+import { Redirect, withRouter } from 'react-router-dom';
+
+import React from 'react';
+import Select from 'react-select';
+import { getPersons } from '../../api/services';
+
 // import {
 //   deleteDrugById,
 //   getConceptNames,
@@ -6,10 +11,6 @@ import { Redirect, withRouter } from "react-router-dom";
 //   postDrug,
 //   putDrugById
 // } from "../../api/services";
-
-import React from "react";
-import Select from "react-select";
-import { getPersons } from "../../api/services";
 
 class UserAddPrompt extends React.Component {
   constructor(props) {
@@ -20,7 +21,7 @@ class UserAddPrompt extends React.Component {
       personOptions: [],
       isLoading: true,
       personUUID: null,
-      personNotSelected: true
+      personNotSelected: true,
     };
   }
 
@@ -31,7 +32,7 @@ class UserAddPrompt extends React.Component {
         Object.keys(response.data).forEach((key) => {
           personOptions.push({
             value: response.data[key].uuid,
-            label: response.data[key].concatenatedName
+            label: response.data[key].concatenatedName,
           });
         });
 
@@ -64,18 +65,14 @@ class UserAddPrompt extends React.Component {
   createNewUser() {}
 
   cancelButtonHandler() {
-    this.setState({ redirect: "/user/all" });
+    this.setState({ redirect: '/user/all' });
   }
 
   render() {
     const { filterOptions, personChangeHandler, createNewPerson } = this;
 
-    const {
-      redirect,
-      personOptions,
-      isLoading,
-      personNotSelected
-    } = this.state;
+    const { redirect, personOptions, isLoading, personNotSelected } =
+      this.state;
 
     if (redirect) {
       return <Redirect to={redirect} />;
@@ -101,7 +98,7 @@ class UserAddPrompt extends React.Component {
                 <p>Use a person who already exists</p>
                 <div>
                   <label htmlFor="conceptId">Which Person?: </label>
-                  <div style={{ width: "300px", display: "inline-block" }}>
+                  <div style={{ width: '300px', display: 'inline-block' }}>
                     <Select
                       id="personUUID"
                       name="personUUID"
@@ -117,7 +114,7 @@ class UserAddPrompt extends React.Component {
                   <button
                     type="button"
                     disabled={personNotSelected}
-                    onClick={createNewUser.bind(this)}
+                    // onClick={createNewUser.bind(this)}
                   >
                     Next
                   </button>

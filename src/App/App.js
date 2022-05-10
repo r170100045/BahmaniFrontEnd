@@ -1,26 +1,27 @@
-import { CssBaseline, makeStyles } from "@material-ui/core";
-import { Route, Switch } from "react-router-dom";
-import Header from "../components/Header";
-import SideMenu from "../components/SideMenu";
-import AddressHierarchyLevelPage from "../pages/addressHierarchyLevel/AddressHierarchyLevelPage";
-import PatientRelationshipTypePage from "../pages/patientRelationshipType/PatientRelationshipTypePage";
-import PersonAttributeTypePage from "../pages/personAttributeType/PersonAttributeTypePage";
-import VisitTypePage from "../pages/visitType/VisitTypePage";
-import DrugPage from "../pages/drug/DrugPage";
-import PrivilegePage from "../pages/privilege/PrivilegePage";
-import UserPage from "../pages/user/UserPage";
-import UserForm from "../pages/user/UserForm";
+import './App.css';
 
-import "./App.css";
-import ConceptPage from "../pages/concept/ConceptPage";
-import RolePage from "../pages/role/RolePage";
+import { CssBaseline, makeStyles } from '@material-ui/core';
+import { Route, Switch } from 'react-router-dom';
+
+import AddressHierarchyLevelPage from '../pages/addressHierarchyLevel/AddressHierarchyLevelPage';
+import ConceptPage from '../pages/concept/ConceptPage';
+import DrugPage from '../pages/drug/DrugPage';
+import Header from '../components/Header';
+import PatientRelationshipTypePage from '../pages/patientRelationshipType/PatientRelationshipTypePage';
+import PersonAttributeTypePage from '../pages/personAttributeType/PersonAttributeTypePage';
+import PrivilegePage from '../pages/privilege/PrivilegePage';
+import RolePage from '../pages/role/RolePage';
+import SideMenu from '../components/SideMenu';
+import UserForm from '../pages/user/UserForm';
+import UserPage from '../pages/user/UserPage';
+import VisitTypePage from '../pages/visitType/VisitTypePage';
 
 const useStyles = makeStyles({
   appMain: {
-    paddingLeft: "20%",
-    width: "100%",
-    backgroundColor: "#B7CADB"
-  }
+    paddingLeft: '20%',
+    width: '100%',
+    backgroundColor: '#B7CADB',
+  },
 });
 
 export default function App() {

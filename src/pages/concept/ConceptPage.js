@@ -1,8 +1,8 @@
-import { useParams } from "react-router-dom";
-import CommonPage from "../../components/CommonPage";
-import Concepts from "./Concepts";
-import ConceptForm from "./ConceptForm";
-import ConceptView from "./ConceptView";
+import CommonPage from '../../components/CommonPage';
+import ConceptForm from './ConceptForm';
+import ConceptView from './ConceptView';
+import Concepts from './Concepts';
+import { useParams } from 'react-router-dom';
 
 export default function ConceptPage() {
   const { id, action } = useParams();

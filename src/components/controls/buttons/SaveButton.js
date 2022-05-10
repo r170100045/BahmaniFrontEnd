@@ -1,21 +1,22 @@
-import SaveIcon from "@material-ui/icons/Save";
-import { Button, makeStyles, withStyles } from "@material-ui/core";
-import { green } from "@material-ui/core/colors";
+import { Button, makeStyles, withStyles } from '@material-ui/core';
+
+import SaveIcon from '@material-ui/icons/Save';
+import { green } from '@material-ui/core/colors';
 
 const ColorButton = withStyles((theme) => ({
   root: {
-    color: theme.palette.getContrastText(green["A700"]),
-    backgroundColor: green["A700"],
-    "&:hover": {
-      backgroundColor: green[300]
-    }
-  }
+    color: theme.palette.getContrastText(green['A700']),
+    backgroundColor: green['A700'],
+    '&:hover': {
+      backgroundColor: green[300],
+    },
+  },
 }))(Button);
 
 const useStyles = makeStyles((theme) => ({
   margin: {
-    margin: theme.spacing(1)
-  }
+    margin: theme.spacing(1),
+  },
 }));
 
 export default function DeleteButton(props) {

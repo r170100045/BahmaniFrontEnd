@@ -1,5 +1,5 @@
-import axios from "axios";
-import { PATIENT_RELATIONSHIP_TYPE } from "../constants/serviceConstants";
+import { PATIENT_RELATIONSHIP_TYPE } from '../constants/serviceConstants';
+import axios from 'axios';
 
 export const insertPatientRelationshipType = (data) =>
   axios.post(`${PATIENT_RELATIONSHIP_TYPE}`, data).then((res) => res);

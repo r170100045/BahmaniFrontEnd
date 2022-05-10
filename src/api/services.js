@@ -1,5 +1,5 @@
 import {
-  ADDRESS_HIERARCHY,
+  ADDRESS_HIERARCHY_LEVEL,
   CONCEPT,
   CONCEPT_CLASS,
   CONCEPT_DATA_TYPE,
@@ -8,23 +8,22 @@ import {
   CONCEPT_REFERENCE_SOURCE,
   CONCEPT_REFERENCE_TERM,
   DRUG,
+  PATIENT_RELATIONSHIP_TYPE,
   PERSON_ATTRIBUTE_TYPE,
   PERSON_NAME,
   PRIVILEGE,
-  RELATIONSHIP,
   ROLE,
   USER,
   VISIT_TYPE,
-} from "../constants/serviceConstants";
+} from '../constants/serviceConstants';
 
-import axios from "axios";
+import axios from 'axios';
 
-//changed
-// address hierarchy enhanced
+// address hierarchy
 export const getAddressHierarchies = () =>
-  axios.get(`${ADDRESS_HIERARCHY}`).then((res) => res);
+  axios.get(`${ADDRESS_HIERARCHY_LEVEL}`).then((res) => res);
 
-// concept map types greater
+// concept map types
 export const getConceptMapTypes = () =>
   axios
     .get(`${CONCEPT_MAP_TYPE}`, { params: { hidden: false } })
@@ -108,15 +107,15 @@ export const deletePersonAttributeTypeById = (id) =>
 
 // relationshipType apis
 export const getRelationshipTypes = () =>
-  axios.get(`${RELATIONSHIP}`).then((res) => res);
+  axios.get(`${PATIENT_RELATIONSHIP_TYPE}`).then((res) => res);
 export const getRelationshipTypeById = (id) =>
-  axios.get(`${RELATIONSHIP}/${id}`).then((res) => res);
+  axios.get(`${PATIENT_RELATIONSHIP_TYPE}/${id}`).then((res) => res);
 export const createRelationshipType = (body) =>
-  axios.post(`${RELATIONSHIP}`, body).then((res) => res);
+  axios.post(`${PATIENT_RELATIONSHIP_TYPE}`, body).then((res) => res);
 export const updateRelationshipTypeById = (id, body) =>
-  axios.put(`${RELATIONSHIP}/${id}`, body).then((res) => res);
+  axios.put(`${PATIENT_RELATIONSHIP_TYPE}/${id}`, body).then((res) => res);
 export const deleteRelationshipTypeById = (id) =>
-  axios.delete(`${RELATIONSHIP}/${id}`).then((res) => res);
+  axios.delete(`${PATIENT_RELATIONSHIP_TYPE}/${id}`).then((res) => res);
 
 // visitType apis
 export const getVisitTypes = () =>

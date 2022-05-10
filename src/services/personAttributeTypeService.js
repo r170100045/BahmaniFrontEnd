@@ -1,5 +1,5 @@
-import axios from "axios";
-import { PERSON_ATTRIBUTE_TYPE } from "../constants/serviceConstants";
+import { PERSON_ATTRIBUTE_TYPE } from '../constants/serviceConstants';
+import axios from 'axios';
 
 export const insertPersonAttributeType = (data) =>
   axios.post(`${PERSON_ATTRIBUTE_TYPE}`, data).then((res) => res);

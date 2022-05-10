@@ -1,9 +1,10 @@
-import MaterialTable, { MTableToolbar } from "material-table";
-import { useEffect, useState } from "react";
-import { Link, Redirect } from "react-router-dom";
-import EditIcon from "@material-ui/icons/Edit";
-import Controls from "../../components/controls/Controls";
-import { getAllVisitTypes } from "../../services/visitTypeService";
+import { Link, Redirect } from 'react-router-dom';
+import MaterialTable, { MTableToolbar } from 'material-table';
+import { useEffect, useState } from 'react';
+
+import Controls from '../../components/controls/Controls';
+import EditIcon from '@material-ui/icons/Edit';
+import { getAllVisitTypes } from '../../services/visitTypeService';
 
 const VisitTypes = () => {
   const [visitTypes, setVisitTypes] = useState([]);
@@ -11,20 +12,20 @@ const VisitTypes = () => {
 
   const columns = [
     {
-      title: "Name",
-      field: "name"
+      title: 'Name',
+      field: 'name',
     },
     {
-      title: "Description",
-      field: "description"
-    }
+      title: 'Description',
+      field: 'description',
+    },
   ];
 
   const options = {
     pageSize: 3,
     pageSizeOptions: [3, 5, 10, 20],
     emptyRowsWhenPaging: false,
-    actionsColumnIndex: -1
+    actionsColumnIndex: -1,
   };
 
   useEffect(() => {
@@ -44,29 +45,29 @@ const VisitTypes = () => {
     Toolbar: (props) => (
       <div>
         <MTableToolbar {...props} />
-        <div className="text-end" style={{ padding: "0px 10px" }}>
+        <div className="text-end" style={{ padding: '0px 10px' }}>
           <Link to="/visitType/edit/add">
             <Controls.AddButton />
           </Link>
         </div>
       </div>
-    )
+    ),
   };
 
   const actions = [
     {
       icon: () => <EditIcon color="primary" />,
-      tooltip: "Edit",
+      tooltip: 'Edit',
       onClick: (event, rowData) =>
-        setRedirect(`/visitType/edit/${rowData.uuid}`)
-    }
+        setRedirect(`/visitType/edit/${rowData.uuid}`),
+    },
   ];
 
   if (redirect) return <Redirect to={redirect} />;
 
   return (
     <>
-      <div style={{ maxWidth: "90%", margin: "auto" }}>
+      <div style={{ maxWidth: '90%', margin: 'auto' }}>
         <MaterialTable
           title="Visit Types"
           data={visitTypes}

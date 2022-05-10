@@ -1,15 +1,15 @@
-import Input from "./Input";
-import RadioGroup from "./RadioGroup";
-import Select from "./Select";
-import Checkbox from "./Checkbox";
-import DatePicker from "./DatePicker";
-import Button from "./buttons/Button";
-import SaveButton from "./buttons/SaveButton";
-import AddButton from "./buttons/AddButton";
-import ResetButton from "./buttons/ResetButton";
-import CancelButton from "./buttons/CancelButton";
-import DeleteButton from "./buttons/DeleteButton";
-import RetireButton from "./buttons/RetireButton";
+import AddButton from './buttons/AddButton';
+import Button from './buttons/Button';
+import CancelButton from './buttons/CancelButton';
+import Checkbox from './Checkbox';
+import DatePicker from './DatePicker';
+import DeleteButton from './buttons/DeleteButton';
+import Input from './Input';
+import RadioGroup from './RadioGroup';
+import ResetButton from './buttons/ResetButton';
+import RetireButton from './buttons/RetireButton';
+import SaveButton from './buttons/SaveButton';
+import Select from './Select';
 
 const Controls = {
   Input,
@@ -23,7 +23,7 @@ const Controls = {
   CancelButton,
   DeleteButton,
   RetireButton,
-  AddButton
+  AddButton,
 };
 
 export default Controls;

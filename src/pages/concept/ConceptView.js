@@ -1,5 +1,5 @@
-import React, { Fragment } from "react";
-import { Redirect, withRouter } from "react-router-dom";
+import React, { Fragment } from 'react';
+import { Redirect, withRouter } from 'react-router-dom';
 
 class ConceptView extends React.Component {
   constructor(props) {

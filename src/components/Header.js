@@ -1,9 +1,9 @@
-import { AppBar, Grid, Toolbar, makeStyles } from "@material-ui/core";
+import { AppBar, Grid, Toolbar, makeStyles } from '@material-ui/core';
 
 const useStyles = makeStyles({
   root: {
-    backgroundColor: "#fff"
-  }
+    backgroundColor: '#fff',
+  },
 });
 
 export default function Header() {
@@ -12,7 +12,7 @@ export default function Header() {
     <AppBar
       position="static"
       className={classes.root}
-      style={{ height: "10vh" }}
+      style={{ height: '10vh' }}
     >
       <Toolbar>
         <Grid container>

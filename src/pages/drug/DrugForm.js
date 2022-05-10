@@ -1,14 +1,14 @@
-import { Redirect, withRouter } from "react-router-dom";
+import { Redirect, withRouter } from 'react-router-dom';
 import {
   deleteDrugById,
   getConceptNames,
   getDrugById,
   postDrug,
-  putDrugById
-} from "../../api/services";
+  putDrugById,
+} from '../../api/services';
 
-import React from "react";
-import Select from "react-select";
+import React from 'react';
+import Select from 'react-select';
 
 class DrugForm extends React.Component {
   constructor(props) {
@@ -16,14 +16,14 @@ class DrugForm extends React.Component {
 
     const initialDrugState = {
       combination: false,
-      conceptId: "",
-      dosageForm: "",
-      maximumDailyDose: "",
-      minimumDailyDose: "",
-      name: "",
+      conceptId: '',
+      dosageForm: '',
+      maximumDailyDose: '',
+      minimumDailyDose: '',
+      name: '',
       retired: false,
-      strength: "",
-      retireReason: ""
+      strength: '',
+      retireReason: '',
     };
 
     this.state = {
@@ -32,7 +32,7 @@ class DrugForm extends React.Component {
       drugId: this.props.match.params.id,
       options: [],
       isLoading: true,
-      error: false
+      error: false,
     };
   }
 
@@ -45,12 +45,12 @@ class DrugForm extends React.Component {
         Object.keys(response.data).forEach((key) => {
           options.push({
             value: response.data[key].conceptId,
-            label: response.data[key].name
+            label: response.data[key].name,
           });
         });
 
         this.setState({ options }, () => {
-          if (drugId !== "add") {
+          if (drugId !== 'add') {
             getDrugById(drugId)
               .then((response) => {
                 this.setState({ drug: response.data, isLoading: false });
@@ -69,7 +69,7 @@ class DrugForm extends React.Component {
   }
 
   getValueFor(field) {
-    return field === null ? "" : field;
+    return field === null ? '' : field;
   }
 
   unretireDrug() {
@@ -78,7 +78,7 @@ class DrugForm extends React.Component {
     this.setState({ drug }, () => {
       putDrugById(drugId, drug)
         .then(() => {
-          this.setState({ redirect: "/drug/view/all" });
+          this.setState({ redirect: '/drug/view/all' });
         })
         .catch((error) => {
           console.log(error);
@@ -145,13 +145,13 @@ class DrugForm extends React.Component {
 
   submitDrugFormHandler() {
     const { drug, drugId } = this.state;
-    if (drug.name === "" || drug.conceptId === "")
+    if (drug.name === '' || drug.conceptId === '')
       this.setState({ error: true });
     else {
-      if (drugId === "add") {
+      if (drugId === 'add') {
         postDrug(drug)
           .then(() => {
-            this.setState({ redirect: "/drug/view/all" });
+            this.setState({ redirect: '/drug/view/all' });
           })
           .catch((error) => {
             console.log(error);
@@ -159,7 +159,7 @@ class DrugForm extends React.Component {
       } else {
         putDrugById(drugId, drug)
           .then(() => {
-            this.setState({ redirect: "/drug/view/all" });
+            this.setState({ redirect: '/drug/view/all' });
           })
           .catch((error) => {
             console.log(error);
@@ -169,7 +169,7 @@ class DrugForm extends React.Component {
   }
 
   cancelButtonHandler() {
-    this.setState({ redirect: "/drug/view/all" });
+    this.setState({ redirect: '/drug/view/all' });
   }
 
   retireDrug() {
@@ -182,7 +182,7 @@ class DrugForm extends React.Component {
           console.log(error);
         });
 
-      this.setState({ redirect: "/drug/view/all" });
+      this.setState({ redirect: '/drug/view/all' });
     });
   }
 
@@ -190,7 +190,7 @@ class DrugForm extends React.Component {
     let { drugId } = this.state;
     deleteDrugById(drugId)
       .then(() => {
-        this.setState({ redirect: "/drug/view/all" });
+        this.setState({ redirect: '/drug/view/all' });
       })
       .catch((error) => {
         console.log(error);
@@ -213,7 +213,7 @@ class DrugForm extends React.Component {
       cancelButtonHandler,
       retireDrug,
       deleteDrug,
-      getValueFor
+      getValueFor,
     } = this;
 
     const { drug, redirect, drugId, options, isLoading, error } = this.state;
@@ -230,14 +230,14 @@ class DrugForm extends React.Component {
       return <Redirect to={redirect} />;
     }
 
-    if (!isLoading || drugId === "add") {
+    if (!isLoading || drugId === 'add') {
       return (
         <React.Fragment>
           {error && <p>Fill the required fields</p>}
           <p>Concept Drug Management</p>
           {drug.retired && (
             <p>
-              This drug is retired by ... ... - {drug.retireReason}{" "}
+              This drug is retired by ... ... - {drug.retireReason}{' '}
               <button type="button" onClick={unretireDrug.bind(this)}>
                 Unretire this drug
               </button>
@@ -257,7 +257,7 @@ class DrugForm extends React.Component {
             <br />
 
             <label htmlFor="conceptId">Concept*: </label>
-            <div style={{ width: "300px", display: "inline-block" }}>
+            <div style={{ width: '300px', display: 'inline-block' }}>
               <Select
                 id="conceptId"
                 name="conceptId"
@@ -281,7 +281,7 @@ class DrugForm extends React.Component {
             <br />
 
             <label htmlFor="dosageForm">Dosage Form: </label>
-            <div style={{ width: "300px", display: "inline-block" }}>
+            <div style={{ width: '300px', display: 'inline-block' }}>
               <Select
                 id="dosageForm"
                 name="dosageForm"
@@ -335,7 +335,7 @@ class DrugForm extends React.Component {
           </form>
           <hr />
 
-          {drugId !== "add" && (
+          {drugId !== 'add' && (
             <div>
               <p>Retire this Drug</p>
               <label htmlFor="retireReason">Reason: </label>

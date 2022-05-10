@@ -1,5 +1,5 @@
-import axios from "axios";
-import { PRIVILEGE } from "../constants/serviceConstants";
+import { PRIVILEGE } from '../constants/serviceConstants';
+import axios from 'axios';
 
 export const insertPrivilege = (data) =>
   axios.post(`${PRIVILEGE}`, data).then((res) => res);

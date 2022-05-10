@@ -1,25 +1,25 @@
-import React from "react";
-import { makeStyles } from "@material-ui/core";
-import { blue } from "@material-ui/core/colors";
+import React from 'react';
+import { blue } from '@material-ui/core/colors';
+import { makeStyles } from '@material-ui/core';
 
 const useStyles = makeStyles((theme) => ({
   pageHeight: {
-    overflow: "auto",
-    height: "90vh"
+    overflow: 'auto',
+    height: '90vh',
   },
   pageTitle: {
-    textAlign: "center",
-    fontSize: "20px",
-    margin: "2vh",
-    padding: "10px",
-    textTransform: "capitalize",
-    fontWeight: "bolder",
-    color: "white",
-    backgroundColor: blue["A700"],
-    "&:hover": {
-      backgroundColor: blue[900]
-    }
-  }
+    textAlign: 'center',
+    fontSize: '20px',
+    margin: '2vh',
+    padding: '10px',
+    textTransform: 'capitalize',
+    fontWeight: 'bolder',
+    color: 'white',
+    backgroundColor: blue['A700'],
+    '&:hover': {
+      backgroundColor: blue[900],
+    },
+  },
 }));
 
 function CommonPage(props) {
@@ -30,9 +30,9 @@ function CommonPage(props) {
     <>
       <div className={classes.pageHeight}>
         <p className={classes.pageTitle}>{title}</p>
-        {action === "view" && id === "all" && viewAll}
-        {action === "view" && id !== "all" && viewEach}
-        {action === "edit" && addOrEdit}
+        {action === 'view' && id === 'all' && viewAll}
+        {action === 'view' && id !== 'all' && viewEach}
+        {action === 'edit' && addOrEdit}
       </div>
     </>
   );

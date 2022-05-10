@@ -1,31 +1,32 @@
-import { Redirect, withRouter } from "react-router-dom";
-import React from "react";
+import { Redirect, withRouter } from 'react-router-dom';
 import {
-  insertPrivilege,
+  deletePrivilegeById,
   getPrivilegeById,
+  insertPrivilege,
   updatePrivilegeById,
-  deletePrivilegeById
-} from "../../services/privilegeService";
+} from '../../services/privilegeService';
+
+import React from 'react';
 
 class PrivilegeForm extends React.Component {
   constructor(props) {
     super(props);
     const initialPrivilegeState = {
-      privilege: "",
-      description: "",
-      uuid: ""
+      privilege: '',
+      description: '',
+      uuid: '',
     };
 
     this.state = {
       privilege: initialPrivilegeState,
       privilegeId: this.props.match.params.id,
-      redirect: null
+      redirect: null,
     };
   }
 
   componentDidMount() {
     const { privilegeId } = this.state;
-    if (privilegeId !== "add") {
+    if (privilegeId !== 'add') {
       getPrivilegeById(privilegeId)
         .then((response) => {
           this.setState({ privilege: response.data });
@@ -50,10 +51,10 @@ class PrivilegeForm extends React.Component {
 
   savePrivilege() {
     const { privilegeId, privilege } = this.state;
-    if (privilegeId === "add") {
+    if (privilegeId === 'add') {
       insertPrivilege(privilege)
         .then(() => {
-          this.setState({ redirect: "/privilege/view/all" });
+          this.setState({ redirect: '/privilege/view/all' });
         })
         .catch((error) => {
           console.log(error);
@@ -61,7 +62,7 @@ class PrivilegeForm extends React.Component {
     } else {
       updatePrivilegeById(privilegeId, privilege)
         .then(() => {
-          this.setState({ redirect: "/privilege/view/all" });
+          this.setState({ redirect: '/privilege/view/all' });
         })
         .catch((error) => {
           console.log(error);
@@ -70,14 +71,14 @@ class PrivilegeForm extends React.Component {
   }
 
   cancelButtonHandler() {
-    this.setState({ redirect: "/privilege/view/all" });
+    this.setState({ redirect: '/privilege/view/all' });
   }
 
   deletePrivilege() {
     let { privilegeId } = this.state;
     deletePrivilegeById(privilegeId)
       .then(() => {
-        this.setState({ redirect: "/privilege/view/all" });
+        this.setState({ redirect: '/privilege/view/all' });
       })
       .catch((error) => {
         console.log(error);
@@ -85,7 +86,7 @@ class PrivilegeForm extends React.Component {
   }
 
   getValueFor(field) {
-    return field === null ? "" : field;
+    return field === null ? '' : field;
   }
 
   render() {
@@ -96,7 +97,7 @@ class PrivilegeForm extends React.Component {
       savePrivilege,
       getValueFor,
       cancelButtonHandler,
-      deletePrivilege
+      deletePrivilege,
     } = this;
 
     if (redirect) return <Redirect to={redirect} />;
@@ -110,7 +111,7 @@ class PrivilegeForm extends React.Component {
               type="text"
               id="privilege"
               name="privilege"
-              disabled={privilegeId === "add" ? false : true}
+              disabled={privilegeId === 'add' ? false : true}
               value={getValueFor(privilege.privilege)}
               onChange={privilegeChangeHandler.bind(this)}
             />

@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Paper, makeStyles } from "@material-ui/core";
+import { Paper, makeStyles } from '@material-ui/core';
+import React, { useState } from 'react';
 
 export function useForm(initialFValues, validateOnChange = false, validate) {
   const [values, setValues] = useState(initialFValues);
@@ -9,7 +9,7 @@ export function useForm(initialFValues, validateOnChange = false, validate) {
     const { name, value } = e.target;
     setValues({
       ...values,
-      [name]: value
+      [name]: value,
     });
     // if (validateOnChange) validate({ [name]: value });
   };
@@ -25,21 +25,21 @@ export function useForm(initialFValues, validateOnChange = false, validate) {
     errors,
     setErrors,
     handleInputChange,
-    resetForm
+    resetForm,
   };
 }
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    "& .MuiFormControl-root": {
-      width: "80%",
-      margin: theme.spacing(1)
-    }
+    '& .MuiFormControl-root': {
+      width: '80%',
+      margin: theme.spacing(1),
+    },
   },
   pageContent: {
     margin: theme.spacing(5),
-    padding: theme.spacing(3)
-  }
+    padding: theme.spacing(3),
+  },
 }));
 
 export function Form(props) {
