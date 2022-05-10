@@ -1,29 +1,30 @@
 import {
+  ADDRESS_HIERARCHY,
   CONCEPT,
   CONCEPT_CLASS,
   CONCEPT_DATA_TYPE,
-  CONCEPT_NAME,
-  DRUG,
-  PERSON_NAME,
-  PERSON_ATTRIBUTE_TYPE,
-  PRIVILEGE,
-  RELATIONSHIP,
-  VISIT_TYPE,
-  USER,
-  ROLE,
   CONCEPT_MAP_TYPE,
+  CONCEPT_NAME,
   CONCEPT_REFERENCE_SOURCE,
   CONCEPT_REFERENCE_TERM,
-  ADDRESS_HIERARCHY
+  DRUG,
+  PERSON_ATTRIBUTE_TYPE,
+  PERSON_NAME,
+  PRIVILEGE,
+  RELATIONSHIP,
+  ROLE,
+  USER,
+  VISIT_TYPE,
 } from "../constants/serviceConstants";
 
 import axios from "axios";
 
+//changed
 // address hierarchy enhanced
 export const getAddressHierarchies = () =>
   axios.get(`${ADDRESS_HIERARCHY}`).then((res) => res);
 
-// concept map types greater 
+// concept map types greater
 export const getConceptMapTypes = () =>
   axios
     .get(`${CONCEPT_MAP_TYPE}`, { params: { hidden: false } })
