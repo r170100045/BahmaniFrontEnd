@@ -23,7 +23,7 @@ import axios from "axios";
 export const getAddressHierarchies = () =>
   axios.get(`${ADDRESS_HIERARCHY}`).then((res) => res);
 
-// concept map types
+// concept map types greater 
 export const getConceptMapTypes = () =>
   axios
     .get(`${CONCEPT_MAP_TYPE}`, { params: { hidden: false } })
