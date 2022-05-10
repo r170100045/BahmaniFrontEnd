@@ -19,7 +19,7 @@ import {
 
 import axios from "axios";
 
-// address hierarchy
+// address hierarchy enhanced
 export const getAddressHierarchies = () =>
   axios.get(`${ADDRESS_HIERARCHY}`).then((res) => res);
 
