@@ -8,17 +8,13 @@ const useStyles = makeStyles((theme) => ({
     height: '90vh',
   },
   pageTitle: {
-    textAlign: 'center',
+    textAlign:'left',
     fontSize: '20px',
-    margin: '2vh',
+    marginTop: '10vh',
     padding: '10px',
     textTransform: 'capitalize',
     fontWeight: 'bolder',
-    color: 'white',
-    backgroundColor: blue['A700'],
-    '&:hover': {
-      backgroundColor: blue[900],
-    },
+    color: '#0c0b0b',
   },
 }));
 

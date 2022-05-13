@@ -1,7 +1,7 @@
 import { MenuItem, MenuList, Paper, makeStyles } from '@material-ui/core';
 
 import { Link } from 'react-router-dom';
-import React from 'react';
+import React, { useState } from 'react';
 import { blue } from '@material-ui/core/colors';
 
 const useStyles = makeStyles((theme) => ({
@@ -10,20 +10,30 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: 'column',
     position: 'absolute',
     left: '0px',
-    width: '20%',
     height: '100%',
-    backgroundColor: '#B7CADB',
     color: 'white',
   },
   paper: {
     margin: '2vh',
     marginTop: '12vh',
-    height: '100vh',
+
   },
+  link: {
+    textDecoration: 'none', 
+    'color': '#5f6163',
+    'fontSize': 16
+  },
+  activeLink: {
+    textDecoration: 'none', 
+    'color': '#5f6163',
+    'fontSize': 16
+  }
 }));
 
 export default function SideMenu() {
   const classes = useStyles();
+  const[linkClass, setLinkClass] = useState('link');
+  //window.location.pathname && and change the class of that link classes.active 
   return (
     <div className={classes.sideMenu}>
       <Paper className={classes.paper}>
@@ -31,25 +41,25 @@ export default function SideMenu() {
           <MenuItem>
             <Link
               to="/addressHierarchyLevel/view/all"
-              style={{ textDecoration: 'none' }}
+              className={classes.link}
             >
               Address Hierarchy
             </Link>
           </MenuItem>
           <MenuItem>
-            <Link to="/concept/view/all" style={{ textDecoration: 'none' }}>
+            <Link className={classes.link} to="/concept/view/all">
               Concepts
             </Link>
           </MenuItem>
           <MenuItem>
-            <Link to="/drug/view/all" style={{ textDecoration: 'none' }}>
+            <Link className={classes.link} to="/drug/view/all" >
               Medication Data
             </Link>
           </MenuItem>
           <MenuItem>
             <Link
+            className={classes.link}
               to="/patientRelationshipType/view/all"
-              style={{ textDecoration: 'none' }}
             >
               Patient Relationships
             </Link>
@@ -57,29 +67,29 @@ export default function SideMenu() {
 
           <MenuItem>
             <Link
+            className={classes.link}
               to="/personAttributeType/view/all"
-              style={{ textDecoration: 'none' }}
             >
               Person Attributes
             </Link>
           </MenuItem>
           <MenuItem>
-            <Link to="/user/view/all" style={{ textDecoration: 'none' }}>
+            <Link className={classes.link} to="/user/view/all">
               Users
             </Link>
           </MenuItem>
           <MenuItem>
-            <Link to="/role/view/all" style={{ textDecoration: 'none' }}>
+            <Link className={classes.link} to="/role/view/all">
               Roles
             </Link>
           </MenuItem>
           <MenuItem>
-            <Link to="/privilege/view/all" style={{ textDecoration: 'none' }}>
+            <Link className={classes.link} to="/privilege/view/all">
               Privileges
             </Link>
           </MenuItem>
           <MenuItem>
-            <Link to="/visitType/view/all" style={{ textDecoration: 'none' }}>
+            <Link className={classes.link} to="/visitType/view/all">
               Visit Types
             </Link>
           </MenuItem>

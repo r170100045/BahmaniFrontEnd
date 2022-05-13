@@ -81,7 +81,7 @@ const AddressHierarchyLevels = () => {
 
   return (
     <>
-      <div style={{ maxWidth: '90%', margin: 'auto' }}>
+      <div style={{ maxWidth: '96%', margin: 'auto' }}>
         <MaterialTable
           title="Address Hierarchy Levels"
           data={columnData}

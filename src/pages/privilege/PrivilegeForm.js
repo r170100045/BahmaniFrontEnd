@@ -7,6 +7,8 @@ import {
 } from '../../services/privilegeService';
 
 import React from 'react';
+import { Paper } from '@material-ui/core';
+import { buttonGroupStyle, buttonStyle, inputStyle, labelStyle, paperStyle } from '../../constants/formStyling';
 
 class PrivilegeForm extends React.Component {
   constructor(props) {
@@ -99,15 +101,15 @@ class PrivilegeForm extends React.Component {
       cancelButtonHandler,
       deletePrivilege,
     } = this;
-
     if (redirect) return <Redirect to={redirect} />;
 
     return (
       <React.Fragment>
-        <div>
-          <label htmlFor="privilege">
+        <Paper style={paperStyle}>
+          <label htmlFor="privilege" style={labelStyle}>
             Privilege Name :
             <input
+            style={inputStyle}
               type="text"
               id="privilege"
               name="privilege"
@@ -118,9 +120,10 @@ class PrivilegeForm extends React.Component {
           </label>
           <br />
 
-          <label htmlFor="description">
+          <label htmlFor="description" style={labelStyle}>
             Description :
             <textarea
+            style={inputStyle}
               id="description"
               name="description"
               rows="3"
@@ -131,17 +134,18 @@ class PrivilegeForm extends React.Component {
           </label>
           <br />
 
-          <button type="button" onClick={savePrivilege.bind(this)}>
+          <button type="button" style={buttonStyle} onClick={savePrivilege.bind(this)}>
             Save Visit Type
           </button>
-          <button type="button" onClick={cancelButtonHandler.bind(this)}>
+          <button type="button" style={buttonStyle} onClick={cancelButtonHandler.bind(this)}>
             Cancel
           </button>
-          <button type="button" onClick={deletePrivilege.bind(this)}>
+          <button type="button" style={buttonStyle} onClick={deletePrivilege.bind(this)}>
             Delete
           </button>
+          
           <br />
-        </div>
+        </Paper>
       </React.Fragment>
     );
   }

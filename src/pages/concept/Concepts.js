@@ -99,7 +99,7 @@ const Concepts = () => {
 
   return (
     <>
-      <div style={{ maxWidth: '80%', margin: 'auto' }}>
+      <div style={{ maxWidth: '96%', margin: 'auto' }}>
         <MaterialTable
           title="Concepts"
           data={filteredConceptsOnRetired}

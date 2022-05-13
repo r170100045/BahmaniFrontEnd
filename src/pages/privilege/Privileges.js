@@ -67,7 +67,7 @@ const Privileges = () => {
 
   return (
     <>
-      <div style={{ maxWidth: '90%', margin: 'auto' }}>
+      <div style={{ maxWidth: '96%', margin: 'auto' }}>
         <MaterialTable
           title="Privileges"
           data={privileges}

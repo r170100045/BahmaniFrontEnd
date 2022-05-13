@@ -9,6 +9,8 @@ import {
 
 import React from 'react';
 import Select from 'react-select';
+import { Paper } from '@material-ui/core';
+import { buttonGroupStyle, buttonStyle, inputStyle, labelStyle, paperStyle } from '../../constants/formStyling';
 
 class DrugForm extends React.Component {
   constructor(props) {
@@ -245,20 +247,23 @@ class DrugForm extends React.Component {
           )}
           <hr />
 
-          <form>
-            <label htmlFor="name">Name*: </label>
+          <Paper style={paperStyle}>
+            <label htmlFor="name" style={labelStyle}>Name*: 
             <input
+              style={inputStyle}
               type="text"
               id="name"
               name="name"
               onChange={nameChangeHandler.bind(this)}
               value={getValueFor(drug.name)}
             />
+            </label>
             <br />
 
-            <label htmlFor="conceptId">Concept*: </label>
+            <label htmlFor="conceptId" style={labelStyle}>Concept*: 
             <div style={{ width: '300px', display: 'inline-block' }}>
               <Select
+              style={inputStyle}
                 id="conceptId"
                 name="conceptId"
                 placeholder="Enter concept name or id"
@@ -268,9 +273,10 @@ class DrugForm extends React.Component {
                 filterOption={filterOptions}
               />
             </div>
+            </label>
 
             <br />
-            <label htmlFor="combination">Combination: </label>
+            <label htmlFor="combination" style={labelStyle}>Combination: 
             <input
               type="checkbox"
               id="combination"
@@ -278,9 +284,10 @@ class DrugForm extends React.Component {
               onChange={combinationChangeHandler.bind(this)}
               checked={getValueFor(drug.combination)}
             />
+            </label>
             <br />
 
-            <label htmlFor="dosageForm">Dosage Form: </label>
+            <label htmlFor="dosageForm" style={labelStyle}>Dosage Form:
             <div style={{ width: '300px', display: 'inline-block' }}>
               <Select
                 id="dosageForm"
@@ -292,9 +299,10 @@ class DrugForm extends React.Component {
                 filterOption={filterOptions}
               />
             </div>
+            </label>
 
             <br />
-            <label htmlFor="strength">Strength: </label>
+            <label htmlFor="strength" style={labelStyle}>Strength:
             <input
               type="text"
               id="strength"
@@ -302,9 +310,10 @@ class DrugForm extends React.Component {
               onChange={strengthChangeHandler.bind(this)}
               value={getValueFor(drug.strength)}
             />
+            </label>
             <br />
 
-            <label htmlFor="minimumDailyDose">Minimum Daily Dose: </label>
+            <label htmlFor="minimumDailyDose" style={labelStyle}>Minimum Daily Dose:
             <input
               type="number"
               id="minimumDailyDose"
@@ -313,9 +322,10 @@ class DrugForm extends React.Component {
               value={getValueFor(drug.minimumDailyDose)}
               step="any"
             />
+            </label>
             <br />
 
-            <label htmlFor="maximumDailyDose">Maximum Daily Dose: </label>
+            <label htmlFor="maximumDailyDose" style={labelStyle}>Maximum Daily Dose:
             <input
               type="number"
               id="maximumDailyDose"
@@ -324,15 +334,16 @@ class DrugForm extends React.Component {
               value={getValueFor(drug.maximumDailyDose)}
               step="any"
             />
+            </label>
             <br />
-
-            <button type="button" onClick={submitDrugFormHandler.bind(this)}>
+            <button type="button" style={buttonStyle} onClick={submitDrugFormHandler.bind(this)}>
               Save Concept Drug
             </button>
-            <button type="button" onClick={cancelButtonHandler.bind(this)}>
+            <button type="button" style={buttonStyle} onClick={cancelButtonHandler.bind(this)}>
               Cancel
             </button>
-          </form>
+            
+          </Paper>
           <hr />
 
           {drugId !== 'add' && (

@@ -18,7 +18,7 @@ import VisitTypePage from '../pages/visitType/VisitTypePage';
 
 const useStyles = makeStyles({
   appMain: {
-    paddingLeft: '20%',
+    paddingLeft: '200px',
     width: '100%',
     backgroundColor: '#B7CADB',
   },
