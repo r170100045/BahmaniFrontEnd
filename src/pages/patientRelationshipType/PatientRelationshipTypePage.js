@@ -1,6 +1,5 @@
 import CommonPage from "../../components/CommonPage";
-import ModifyRelationshipType from "./ModifyRelationshipType";
-import PatientRelationshipForm from "./PatientRelationshipForm";
+import PatientRelationshipTypeForm from "./PatientRelationshipTypeForm";
 import PatientRelationshipTypes from "./PatientRelationshipTypes";
 import { useParams } from "react-router-dom";
 
@@ -13,8 +12,7 @@ export default function PatientRelationshipTypePage() {
       action={action}
       title="Patient Relationship Management"
       viewAll={<PatientRelationshipTypes />}
-      addOrEdit={<ModifyRelationshipType id={id} />}
-      // addOrEdit={<PatientRelationshipForm id={id} />}
+      addOrEdit={<PatientRelationshipTypeForm id={id} />}
     />
   );
 }

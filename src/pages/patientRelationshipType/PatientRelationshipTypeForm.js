@@ -8,7 +8,7 @@ import {
 
 import React from "react";
 
-class ModifyRelationshipType extends React.Component {
+class PatientRelationshipTypeForm extends React.Component {
   constructor(props) {
     super(props);
     const initialRelationshipTypeState = {
@@ -238,4 +238,4 @@ class ModifyRelationshipType extends React.Component {
     );
   }
 }
-export default withRouter(ModifyRelationshipType);
+export default withRouter(PatientRelationshipTypeForm);
