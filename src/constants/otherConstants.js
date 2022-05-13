@@ -1,26 +1,26 @@
 export const EXAMPLE_ENTRIES = ["Bihar", "Araria", "Bhargama", "Baija Patti"];
 
 export const FORMAT_OPTIONS = [
-  { id: "java.lang.Boolean", title: "java.lang.Boolean" },
-  { id: "java.lang.Character", title: "java.lang.Character" },
-  { id: "java.lang.Float", title: "java.lang.Float" },
-  { id: "java.lang.Integer", title: "java.lang.Integer" },
-  { id: "java.lang.String", title: "java.lang.String" },
-  { id: "java.openmrs.Concept", title: "java.openmrs.Concept" },
-  { id: "java.openmrs.Drug", title: "java.openmrs.Drug" },
-  { id: "java.openmrs.Encounter", title: "java.openmrs.Encounter" },
-  { id: "java.openmrs.Location", title: "java.openmrs.Location" },
-  { id: "java.openmrs.Patient", title: "java.openmrs.Patient" },
-  { id: "java.openmrs.Person", title: "java.openmrs.Person" },
+  { label: "java.lang.Boolean", value: "java.lang.Boolean" },
+  { label: "java.lang.Character", value: "java.lang.Character" },
+  { label: "java.lang.Float", value: "java.lang.Float" },
+  { label: "java.lang.Integer", value: "java.lang.Integer" },
+  { label: "java.lang.String", value: "java.lang.String" },
+  { label: "java.openmrs.Concept", value: "java.openmrs.Concept" },
+  { label: "java.openmrs.Drug", value: "java.openmrs.Drug" },
+  { label: "java.openmrs.Encounter", value: "java.openmrs.Encounter" },
+  { label: "java.openmrs.Location", value: "java.openmrs.Location" },
+  { label: "java.openmrs.Patient", value: "java.openmrs.Patient" },
+  { label: "java.openmrs.Person", value: "java.openmrs.Person" },
   {
-    id: "java.openmrs.ProgramWorkflow",
-    title: "java.openmrs.ProgramWorkflow",
+    label: "java.openmrs.ProgramWorkflow",
+    value: "java.openmrs.ProgramWorkflow",
   },
-  { id: "java.openmrs.Provider", title: "java.openmrs.Provider" },
-  { id: "java.openmrs.User", title: "java.openmrs.User" },
+  { label: "java.openmrs.Provlabeler", value: "java.openmrs.Provlabeler" },
+  { label: "java.openmrs.User", value: "java.openmrs.User" },
   {
-    id: "java.openmrs.util.AttributableDate",
-    title: "java.openmrs.util.AttributableDate",
+    label: "java.openmrs.util.AttributableDate",
+    value: "java.openmrs.util.AttributableDate",
   },
 ];
 
