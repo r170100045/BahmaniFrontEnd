@@ -66,22 +66,6 @@ const PatientRelationshipTypes = () => {
       onClick: (event, rowData) =>
         setRedirect(`/patientRelationshipType/edit/${rowData.uuid}`),
     },
-    // (rowData) => ({
-    //   icon: () =>
-    //     rowData.retired ? (
-    //       <AlarmOnIcon color="primary" />
-    //     ) : (
-    //       <AlarmOffIcon color="primary" />
-    //     ),
-    //   tooltip: rowData.retired ? "Unretire" : "Retire",
-    //   onClick: (event, rowData) =>
-    //     alert("This user is retired: " + rowData.retired)
-    // }),
-    // {
-    //   icon: () => <DeleteIcon color="secondary" />,
-    //   tooltip: "Delete",
-    //   onClick: (event, rowData) => alert("You want to delete " + rowData.title)
-    // }
   ];
 
   if (redirect) return <Redirect to={redirect} />;
