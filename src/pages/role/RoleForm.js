@@ -1,4 +1,4 @@
-import { Link, Redirect, withRouter } from 'react-router-dom';
+import { Link, Redirect, withRouter } from "react-router-dom";
 import {
   deleteRoleById,
   getRoleById,
@@ -6,18 +6,18 @@ import {
   getRoles,
   insertRole,
   updateRoleById,
-} from '../../services/roleService';
+} from "../../services/roleService";
 
-import React from 'react';
-import { getPrivileges } from '../../services/privilegeService';
+import React from "react";
+import { getPrivileges } from "../../services/privilegeService";
 
 class RoleForm extends React.Component {
   constructor(props) {
     super(props);
     const initialRoleState = {
-      role: '',
-      description: '',
-      uuid: '',
+      role: "",
+      description: "",
+      uuid: "",
       parentRoles: [],
       childRoles: [],
       rolePrivileges: [],
@@ -69,7 +69,7 @@ class RoleForm extends React.Component {
       });
 
       this.setState({ displayChildRoles }, () => {
-        resolve('success');
+        resolve("success");
       });
     });
   }
@@ -80,7 +80,7 @@ class RoleForm extends React.Component {
       const inheritedRoles = [];
 
       allRoles.forEach((el) => {
-        if (el !== 'Anonymous' && el !== 'Authenticated') {
+        if (el !== "Anonymous" && el !== "Authenticated") {
           if (role.parentRoles.includes(el)) {
             inheritedRoles.push({
               role: el,
@@ -96,7 +96,7 @@ class RoleForm extends React.Component {
       });
 
       this.setState({ inheritedRoles }, () => {
-        resolve('success');
+        resolve("success");
       });
     });
   }
@@ -104,18 +104,18 @@ class RoleForm extends React.Component {
   setRole() {
     return new Promise((resolve, reject) => {
       const { roleId } = this.state;
-      if (roleId !== 'add') {
+      if (roleId !== "add") {
         getRoleById(roleId)
           .then((response) => {
             this.setState({ role: response.data }, () => {
-              resolve('success');
+              resolve("success");
             });
           })
           .catch((error) => {
             console.log(error);
           });
       } else {
-        resolve('success');
+        resolve("success");
       }
     });
   }
@@ -129,7 +129,7 @@ class RoleForm extends React.Component {
             allRoles.push(response.data[key].role);
           });
           this.setState({ allRoles }, () => {
-            resolve('success');
+            resolve("success");
           });
         })
         .catch((e) => reject(e));
@@ -147,7 +147,7 @@ class RoleForm extends React.Component {
         this.setState({ allPrivileges });
 
         if (index === role.rolePrivileges.length - 1) {
-          resolve('success');
+          resolve("success");
         }
       });
     });
@@ -181,7 +181,7 @@ class RoleForm extends React.Component {
       });
 
       this.setState({ allPrivileges: tempAllPrivileges }, () => {
-        resolve('success');
+        resolve("success");
       });
     });
   }
@@ -199,7 +199,7 @@ class RoleForm extends React.Component {
             });
           });
           this.setState({ allPrivileges }, () => {
-            resolve('success');
+            resolve("success");
           });
         })
         .catch((e) => reject(e));
@@ -257,21 +257,21 @@ class RoleForm extends React.Component {
   }
 
   cancel() {
-    this.setState({ redirect: '/role/view/all' });
+    this.setState({ redirect: "/role/view/all" });
   }
 
   deleteRole() {
     const { roleId } = this.state;
     deleteRoleById(roleId)
       .then((res) => {
-        this.setState({ redirect: '/role/view/all' });
+        this.setState({ redirect: "/role/view/all" });
       })
       .catch((e) => console.log(e.message));
   }
 
   saveRole() {
     const { roleId, role } = this.state;
-    console.log('role', role);
+    console.log("role", role);
     // if (roleId === "add") {
     //   insertRole(role)
     //     .then(() => {
@@ -292,11 +292,11 @@ class RoleForm extends React.Component {
   }
 
   getValueFor(field) {
-    return field === null ? '' : field;
+    return field === null ? "" : field;
   }
 
   getChildRoleUUID(childRole) {
-    var uuid = '';
+    var uuid = "";
 
     getRoleByName(childRole)
       .then((response) => {
@@ -351,7 +351,7 @@ class RoleForm extends React.Component {
               id="role"
               name="role"
               value={getValueFor(role.role)}
-              disabled={roleId === 'add' ? false : true}
+              disabled={roleId === "add" ? false : true}
               onChange={roleChangeHandler.bind(this)}
             />
           </label>
@@ -417,7 +417,7 @@ class RoleForm extends React.Component {
                       checked={el.checked}
                       id={el.role}
                       onChange={(e) => inheritedRoleChangeHandler(e, index)}
-                    />{' '}
+                    />{" "}
                     <label htmlFor={el.role}>{el.role}</label>
                   </div>
                 ))}
@@ -440,7 +440,7 @@ class RoleForm extends React.Component {
                       disabled={el.disabled}
                       id={el.privilege}
                       onChange={(e) => privilegeChangeHandler(e, index)}
-                    />{' '}
+                    />{" "}
                     <label htmlFor={el.privilege}>{el.privilege}</label>
                   </div>
                 ))}
@@ -449,7 +449,7 @@ class RoleForm extends React.Component {
           </div>
 
           <br />
-          {roleId !== 'add' && (
+          {roleId !== "add" && (
             <div>
               <span>UUID: </span>
               <span>{role.uuid}</span>
@@ -464,7 +464,7 @@ class RoleForm extends React.Component {
             Cancel
           </button>
 
-          {roleId !== 'add' && (
+          {roleId !== "add" && (
             <button type="button" onClick={deleteRole.bind(this)}>
               Delete
             </button>

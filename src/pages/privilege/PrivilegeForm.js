@@ -1,22 +1,28 @@
-import { Redirect, withRouter } from 'react-router-dom';
+import { Redirect, withRouter } from "react-router-dom";
+import {
+  buttonGroupStyle,
+  buttonStyle,
+  inputStyle,
+  labelStyle,
+  paperStyle,
+} from "../../constants/formStyling";
 import {
   deletePrivilegeById,
   getPrivilegeById,
   insertPrivilege,
   updatePrivilegeById,
-} from '../../services/privilegeService';
+} from "../../services/privilegeService";
 
-import React from 'react';
-import { Paper } from '@material-ui/core';
-import { buttonGroupStyle, buttonStyle, inputStyle, labelStyle, paperStyle } from '../../constants/formStyling';
+import { Paper } from "@material-ui/core";
+import React from "react";
 
 class PrivilegeForm extends React.Component {
   constructor(props) {
     super(props);
     const initialPrivilegeState = {
-      privilege: '',
-      description: '',
-      uuid: '',
+      privilege: "",
+      description: "",
+      uuid: "",
     };
 
     this.state = {
@@ -28,7 +34,7 @@ class PrivilegeForm extends React.Component {
 
   componentDidMount() {
     const { privilegeId } = this.state;
-    if (privilegeId !== 'add') {
+    if (privilegeId !== "add") {
       getPrivilegeById(privilegeId)
         .then((response) => {
           this.setState({ privilege: response.data });
@@ -53,10 +59,10 @@ class PrivilegeForm extends React.Component {
 
   savePrivilege() {
     const { privilegeId, privilege } = this.state;
-    if (privilegeId === 'add') {
+    if (privilegeId === "add") {
       insertPrivilege(privilege)
         .then(() => {
-          this.setState({ redirect: '/privilege/view/all' });
+          this.setState({ redirect: "/privilege/view/all" });
         })
         .catch((error) => {
           console.log(error);
@@ -64,7 +70,7 @@ class PrivilegeForm extends React.Component {
     } else {
       updatePrivilegeById(privilegeId, privilege)
         .then(() => {
-          this.setState({ redirect: '/privilege/view/all' });
+          this.setState({ redirect: "/privilege/view/all" });
         })
         .catch((error) => {
           console.log(error);
@@ -73,14 +79,14 @@ class PrivilegeForm extends React.Component {
   }
 
   cancelButtonHandler() {
-    this.setState({ redirect: '/privilege/view/all' });
+    this.setState({ redirect: "/privilege/view/all" });
   }
 
   deletePrivilege() {
     let { privilegeId } = this.state;
     deletePrivilegeById(privilegeId)
       .then(() => {
-        this.setState({ redirect: '/privilege/view/all' });
+        this.setState({ redirect: "/privilege/view/all" });
       })
       .catch((error) => {
         console.log(error);
@@ -88,7 +94,7 @@ class PrivilegeForm extends React.Component {
   }
 
   getValueFor(field) {
-    return field === null ? '' : field;
+    return field === null ? "" : field;
   }
 
   render() {
@@ -109,11 +115,11 @@ class PrivilegeForm extends React.Component {
           <label htmlFor="privilege" style={labelStyle}>
             Privilege Name :
             <input
-            style={inputStyle}
+              style={inputStyle}
               type="text"
               id="privilege"
               name="privilege"
-              disabled={privilegeId === 'add' ? false : true}
+              disabled={privilegeId === "add" ? false : true}
               value={getValueFor(privilege.privilege)}
               onChange={privilegeChangeHandler.bind(this)}
             />
@@ -123,7 +129,7 @@ class PrivilegeForm extends React.Component {
           <label htmlFor="description" style={labelStyle}>
             Description :
             <textarea
-            style={inputStyle}
+              style={inputStyle}
               id="description"
               name="description"
               rows="3"
@@ -134,16 +140,28 @@ class PrivilegeForm extends React.Component {
           </label>
           <br />
 
-          <button type="button" style={buttonStyle} onClick={savePrivilege.bind(this)}>
+          <button
+            type="button"
+            style={buttonStyle}
+            onClick={savePrivilege.bind(this)}
+          >
             Save Visit Type
           </button>
-          <button type="button" style={buttonStyle} onClick={cancelButtonHandler.bind(this)}>
+          <button
+            type="button"
+            style={buttonStyle}
+            onClick={cancelButtonHandler.bind(this)}
+          >
             Cancel
           </button>
-          <button type="button" style={buttonStyle} onClick={deletePrivilege.bind(this)}>
+          <button
+            type="button"
+            style={buttonStyle}
+            onClick={deletePrivilege.bind(this)}
+          >
             Delete
           </button>
-          
+
           <br />
         </Paper>
       </React.Fragment>

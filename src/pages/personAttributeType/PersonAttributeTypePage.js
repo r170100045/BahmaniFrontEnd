@@ -1,7 +1,7 @@
-import CommonPage from '../../components/CommonPage';
-import PersonAttributeForm from './PersonAttributeForm';
-import PersonAttributeTypes from './PersonAttributeTypes';
-import { useParams } from 'react-router-dom';
+import CommonPage from "../../components/CommonPage";
+import PersonAttributeForm from "./PersonAttributeForm";
+import PersonAttributeTypes from "./PersonAttributeTypes";
+import { useParams } from "react-router-dom";
 
 export default function PersonAttributeTypePage() {
   const { id, action } = useParams();

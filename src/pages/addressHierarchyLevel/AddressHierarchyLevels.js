@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
-import { EXAMPLE_ENTRIES } from '../../constants/otherConstants';
-import MaterialTable from 'material-table';
-import { getAllAddressHierarchyLevels } from '../../services/addressHierarchyLevelService';
+import { EXAMPLE_ENTRIES } from "../../constants/otherConstants";
+import MaterialTable from "material-table";
+import { getAllAddressHierarchyLevels } from "../../services/addressHierarchyLevelService";
 
 const AddressHierarchyLevels = () => {
   const [addressHierarchyLevels, setAddressHierarchyLevels] = useState([]);
@@ -11,25 +11,25 @@ const AddressHierarchyLevels = () => {
 
   const columns = [
     {
-      title: 'Level',
-      field: 'level',
+      title: "Level",
+      field: "level",
     },
     {
-      title: 'Name',
-      field: 'name',
+      title: "Name",
+      field: "name",
     },
     {
-      title: 'Example Entry',
-      field: 'example',
+      title: "Example Entry",
+      field: "example",
     },
     {
-      title: 'Mapped Address Field',
-      field: 'addressField',
+      title: "Mapped Address Field",
+      field: "addressField",
     },
     {
-      title: 'Required',
-      field: 'required',
-      lookup: { true: 'Yes', false: 'No' },
+      title: "Required",
+      field: "required",
+      lookup: { true: "Yes", false: "No" },
     },
   ];
 
@@ -81,7 +81,7 @@ const AddressHierarchyLevels = () => {
 
   return (
     <>
-      <div style={{ maxWidth: '96%', margin: 'auto' }}>
+      <div style={{ maxWidth: "96%", margin: "auto" }}>
         <MaterialTable
           title="Address Hierarchy Levels"
           data={columnData}

@@ -1,5 +1,5 @@
-import { DRUG } from '../constants/serviceConstants';
-import axios from 'axios';
+import { DRUG } from "../constants/serviceConstants";
+import axios from "axios";
 
 export const insertDrug = (data) =>
   axios.post(`${DRUG}`, data).then((res) => res);

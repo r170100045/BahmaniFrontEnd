@@ -2,9 +2,9 @@ import {
   CONCEPT_CLASS,
   CONCEPT_DATA_TYPE,
   CONCEPT_NAME,
-} from '../constants/serviceConstants';
+} from "../constants/serviceConstants";
 
-import axios from 'axios';
+import axios from "axios";
 
 export const getConceptNames = () =>
   axios.get(`${CONCEPT_NAME}`).then((res) => res);

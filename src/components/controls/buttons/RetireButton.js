@@ -1,14 +1,14 @@
-import { Button, makeStyles, withStyles } from '@material-ui/core';
+import { Button, makeStyles, withStyles } from "@material-ui/core";
 
-import AlarmOffIcon from '@material-ui/icons/AlarmOff';
-import AlarmOnIcon from '@material-ui/icons/AlarmOn';
-import { yellow } from '@material-ui/core/colors';
+import AlarmOffIcon from "@material-ui/icons/AlarmOff";
+import AlarmOnIcon from "@material-ui/icons/AlarmOn";
+import { yellow } from "@material-ui/core/colors";
 
 const ColorButton = withStyles((theme) => ({
   root: {
     color: theme.palette.getContrastText(yellow[100]),
     backgroundColor: yellow[100],
-    '&:hover': {
+    "&:hover": {
       backgroundColor: yellow[50],
     },
   },
@@ -23,7 +23,7 @@ const useStyles = makeStyles((theme) => ({
 export default function RetireButton(props) {
   const classes = useStyles();
   const { onClick, retired, ...other } = props;
-  const text = retired ? 'Un - Retire' : 'Retire';
+  const text = retired ? "Un - Retire" : "Retire";
   const icon = retired ? <AlarmOnIcon /> : <AlarmOffIcon />;
 
   return (

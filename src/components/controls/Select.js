@@ -4,9 +4,9 @@ import {
   InputLabel,
   MenuItem,
   Select as MuiSelect,
-} from '@material-ui/core';
+} from "@material-ui/core";
 
-import React from 'react';
+import React from "react";
 
 export default function Select(props) {
   const { name, label, value, error = null, onChange, options } = props;

@@ -1,13 +1,13 @@
-import { Button, makeStyles, withStyles } from '@material-ui/core';
+import { Button, makeStyles, withStyles } from "@material-ui/core";
 
-import SaveIcon from '@material-ui/icons/Save';
-import { green } from '@material-ui/core/colors';
+import SaveIcon from "@material-ui/icons/Save";
+import { green } from "@material-ui/core/colors";
 
 const ColorButton = withStyles((theme) => ({
   root: {
-    color: theme.palette.getContrastText(green['A700']),
-    backgroundColor: green['A700'],
-    '&:hover': {
+    color: theme.palette.getContrastText(green["A700"]),
+    backgroundColor: green["A700"],
+    "&:hover": {
       backgroundColor: green[300],
     },
   },

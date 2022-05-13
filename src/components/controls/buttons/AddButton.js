@@ -1,13 +1,13 @@
-import { Button, makeStyles, withStyles } from '@material-ui/core';
+import { Button, makeStyles, withStyles } from "@material-ui/core";
 
-import AddIcon from '@material-ui/icons/Add';
-import { blue } from '@material-ui/core/colors';
+import AddIcon from "@material-ui/icons/Add";
+import { blue } from "@material-ui/core/colors";
 
 const ColorButton = withStyles((theme) => ({
   root: {
-    color: theme.palette.getContrastText(blue['A700']),
-    backgroundColor: blue['A700'],
-    '&:hover': {
+    color: theme.palette.getContrastText(blue["A700"]),
+    backgroundColor: blue["A700"],
+    "&:hover": {
       backgroundColor: blue[900],
     },
   },

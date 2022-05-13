@@ -1,11 +1,11 @@
-import { FormControlLabel, Switch } from '@material-ui/core';
-import { Link, Redirect } from 'react-router-dom';
-import MaterialTable, { MTableToolbar } from 'material-table';
-import { useEffect, useState } from 'react';
+import { FormControlLabel, Switch } from "@material-ui/core";
+import { Link, Redirect } from "react-router-dom";
+import MaterialTable, { MTableToolbar } from "material-table";
+import { useEffect, useState } from "react";
 
-import Controls from '../../components/controls/Controls';
-import EditIcon from '@material-ui/icons/Edit';
-import { getDrugs } from '../../api/services';
+import Controls from "../../components/controls/Controls";
+import EditIcon from "@material-ui/icons/Edit";
+import { getDrugs } from "../../api/services";
 
 const Drugs = () => {
   const [drugs, setDrugs] = useState([]);
@@ -16,12 +16,12 @@ const Drugs = () => {
 
   const columns = [
     {
-      title: 'Name',
-      field: 'name',
+      title: "Name",
+      field: "name",
     },
     {
-      title: 'Strength',
-      field: 'strength',
+      title: "Strength",
+      field: "strength",
     },
   ];
 
@@ -58,7 +58,7 @@ const Drugs = () => {
     Toolbar: (props) => (
       <div>
         <MTableToolbar {...props} />
-        <div class="text-end" style={{ padding: '0px 10px' }}>
+        <div class="text-end" style={{ padding: "0px 10px" }}>
           <FormControlLabel
             value="start"
             control={
@@ -68,7 +68,7 @@ const Drugs = () => {
                 checked={showRetired}
               />
             }
-            label={showRetired ? 'Hide Retired' : 'Show Retired'}
+            label={showRetired ? "Hide Retired" : "Show Retired"}
             labelPlacement="start"
           />
           <Link to="/drug/edit/add">
@@ -82,7 +82,7 @@ const Drugs = () => {
   const actions = [
     {
       icon: () => <EditIcon color="primary" />,
-      tooltip: 'Edit',
+      tooltip: "Edit",
       onClick: (event, rowData) => setRedirect(`/drug/edit/${rowData.uuid}`),
     },
   ];
@@ -93,7 +93,7 @@ const Drugs = () => {
 
   return (
     <>
-      <div style={{ maxWidth: '96%', margin: 'auto' }}>
+      <div style={{ maxWidth: "96%", margin: "auto" }}>
         <MaterialTable
           title="Drugs"
           data={filteredDrugsOnRetired}

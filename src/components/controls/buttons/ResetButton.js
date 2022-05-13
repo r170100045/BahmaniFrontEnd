@@ -1,13 +1,13 @@
-import { Button, makeStyles, withStyles } from '@material-ui/core';
+import { Button, makeStyles, withStyles } from "@material-ui/core";
 
-import RotateLeftIcon from '@material-ui/icons/RotateLeft';
-import { yellow } from '@material-ui/core/colors';
+import RotateLeftIcon from "@material-ui/icons/RotateLeft";
+import { yellow } from "@material-ui/core/colors";
 
 const ColorButton = withStyles((theme) => ({
   root: {
     color: theme.palette.getContrastText(yellow[100]),
     backgroundColor: yellow[100],
-    '&:hover': {
+    "&:hover": {
       backgroundColor: yellow[50],
     },
   },

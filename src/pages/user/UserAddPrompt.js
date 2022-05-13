@@ -1,8 +1,8 @@
-import { Redirect, withRouter } from 'react-router-dom';
+import { Redirect, withRouter } from "react-router-dom";
 
-import React from 'react';
-import Select from 'react-select';
-import { getPersons } from '../../api/services';
+import React from "react";
+import Select from "react-select";
+import { getPersons } from "../../api/services";
 
 // import {
 //   deleteDrugById,
@@ -65,7 +65,7 @@ class UserAddPrompt extends React.Component {
   createNewUser() {}
 
   cancelButtonHandler() {
-    this.setState({ redirect: '/user/all' });
+    this.setState({ redirect: "/user/all" });
   }
 
   render() {
@@ -98,7 +98,7 @@ class UserAddPrompt extends React.Component {
                 <p>Use a person who already exists</p>
                 <div>
                   <label htmlFor="conceptId">Which Person?: </label>
-                  <div style={{ width: '300px', display: 'inline-block' }}>
+                  <div style={{ width: "300px", display: "inline-block" }}>
                     <Select
                       id="personUUID"
                       name="personUUID"

@@ -1,5 +1,5 @@
-import { Paper, makeStyles } from '@material-ui/core';
-import React, { useState } from 'react';
+import { Paper, makeStyles } from "@material-ui/core";
+import React, { useState } from "react";
 
 export function useForm(initialFValues, validateOnChange = false, validate) {
   const [values, setValues] = useState(initialFValues);
@@ -31,8 +31,8 @@ export function useForm(initialFValues, validateOnChange = false, validate) {
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    '& .MuiFormControl-root': {
-      width: '80%',
+    "& .MuiFormControl-root": {
+      width: "80%",
       margin: theme.spacing(1),
     },
   },

@@ -1,10 +1,10 @@
-import { Link, Redirect } from 'react-router-dom';
-import MaterialTable, { MTableToolbar } from 'material-table';
-import { useEffect, useState } from 'react';
+import { Link, Redirect } from "react-router-dom";
+import MaterialTable, { MTableToolbar } from "material-table";
+import { useEffect, useState } from "react";
 
-import Controls from '../../components/controls/Controls';
-import EditIcon from '@material-ui/icons/Edit';
-import { getRoles } from '../../services/roleService';
+import Controls from "../../components/controls/Controls";
+import EditIcon from "@material-ui/icons/Edit";
+import { getRoles } from "../../services/roleService";
 
 const Roles = () => {
   const [roles, setRoles] = useState([]);
@@ -12,20 +12,20 @@ const Roles = () => {
 
   const columns = [
     {
-      title: 'Role',
-      field: 'role',
+      title: "Role",
+      field: "role",
     },
     {
-      title: 'Description',
-      field: 'description',
+      title: "Description",
+      field: "description",
     },
     {
-      title: 'Inherited Roles',
-      field: 'parentRoles',
+      title: "Inherited Roles",
+      field: "parentRoles",
     },
     {
-      title: 'Privileges',
-      field: 'rolePrivileges',
+      title: "Privileges",
+      field: "rolePrivileges",
     },
   ];
 
@@ -53,7 +53,7 @@ const Roles = () => {
     Toolbar: (props) => (
       <div>
         <MTableToolbar {...props} />
-        <div className="text-end" style={{ padding: '0px 10px' }}>
+        <div className="text-end" style={{ padding: "0px 10px" }}>
           <Link to="/role/edit/add">
             <Controls.AddButton />
           </Link>
@@ -65,7 +65,7 @@ const Roles = () => {
   const actions = [
     {
       icon: () => <EditIcon color="primary" />,
-      tooltip: 'Edit',
+      tooltip: "Edit",
       onClick: (event, rowData) => setRedirect(`/role/edit/${rowData.uuid}`),
     },
   ];
@@ -74,7 +74,7 @@ const Roles = () => {
 
   return (
     <>
-      <div style={{ maxWidth: '96%', margin: 'auto' }}>
+      <div style={{ maxWidth: "96%", margin: "auto" }}>
         <MaterialTable
           title="Current Roles"
           data={roles}
