@@ -1,10 +1,10 @@
-import { Link, Redirect } from 'react-router-dom';
-import MaterialTable, { MTableToolbar } from 'material-table';
-import { useEffect, useState } from 'react';
+import { Link, Redirect } from "react-router-dom";
+import MaterialTable, { MTableToolbar } from "material-table";
+import { useEffect, useState } from "react";
 
-import Controls from '../../components/controls/Controls';
-import EditIcon from '@material-ui/icons/Edit';
-import { getPrivileges } from '../../services/privilegeService';
+import Controls from "../../components/controls/Controls";
+import EditIcon from "@material-ui/icons/Edit";
+import { getPrivileges } from "../../services/privilegeService";
 
 const Privileges = () => {
   const [privileges, setPrivileges] = useState([]);
@@ -12,12 +12,12 @@ const Privileges = () => {
 
   const columns = [
     {
-      title: 'Privilege Name',
-      field: 'privilege',
+      title: "Privilege Name",
+      field: "privilege",
     },
     {
-      title: 'Description',
-      field: 'description',
+      title: "Description",
+      field: "description",
     },
   ];
 
@@ -45,7 +45,7 @@ const Privileges = () => {
     Toolbar: (props) => (
       <div>
         <MTableToolbar {...props} />
-        <div className="text-end" style={{ padding: '0px 10px' }}>
+        <div className="text-end" style={{ padding: "0px 10px" }}>
           <Link to="/privilege/edit/add">
             <Controls.AddButton />
           </Link>
@@ -57,7 +57,7 @@ const Privileges = () => {
   const actions = [
     {
       icon: () => <EditIcon color="primary" />,
-      tooltip: 'Edit',
+      tooltip: "Edit",
       onClick: (event, rowData) =>
         setRedirect(`/privilege/edit/${rowData.uuid}`),
     },
@@ -67,7 +67,7 @@ const Privileges = () => {
 
   return (
     <>
-      <div style={{ maxWidth: '96%', margin: 'auto' }}>
+      <div style={{ maxWidth: "96%", margin: "auto" }}>
         <MaterialTable
           title="Privileges"
           data={privileges}

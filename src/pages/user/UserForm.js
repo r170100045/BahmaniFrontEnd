@@ -1,25 +1,25 @@
-import { Redirect, withRouter } from 'react-router-dom';
+import { Redirect, withRouter } from "react-router-dom";
 import {
   deleteDrugById,
   getUser,
   postDrug,
   putDrugById,
-} from '../../api/services';
+} from "../../api/services";
 
-import React from 'react';
-import { getRoles } from '@testing-library/react';
+import React from "react";
+import { getRoles } from "@testing-library/react";
 
 class UserForm extends React.Component {
   constructor(props) {
     super(props);
 
     const initialUserState = {
-      systemId: '',
-      username: '',
-      password: '',
-      salt: '',
-      secretQuestion: '',
-      secretAnswer: '',
+      systemId: "",
+      username: "",
+      password: "",
+      salt: "",
+      secretQuestion: "",
+      secretAnswer: "",
       retired: false,
       retireReason: null,
       userProperty: [],
@@ -32,7 +32,7 @@ class UserForm extends React.Component {
       userId: this.props.match.params.id,
       isLoading: true,
       error: false,
-      passwordRetype: '',
+      passwordRetype: "",
       roles: [],
       showAdvancedOptions: false,
     };
@@ -51,7 +51,7 @@ class UserForm extends React.Component {
       getRoles()
         .then((response) => {
           this.setState({ roles: response.data }, () => {
-            resolve('success');
+            resolve("success");
           });
         })
         .catch((e) => reject(e));
@@ -60,11 +60,11 @@ class UserForm extends React.Component {
 
   setUser(userId) {
     return new Promise((resolve, reject) => {
-      if (userId !== 'add') {
+      if (userId !== "add") {
         getUser()
           .then((response) => {
             this.setState({ user: response.data }, () => {
-              resolve('success');
+              resolve("success");
             });
           })
           .catch((e) => reject(e));
@@ -73,7 +73,7 @@ class UserForm extends React.Component {
   }
 
   getValueFor(field) {
-    return field === null ? '' : field;
+    return field === null ? "" : field;
   }
 
   unretireUser() {
@@ -131,7 +131,7 @@ class UserForm extends React.Component {
   }
 
   cancelButtonHandler() {
-    this.setState({ redirect: '/user/all' });
+    this.setState({ redirect: "/user/all" });
   }
 
   retireUser() {
@@ -202,14 +202,14 @@ class UserForm extends React.Component {
 
     const getAdvancedOptionsText =
       showAdvancedOptions === false
-        ? 'Show Advanced Options'
-        : 'Hide Advanced Options';
+        ? "Show Advanced Options"
+        : "Hide Advanced Options";
 
     if (redirect) {
       return <Redirect to={redirect} />;
     }
 
-    if (!isLoading || userId === 'add') {
+    if (!isLoading || userId === "add") {
       return (
         <React.Fragment>
           {error && <p>Fill the required fields</p>}
@@ -217,7 +217,7 @@ class UserForm extends React.Component {
 
           {user.retired && (
             <p>
-              This user is disabled by ... ... - {user.retireReason}{' '}
+              This user is disabled by ... ... - {user.retireReason}{" "}
               <button type="button" onClick={unretireUser.bind(this)}>
                 Enable this user
               </button>
@@ -259,7 +259,7 @@ class UserForm extends React.Component {
               <br />
 
               <span>
-                Gender*:{' '}
+                Gender*:{" "}
                 <input type="radio" id="male" name="gender" value="male" />
                 <label for="male">Male</label>
                 <input type="radio" id="female" name="gender" value="female" />
@@ -280,7 +280,7 @@ class UserForm extends React.Component {
                 checked="true"
               />
               <label for="providerAccount">
-                {' '}
+                {" "}
                 Create a Provider account for this user
               </label>
             </fieldset>
@@ -291,7 +291,7 @@ class UserForm extends React.Component {
               <legend>Login Info</legend>
               System Id (System Id will be generated after saving)
               <label htmlFor="systemId">System Id</label>
-              {userId === 'add' ? (
+              {userId === "add" ? (
                 <span>System Id</span>
               ) : (
                 <input
@@ -386,7 +386,7 @@ class UserForm extends React.Component {
             <button type="button" onClick={cancelButtonHandler.bind(this)}>
               Cancel
             </button>
-            {userId !== 'add' && (
+            {userId !== "add" && (
               <button type="button" onClick={deleteUser.bind(this)}>
                 Delete User
               </button>
@@ -394,7 +394,7 @@ class UserForm extends React.Component {
           </form>
           <hr />
 
-          {userId !== 'add' && (
+          {userId !== "add" && (
             <fieldset>
               <p>Disable Account</p>
               <label htmlFor="retireReason">Reason: </label>

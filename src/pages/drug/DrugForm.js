@@ -1,16 +1,22 @@
-import { Redirect, withRouter } from 'react-router-dom';
+import { Redirect, withRouter } from "react-router-dom";
+import {
+  buttonGroupStyle,
+  buttonStyle,
+  inputStyle,
+  labelStyle,
+  paperStyle,
+} from "../../constants/formStyling";
 import {
   deleteDrugById,
   getConceptNames,
   getDrugById,
   postDrug,
   putDrugById,
-} from '../../api/services';
+} from "../../api/services";
 
-import React from 'react';
-import Select from 'react-select';
-import { Paper } from '@material-ui/core';
-import { buttonGroupStyle, buttonStyle, inputStyle, labelStyle, paperStyle } from '../../constants/formStyling';
+import { Paper } from "@material-ui/core";
+import React from "react";
+import Select from "react-select";
 
 class DrugForm extends React.Component {
   constructor(props) {
@@ -18,14 +24,14 @@ class DrugForm extends React.Component {
 
     const initialDrugState = {
       combination: false,
-      conceptId: '',
-      dosageForm: '',
-      maximumDailyDose: '',
-      minimumDailyDose: '',
-      name: '',
+      conceptId: "",
+      dosageForm: "",
+      maximumDailyDose: "",
+      minimumDailyDose: "",
+      name: "",
       retired: false,
-      strength: '',
-      retireReason: '',
+      strength: "",
+      retireReason: "",
     };
 
     this.state = {
@@ -52,7 +58,7 @@ class DrugForm extends React.Component {
         });
 
         this.setState({ options }, () => {
-          if (drugId !== 'add') {
+          if (drugId !== "add") {
             getDrugById(drugId)
               .then((response) => {
                 this.setState({ drug: response.data, isLoading: false });
@@ -71,7 +77,7 @@ class DrugForm extends React.Component {
   }
 
   getValueFor(field) {
-    return field === null ? '' : field;
+    return field === null ? "" : field;
   }
 
   unretireDrug() {
@@ -80,7 +86,7 @@ class DrugForm extends React.Component {
     this.setState({ drug }, () => {
       putDrugById(drugId, drug)
         .then(() => {
-          this.setState({ redirect: '/drug/view/all' });
+          this.setState({ redirect: "/drug/view/all" });
         })
         .catch((error) => {
           console.log(error);
@@ -147,13 +153,13 @@ class DrugForm extends React.Component {
 
   submitDrugFormHandler() {
     const { drug, drugId } = this.state;
-    if (drug.name === '' || drug.conceptId === '')
+    if (drug.name === "" || drug.conceptId === "")
       this.setState({ error: true });
     else {
-      if (drugId === 'add') {
+      if (drugId === "add") {
         postDrug(drug)
           .then(() => {
-            this.setState({ redirect: '/drug/view/all' });
+            this.setState({ redirect: "/drug/view/all" });
           })
           .catch((error) => {
             console.log(error);
@@ -161,7 +167,7 @@ class DrugForm extends React.Component {
       } else {
         putDrugById(drugId, drug)
           .then(() => {
-            this.setState({ redirect: '/drug/view/all' });
+            this.setState({ redirect: "/drug/view/all" });
           })
           .catch((error) => {
             console.log(error);
@@ -171,7 +177,7 @@ class DrugForm extends React.Component {
   }
 
   cancelButtonHandler() {
-    this.setState({ redirect: '/drug/view/all' });
+    this.setState({ redirect: "/drug/view/all" });
   }
 
   retireDrug() {
@@ -184,7 +190,7 @@ class DrugForm extends React.Component {
           console.log(error);
         });
 
-      this.setState({ redirect: '/drug/view/all' });
+      this.setState({ redirect: "/drug/view/all" });
     });
   }
 
@@ -192,7 +198,7 @@ class DrugForm extends React.Component {
     let { drugId } = this.state;
     deleteDrugById(drugId)
       .then(() => {
-        this.setState({ redirect: '/drug/view/all' });
+        this.setState({ redirect: "/drug/view/all" });
       })
       .catch((error) => {
         console.log(error);
@@ -232,14 +238,14 @@ class DrugForm extends React.Component {
       return <Redirect to={redirect} />;
     }
 
-    if (!isLoading || drugId === 'add') {
+    if (!isLoading || drugId === "add") {
       return (
         <React.Fragment>
           {error && <p>Fill the required fields</p>}
           <p>Concept Drug Management</p>
           {drug.retired && (
             <p>
-              This drug is retired by ... ... - {drug.retireReason}{' '}
+              This drug is retired by ... ... - {drug.retireReason}{" "}
               <button type="button" onClick={unretireDrug.bind(this)}>
                 Unretire this drug
               </button>
@@ -248,105 +254,119 @@ class DrugForm extends React.Component {
           <hr />
 
           <Paper style={paperStyle}>
-            <label htmlFor="name" style={labelStyle}>Name*: 
-            <input
-              style={inputStyle}
-              type="text"
-              id="name"
-              name="name"
-              onChange={nameChangeHandler.bind(this)}
-              value={getValueFor(drug.name)}
-            />
-            </label>
-            <br />
-
-            <label htmlFor="conceptId" style={labelStyle}>Concept*: 
-            <div style={{ width: '300px', display: 'inline-block' }}>
-              <Select
-              style={inputStyle}
-                id="conceptId"
-                name="conceptId"
-                placeholder="Enter concept name or id"
-                defaultValue={getDefaultConceptIdValue}
-                onChange={conceptIdChangeHandler.bind(this)}
-                options={options}
-                filterOption={filterOptions}
+            <label htmlFor="name" style={labelStyle}>
+              Name*:
+              <input
+                style={inputStyle}
+                type="text"
+                id="name"
+                name="name"
+                onChange={nameChangeHandler.bind(this)}
+                value={getValueFor(drug.name)}
               />
-            </div>
-            </label>
-
-            <br />
-            <label htmlFor="combination" style={labelStyle}>Combination: 
-            <input
-              type="checkbox"
-              id="combination"
-              name="combination"
-              onChange={combinationChangeHandler.bind(this)}
-              checked={getValueFor(drug.combination)}
-            />
             </label>
             <br />
 
-            <label htmlFor="dosageForm" style={labelStyle}>Dosage Form:
-            <div style={{ width: '300px', display: 'inline-block' }}>
-              <Select
-                id="dosageForm"
-                name="dosageForm"
-                placeholder="Enter concept name or id"
-                defaultValue={getDefaultDosageFormValue}
-                onChange={dosageFormChangeHandler.bind(this)}
-                options={options}
-                filterOption={filterOptions}
+            <label htmlFor="conceptId" style={labelStyle}>
+              Concept*:
+              <div style={{ width: "300px", display: "inline-block" }}>
+                <Select
+                  style={inputStyle}
+                  id="conceptId"
+                  name="conceptId"
+                  placeholder="Enter concept name or id"
+                  defaultValue={getDefaultConceptIdValue}
+                  onChange={conceptIdChangeHandler.bind(this)}
+                  options={options}
+                  filterOption={filterOptions}
+                />
+              </div>
+            </label>
+
+            <br />
+            <label htmlFor="combination" style={labelStyle}>
+              Combination:
+              <input
+                type="checkbox"
+                id="combination"
+                name="combination"
+                onChange={combinationChangeHandler.bind(this)}
+                checked={getValueFor(drug.combination)}
               />
-            </div>
-            </label>
-
-            <br />
-            <label htmlFor="strength" style={labelStyle}>Strength:
-            <input
-              type="text"
-              id="strength"
-              name="strength"
-              onChange={strengthChangeHandler.bind(this)}
-              value={getValueFor(drug.strength)}
-            />
             </label>
             <br />
 
-            <label htmlFor="minimumDailyDose" style={labelStyle}>Minimum Daily Dose:
-            <input
-              type="number"
-              id="minimumDailyDose"
-              name="minimumDailyDose"
-              onChange={minimumDailyDoseChangeHandler.bind(this)}
-              value={getValueFor(drug.minimumDailyDose)}
-              step="any"
-            />
+            <label htmlFor="dosageForm" style={labelStyle}>
+              Dosage Form:
+              <div style={{ width: "300px", display: "inline-block" }}>
+                <Select
+                  id="dosageForm"
+                  name="dosageForm"
+                  placeholder="Enter concept name or id"
+                  defaultValue={getDefaultDosageFormValue}
+                  onChange={dosageFormChangeHandler.bind(this)}
+                  options={options}
+                  filterOption={filterOptions}
+                />
+              </div>
+            </label>
+
+            <br />
+            <label htmlFor="strength" style={labelStyle}>
+              Strength:
+              <input
+                type="text"
+                id="strength"
+                name="strength"
+                onChange={strengthChangeHandler.bind(this)}
+                value={getValueFor(drug.strength)}
+              />
             </label>
             <br />
 
-            <label htmlFor="maximumDailyDose" style={labelStyle}>Maximum Daily Dose:
-            <input
-              type="number"
-              id="maximumDailyDose"
-              name="maximumDailyDose"
-              onChange={maximumDailyDoseChangeHandler.bind(this)}
-              value={getValueFor(drug.maximumDailyDose)}
-              step="any"
-            />
+            <label htmlFor="minimumDailyDose" style={labelStyle}>
+              Minimum Daily Dose:
+              <input
+                type="number"
+                id="minimumDailyDose"
+                name="minimumDailyDose"
+                onChange={minimumDailyDoseChangeHandler.bind(this)}
+                value={getValueFor(drug.minimumDailyDose)}
+                step="any"
+              />
             </label>
             <br />
-            <button type="button" style={buttonStyle} onClick={submitDrugFormHandler.bind(this)}>
+
+            <label htmlFor="maximumDailyDose" style={labelStyle}>
+              Maximum Daily Dose:
+              <input
+                type="number"
+                id="maximumDailyDose"
+                name="maximumDailyDose"
+                onChange={maximumDailyDoseChangeHandler.bind(this)}
+                value={getValueFor(drug.maximumDailyDose)}
+                step="any"
+              />
+            </label>
+            <br />
+            <button
+              type="button"
+              style={buttonStyle}
+              onClick={submitDrugFormHandler.bind(this)}
+            >
               Save Concept Drug
             </button>
-            <button type="button" style={buttonStyle} onClick={cancelButtonHandler.bind(this)}>
+            <button
+              type="button"
+              style={buttonStyle}
+              onClick={cancelButtonHandler.bind(this)}
+            >
               Cancel
             </button>
-            
           </Paper>
           <hr />
 
-          {drugId !== 'add' && (
+          {drugId !== "add" && (
             <div>
               <p>Retire this Drug</p>
               <label htmlFor="retireReason">Reason: </label>

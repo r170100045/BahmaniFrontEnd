@@ -1,48 +1,44 @@
-import { MenuItem, MenuList, Paper, makeStyles } from '@material-ui/core';
+import { MenuItem, MenuList, Paper, makeStyles } from "@material-ui/core";
+import React, { useState } from "react";
 
-import { Link } from 'react-router-dom';
-import React, { useState } from 'react';
-import { blue } from '@material-ui/core/colors';
+import { Link } from "react-router-dom";
+import { blue } from "@material-ui/core/colors";
 
 const useStyles = makeStyles((theme) => ({
   sideMenu: {
-    display: 'flex',
-    flexDirection: 'column',
-    position: 'absolute',
-    left: '0px',
-    height: '100%',
-    color: 'white',
+    display: "flex",
+    flexDirection: "column",
+    position: "absolute",
+    left: "0px",
+    height: "100%",
+    color: "white",
   },
   paper: {
-    margin: '2vh',
-    marginTop: '12vh',
-
+    margin: "2vh",
+    marginTop: "12vh",
   },
   link: {
-    textDecoration: 'none', 
-    'color': '#5f6163',
-    'fontSize': 16
+    textDecoration: "none",
+    color: "#5f6163",
+    fontSize: 16,
   },
   activeLink: {
-    textDecoration: 'none', 
-    'color': '#5f6163',
-    'fontSize': 16
-  }
+    textDecoration: "none",
+    color: "#5f6163",
+    fontSize: 16,
+  },
 }));
 
 export default function SideMenu() {
   const classes = useStyles();
-  const[linkClass, setLinkClass] = useState('link');
-  //window.location.pathname && and change the class of that link classes.active 
+  const [linkClass, setLinkClass] = useState("link");
+  //window.location.pathname && and change the class of that link classes.active
   return (
     <div className={classes.sideMenu}>
       <Paper className={classes.paper}>
         <MenuList>
           <MenuItem>
-            <Link
-              to="/addressHierarchyLevel/view/all"
-              className={classes.link}
-            >
+            <Link to="/addressHierarchyLevel/view/all" className={classes.link}>
               Address Hierarchy
             </Link>
           </MenuItem>
@@ -52,13 +48,13 @@ export default function SideMenu() {
             </Link>
           </MenuItem>
           <MenuItem>
-            <Link className={classes.link} to="/drug/view/all" >
+            <Link className={classes.link} to="/drug/view/all">
               Medication Data
             </Link>
           </MenuItem>
           <MenuItem>
             <Link
-            className={classes.link}
+              className={classes.link}
               to="/patientRelationshipType/view/all"
             >
               Patient Relationships
@@ -66,10 +62,7 @@ export default function SideMenu() {
           </MenuItem>
 
           <MenuItem>
-            <Link
-            className={classes.link}
-              to="/personAttributeType/view/all"
-            >
+            <Link className={classes.link} to="/personAttributeType/view/all">
               Person Attributes
             </Link>
           </MenuItem>

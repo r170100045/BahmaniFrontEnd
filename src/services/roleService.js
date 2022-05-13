@@ -1,5 +1,5 @@
-import { ROLE } from '../constants/serviceConstants';
-import axios from 'axios';
+import { ROLE } from "../constants/serviceConstants";
+import axios from "axios";
 
 export const insertRole = (data) =>
   axios.post(`${ROLE}`, data).then((res) => res);

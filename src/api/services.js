@@ -15,9 +15,9 @@ import {
   ROLE,
   USER,
   VISIT_TYPE,
-} from '../constants/serviceConstants';
+} from "../constants/serviceConstants";
 
-import axios from 'axios';
+import axios from "axios";
 
 // address hierarchy
 export const getAddressHierarchies = () =>

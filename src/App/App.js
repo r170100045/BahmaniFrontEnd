@@ -1,26 +1,26 @@
-import './App.css';
+import "./App.css";
 
-import { CssBaseline, makeStyles } from '@material-ui/core';
-import { Route, Switch } from 'react-router-dom';
+import { CssBaseline, makeStyles } from "@material-ui/core";
+import { Route, Switch } from "react-router-dom";
 
-import AddressHierarchyLevelPage from '../pages/addressHierarchyLevel/AddressHierarchyLevelPage';
-import ConceptPage from '../pages/concept/ConceptPage';
-import DrugPage from '../pages/drug/DrugPage';
-import Header from '../components/Header';
-import PatientRelationshipTypePage from '../pages/patientRelationshipType/PatientRelationshipTypePage';
-import PersonAttributeTypePage from '../pages/personAttributeType/PersonAttributeTypePage';
-import PrivilegePage from '../pages/privilege/PrivilegePage';
-import RolePage from '../pages/role/RolePage';
-import SideMenu from '../components/SideMenu';
-import UserForm from '../pages/user/UserForm';
-import UserPage from '../pages/user/UserPage';
-import VisitTypePage from '../pages/visitType/VisitTypePage';
+import AddressHierarchyLevelPage from "../pages/addressHierarchyLevel/AddressHierarchyLevelPage";
+import ConceptPage from "../pages/concept/ConceptPage";
+import DrugPage from "../pages/drug/DrugPage";
+import Header from "../components/Header";
+import PatientRelationshipTypePage from "../pages/patientRelationshipType/PatientRelationshipTypePage";
+import PersonAttributeTypePage from "../pages/personAttributeType/PersonAttributeTypePage";
+import PrivilegePage from "../pages/privilege/PrivilegePage";
+import RolePage from "../pages/role/RolePage";
+import SideMenu from "../components/SideMenu";
+import UserForm from "../pages/user/UserForm";
+import UserPage from "../pages/user/UserPage";
+import VisitTypePage from "../pages/visitType/VisitTypePage";
 
 const useStyles = makeStyles({
   appMain: {
-    paddingLeft: '200px',
-    width: '100%',
-    backgroundColor: '#B7CADB',
+    paddingLeft: "200px",
+    width: "100%",
+    backgroundColor: "#B7CADB",
   },
 });
 

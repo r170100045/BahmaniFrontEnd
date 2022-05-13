@@ -1,5 +1,5 @@
-import { VISIT_TYPE } from '../constants/serviceConstants';
-import axios from 'axios';
+import { VISIT_TYPE } from "../constants/serviceConstants";
+import axios from "axios";
 
 export const insertVisitType = (data) =>
   axios.post(`${VISIT_TYPE}`, data).then((res) => res);

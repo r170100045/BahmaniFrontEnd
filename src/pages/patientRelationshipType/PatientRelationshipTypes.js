@@ -1,10 +1,10 @@
-import { Link, Redirect } from 'react-router-dom';
-import MaterialTable, { MTableToolbar } from 'material-table';
-import { useEffect, useState } from 'react';
+import { Link, Redirect } from "react-router-dom";
+import MaterialTable, { MTableToolbar } from "material-table";
+import { useEffect, useState } from "react";
 
-import Controls from '../../components/controls/Controls';
-import EditIcon from '@material-ui/icons/Edit';
-import { getAllPatientRelationshipTypes } from '../../services/patientRelationshipTypeService';
+import Controls from "../../components/controls/Controls";
+import EditIcon from "@material-ui/icons/Edit";
+import { getAllPatientRelationshipTypes } from "../../services/patientRelationshipTypeService";
 
 const PatientRelationshipTypes = () => {
   const [patientRelationshipTypes, setPatientRelationshipTypes] = useState([]);
@@ -12,8 +12,8 @@ const PatientRelationshipTypes = () => {
 
   const columns = [
     {
-      title: 'Names',
-      field: 'aisToB',
+      title: "Names",
+      field: "aisToB",
       render: (rowData) => (
         <p>
           {rowData.aisToB}/{rowData.bisToA}
@@ -21,8 +21,8 @@ const PatientRelationshipTypes = () => {
       ),
     },
     {
-      title: 'Description',
-      field: 'description',
+      title: "Description",
+      field: "description",
     },
   ];
 
@@ -50,7 +50,7 @@ const PatientRelationshipTypes = () => {
     Toolbar: (props) => (
       <div>
         <MTableToolbar {...props} />
-        <div className="text-end" style={{ padding: '0px 10px' }}>
+        <div className="text-end" style={{ padding: "0px 10px" }}>
           <Link to="/patientRelationshipType/edit/add">
             <Controls.AddButton />
           </Link>
@@ -62,7 +62,7 @@ const PatientRelationshipTypes = () => {
   const actions = [
     {
       icon: () => <EditIcon color="primary" />,
-      tooltip: 'Edit',
+      tooltip: "Edit",
       onClick: (event, rowData) =>
         setRedirect(`/patientRelationshipType/edit/${rowData.uuid}`),
     },
@@ -88,7 +88,7 @@ const PatientRelationshipTypes = () => {
 
   return (
     <>
-      <div style={{ maxWidth: '96%', margin: 'auto' }}>
+      <div style={{ maxWidth: "96%", margin: "auto" }}>
         <MaterialTable
           title="Patient Relationship Types"
           data={patientRelationshipTypes}
