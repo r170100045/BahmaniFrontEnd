@@ -1,10 +1,14 @@
 import {
+  CONCEPT,
   CONCEPT_CLASS,
   CONCEPT_DATA_TYPE,
   CONCEPT_NAME,
 } from "../constants/serviceConstants";
 
 import axios from "axios";
+
+export const getConceptById = (id) =>
+  axios.get(`${CONCEPT}/${id}`).then((res) => res);
 
 export const getConceptNames = () =>
   axios.get(`${CONCEPT_NAME}`).then((res) => res);

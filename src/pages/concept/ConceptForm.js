@@ -115,6 +115,22 @@ class ConceptForm extends React.Component {
     this.mapCodeChangeHandler = this.mapCodeChangeHandler.bind(this);
   }
 
+  componentDidMount() {
+    this.setClassOptions()
+      .then(() => this.setConceptOptions())
+      .then(() => this.setDrugOptions())
+      .then(() => this.setDataTypeOptions())
+      .then(() => this.setMapRelationshipOptions())
+      .then(() => this.setMapSourceOptions())
+      .then(() => this.setMapReferenceTermOptions())
+      .then(() => this.setFilteredMapReferenceTermOptions())
+      .then(() => this.setMapCodeOptions())
+      .then(() => this.setFetchedConcept())
+      .then(() => this.setDataType())
+      .then(() => this.setSynonyms())
+      .then(() => this.setState({ isLoading: false }));
+  }
+
   mergeConceptnames() {
     const { synonyms, concept } = this.state;
     const fullySpecifiedName = concept.conceptNames.find(
@@ -187,13 +203,13 @@ class ConceptForm extends React.Component {
     // if (conceptId === "add") {
     //   postConcept(concept)
     //     .then(() => {
-    //       this.setState({ redirect: "/concept/all" });
+    //       this.setState({ redirect: "/concept/view/all" });
     //     })
     //     .catch((error) => console.log(error));
     // } else {
     //   putConceptById(conceptId, concept)
     //     .then(() => {
-    //       this.setState({ redirect: "/concept/all" });
+    //       this.setState({ redirect: "/concept/view/all" });
     //     })
     //     .catch((error) => console.log(error));
     // }
@@ -219,7 +235,7 @@ class ConceptForm extends React.Component {
 
   cancelConcept(event) {
     event.preventDefault();
-    this.setState({ redirect: "/concept/all" });
+    this.setState({ redirect: "/concept/view/all" });
   }
 
   deleteConcept(event) {
@@ -227,7 +243,7 @@ class ConceptForm extends React.Component {
     const { conceptId } = this.state;
     deleteConceptById(conceptId)
       .then(() => {
-        this.setState({ redirect: "/concept/all" });
+        this.setState({ redirect: "/concept/view/all" });
       })
       .catch((error) => console.log(error));
   }
@@ -286,22 +302,6 @@ class ConceptForm extends React.Component {
     const { concept } = this.state;
     concept.conceptComplex = selectedOption.value;
     this.setState({ concept });
-  }
-
-  componentDidMount() {
-    this.setClassOptions()
-      .then(() => this.setConceptOptions())
-      .then(() => this.setDrugOptions())
-      .then(() => this.setDataTypeOptions())
-      .then(() => this.setMapRelationshipOptions())
-      .then(() => this.setMapSourceOptions())
-      .then(() => this.setMapReferenceTermOptions())
-      .then(() => this.setFilteredMapReferenceTermOptions())
-      .then(() => this.setMapCodeOptions())
-      .then(() => this.setFetchedConcept())
-      .then(() => this.setDataType())
-      .then(() => this.setSynonyms())
-      .then(() => this.setState({ isLoading: false }));
   }
 
   setClassOptions() {
@@ -827,6 +827,9 @@ class ConceptForm extends React.Component {
     if (!isLoading || conceptId === "add") {
       return (
         <Fragment>
+          <button type="button">
+            <a href={`/concept/view/${conceptId}`}>View</a>
+          </button>
           {conceptId !== "add" && concept.retired && (
             <div>
               <p>
