@@ -52,6 +52,7 @@ class VisitTypeForm extends React.Component {
 
   saveVisitType() {
     const { visitTypeId, visitType } = this.state;
+    console.log("vt", visitType);
     if (visitTypeId === "add") this.insertVisitTypeWithData(visitType);
     else this.updateVisitTypeWithData(visitTypeId, visitType);
   }

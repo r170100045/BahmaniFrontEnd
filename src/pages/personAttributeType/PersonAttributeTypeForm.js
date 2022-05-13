@@ -9,6 +9,7 @@ import {
 import { FORMAT_OPTIONS } from "../../constants/otherConstants";
 import React from "react";
 import Select from "react-select";
+import { getPrivileges } from "../../services/privilegeService";
 
 class PersonAttributeTypeForm extends React.Component {
   constructor(props) {
@@ -17,7 +18,7 @@ class PersonAttributeTypeForm extends React.Component {
     const initialPersonAttributeType = {
       name: "",
       description: "",
-      editPrevilige: "",
+      editPrivilege: "",
       foreignKey: "",
       format: "",
       retireReason: "",
@@ -30,23 +31,52 @@ class PersonAttributeTypeForm extends React.Component {
       personAttributeTypeId: this.props.match.params.id,
       redirect: null,
       isLoading: true,
+      editPrivilegeOptions: [],
     };
   }
 
   componentDidMount() {
-    const { personAttributeTypeId } = this.state;
-    if (personAttributeTypeId !== "add") {
-      getPersonAttributeTypeById(personAttributeTypeId)
+    this.setEditPrivilegeOptions()
+      .then(() => this.setFetchedPersonAttributeType())
+      .then(() => this.setState({ isLoading: false }));
+  }
+
+  setEditPrivilegeOptions() {
+    return new Promise((resolve, reject) => {
+      getPrivileges()
         .then((response) => {
-          this.setState({
-            personAttributeType: response.data,
-            isLoading: false,
+          const editPrivilegeOptions = [];
+          Object.keys(response.data).forEach((key) => {
+            editPrivilegeOptions.push({
+              label: response.data[key].privilege,
+              value: response.data[key].privilege,
+            });
+          });
+          this.setState({ editPrivilegeOptions }, () => {
+            resolve("success");
           });
         })
-        .catch((error) => {
-          console.log(error);
-        });
-    }
+        .catch((e) => reject(e));
+    });
+  }
+
+  setFetchedPersonAttributeType() {
+    const { personAttributeTypeId } = this.state;
+
+    return new Promise((resolve, reject) => {
+      if (personAttributeTypeId !== "add") {
+        getPersonAttributeTypeById(personAttributeTypeId)
+          .then((response) => {
+            console.log(response.data);
+            this.setState({ personAttributeType: response.data }, () =>
+              resolve("success")
+            );
+          })
+          .catch((e) => reject(e));
+      } else {
+        resolve("success");
+      }
+    });
   }
 
   nameChangeHandler(event) {
@@ -63,6 +93,7 @@ class PersonAttributeTypeForm extends React.Component {
 
   savePersonAttributeType() {
     const { personAttributeTypeId, personAttributeType } = this.state;
+    console.log("pat", personAttributeType);
     if (personAttributeTypeId === "add")
       this.insertPersonAttributeTypeWithData(personAttributeType);
     else
@@ -141,6 +172,12 @@ class PersonAttributeTypeForm extends React.Component {
     this.setState({ personAttributeType });
   }
 
+  editPrivilegeChangeHandler(selectedOption) {
+    const { personAttributeType } = this.state;
+    personAttributeType.editPrivilege = selectedOption.value;
+    this.setState({ personAttributeType });
+  }
+
   searchableChangeHandler(event) {
     const { personAttributeType } = this.state;
     personAttributeType.searchable = event.target.checked;
@@ -152,8 +189,13 @@ class PersonAttributeTypeForm extends React.Component {
   }
 
   render() {
-    const { personAttributeType, personAttributeTypeId, redirect, isLoading } =
-      this.state;
+    const {
+      personAttributeType,
+      personAttributeTypeId,
+      redirect,
+      isLoading,
+      editPrivilegeOptions,
+    } = this.state;
 
     const {
       nameChangeHandler,
@@ -164,6 +206,7 @@ class PersonAttributeTypeForm extends React.Component {
       unretirePersonAttributeType,
       deletePersonAttributeType,
       formatChangeHandler,
+      editPrivilegeChangeHandler,
       searchableChangeHandler,
       getValueFor,
     } = this;
@@ -172,6 +215,10 @@ class PersonAttributeTypeForm extends React.Component {
 
     const getDefaultFormatValue = FORMAT_OPTIONS.filter(
       (option) => option.value === personAttributeType.format
+    );
+
+    const getDefaultEditPrivilegeValue = editPrivilegeOptions.filter(
+      (option) => option.value === personAttributeType.editPrivilege
     );
 
     if (!isLoading || personAttributeTypeId === "add") {
@@ -212,7 +259,7 @@ class PersonAttributeTypeForm extends React.Component {
                   name="editPrivilege"
                   defaultValue={getDefaultEditPrivilegeValue}
                   onChange={editPrivilegeChangeHandler.bind(this)}
-                  options={EDIT_PRIVILEGE_OPTIONS}
+                  options={editPrivilegeOptions}
                 />
               </div>
             </label>
