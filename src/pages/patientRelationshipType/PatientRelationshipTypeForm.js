@@ -119,6 +119,10 @@ class PatientRelationshipTypeForm extends React.Component {
       });
   }
 
+  cancelRelationshipType() {
+    this.setState({ redirect: "/patientRelationshipType/view/all" });
+  }
+
   getValueFor(field) {
     return field === null ? "" : field;
   }
@@ -135,6 +139,7 @@ class PatientRelationshipTypeForm extends React.Component {
       unretireRelationshipType,
       deleteRelationshipType,
       getValueFor,
+      cancelRelationshipType,
     } = this;
 
     if (redirect) return <Redirect to={redirect} />;
@@ -180,7 +185,10 @@ class PatientRelationshipTypeForm extends React.Component {
           <br />
 
           <button type="button" onClick={saveRelationshipType.bind(this)}>
-            Save Relationship Type
+            Save
+          </button>
+          <button type="button" onClick={cancelRelationshipType.bind(this)}>
+            Cancel
           </button>
           <br />
         </div>

@@ -145,7 +145,7 @@ class PrivilegeForm extends React.Component {
             style={buttonStyle}
             onClick={savePrivilege.bind(this)}
           >
-            Save Visit Type
+            Save
           </button>
           <button
             type="button"

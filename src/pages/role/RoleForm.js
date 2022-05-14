@@ -1,4 +1,4 @@
-import { Link, Redirect, withRouter } from "react-router-dom";
+import { Redirect, withRouter } from "react-router-dom";
 import {
   deleteRoleById,
   getRoleById,
@@ -30,15 +30,12 @@ class RoleForm extends React.Component {
       allRoles: [],
       inheritedRoles: [],
       allPrivileges: [],
-      displayChildRoles: [],
       isLoading: true,
     };
 
     this.inheritedRoleChangeHandler =
       this.inheritedRoleChangeHandler.bind(this);
     this.privilegeChangeHandler = this.privilegeChangeHandler.bind(this);
-    this.getChildRoleUUID = this.getChildRoleUUID.bind(this);
-    this.redirectToChildRole = this.redirectToChildRole.bind(this);
   }
 
   componentDidMount() {
@@ -46,32 +43,9 @@ class RoleForm extends React.Component {
       .then(() => this.setAllPrivileges())
       .then(() => this.setRole())
       .then(() => this.setInheritedRoles())
+      .then(() => this.setCurrentPrivileges())
       .then(() => this.disableDisplayPrivileges())
-      .then(() => this.enableDisplayPrivileges())
-      .then(() => this.setDisplayChildRoles())
       .then(() => this.setState({ isLoading: false }));
-  }
-
-  setDisplayChildRoles() {
-    return new Promise((resolve, reject) => {
-      const { role } = this.state;
-
-      const displayChildRoles = [];
-      role.childRoles.forEach((chRole) => {
-        getRoleByName(chRole)
-          .then((response) => {
-            displayChildRoles.push({
-              childRole: response.data.role,
-              uuid: response.data.uuid,
-            });
-          })
-          .catch((e) => console.log(e.message));
-      });
-
-      this.setState({ displayChildRoles }, () => {
-        resolve("success");
-      });
-    });
   }
 
   setInheritedRoles() {
@@ -111,9 +85,7 @@ class RoleForm extends React.Component {
               resolve("success");
             });
           })
-          .catch((error) => {
-            console.log(error);
-          });
+          .catch((e) => reject(e));
       } else {
         resolve("success");
       }
@@ -136,19 +108,20 @@ class RoleForm extends React.Component {
     });
   }
 
-  enableDisplayPrivileges() {
+  setCurrentPrivileges() {
     return new Promise((resolve, reject) => {
-      const { role } = this.state;
+      const { role, allPrivileges } = this.state;
+      const tempAllPrivileges = [...allPrivileges];
 
-      role.rolePrivileges.forEach((rp, index) => {
-        const { allPrivileges } = this.state;
-        const apIndex = allPrivileges.findIndex((ap) => ap.privilege === rp);
-        allPrivileges[apIndex].checked = true;
-        this.setState({ allPrivileges });
+      role.rolePrivileges.forEach((rp) => {
+        const tapIndex = tempAllPrivileges.findIndex(
+          (tap) => tap.privilege === rp
+        );
+        tempAllPrivileges[tapIndex].checked = true;
+      });
 
-        if (index === role.rolePrivileges.length - 1) {
-          resolve("success");
-        }
+      this.setState({ allPrivileges: tempAllPrivileges }, () => {
+        resolve("success");
       });
     });
   }
@@ -156,33 +129,32 @@ class RoleForm extends React.Component {
   disableDisplayPrivileges() {
     return new Promise((resolve, reject) => {
       const { role, allPrivileges } = this.state;
-
       const tempAllPrivileges = [...allPrivileges];
 
-      role.parentRoles.forEach((el, index) => {
-        getRoleByName(el)
-          .then((response) => {
-            const parentRolePrivileges = response.data.rolePrivileges;
-
-            parentRolePrivileges.forEach((prPrivilege) => {
-              const index = tempAllPrivileges.findIndex(
-                (ap) => ap.privilege === prPrivilege
-              );
-              tempAllPrivileges[index].checked = true;
-              tempAllPrivileges[index].disabled = true;
-            });
-          })
-          .catch((e) => console.log(e.message));
-      });
-
-      role.rolePrivileges.forEach((rp) => {
-        const index = tempAllPrivileges.findIndex((ap) => ap.privilege === rp);
-        tempAllPrivileges[index].checked = true;
-      });
-
-      this.setState({ allPrivileges: tempAllPrivileges }, () => {
+      if (role.parentRoles.length === 0) {
         resolve("success");
-      });
+      } else {
+        role.parentRoles.forEach((el, index) => {
+          getRoleByName(el)
+            .then((response) => {
+              const parentRolePrivileges = response.data.rolePrivileges;
+              parentRolePrivileges.forEach((prPrivilege) => {
+                const tapIndex = tempAllPrivileges.findIndex(
+                  (tap) => tap.privilege === prPrivilege
+                );
+                tempAllPrivileges[tapIndex].disabled = true;
+              });
+            })
+            .then(() => {
+              if (index === role.parentRoles.length - 1) {
+                this.setState({ allPrivileges: tempAllPrivileges }, () => {
+                  resolve("success");
+                });
+              }
+            })
+            .catch((e) => console.log(e.message));
+        });
+      }
     });
   }
 
@@ -272,58 +244,32 @@ class RoleForm extends React.Component {
   saveRole() {
     const { roleId, role } = this.state;
     console.log("role", role);
-    // if (roleId === "add") {
-    //   insertRole(role)
-    //     .then(() => {
-    //       this.setState({ redirect: "/role/view/all" });
-    //     })
-    //     .catch((error) => {
-    //       console.log(error);
-    //     });
-    // } else {
-    //   updateRoleById(roleId, role)
-    //     .then(() => {
-    //       this.setState({ redirect: "/role/view/all" });
-    //     })
-    //     .catch((error) => {
-    //       console.log(error);
-    //     });
-    // }
+    if (roleId === "add") {
+      insertRole(role)
+        .then(() => {
+          this.setState({ redirect: "/role/view/all" });
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    } else {
+      updateRoleById(roleId, role)
+        .then(() => {
+          this.setState({ redirect: "/role/view/all" });
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
   }
 
   getValueFor(field) {
     return field === null ? "" : field;
   }
 
-  getChildRoleUUID(childRole) {
-    var uuid = "";
-
-    getRoleByName(childRole)
-      .then((response) => {
-        uuid = response.data.uuid;
-      })
-      .catch((e) => console.log(e.message));
-
-    return uuid;
-  }
-
-  redirectToChildRole(uuid) {
-    // this.setState({ redirect: `/role/view/${uuid}` });
-    // console.log("uuid", uuid);
-    // this.props.history.push(`/role/view/${uuid}`);
-    // this.history.pushState(null, `/role/view/${uuid}`);
-  }
-
   render() {
-    const {
-      role,
-      roleId,
-      redirect,
-      inheritedRoles,
-      allPrivileges,
-      isLoading,
-      displayChildRoles,
-    } = this.state;
+    const { role, roleId, redirect, inheritedRoles, allPrivileges, isLoading } =
+      this.state;
     const {
       roleChangeHandler,
       descriptionChangeHandler,
@@ -333,8 +279,6 @@ class RoleForm extends React.Component {
       privilegeChangeHandler,
       cancel,
       deleteRole,
-      getChildRoleUUID,
-      redirectToChildRole,
     } = this;
 
     if (redirect) return <Redirect to={redirect} />;
@@ -370,39 +314,21 @@ class RoleForm extends React.Component {
           </label>
           <br />
 
-          <div>
-            <p>Roles that contain (inherit privileges from) {role.role}</p>
-
-            <ul>
-              {role.childRoles.map((childRole) => (
-                <li key={childRole.uuid}>
-                  {/* <Link to={`/role/view/${childRole.uuid}`}>
-                    {childRole.childRoleName}
-                  </Link> */}
-                  <p
-                    // to={`/role/view/${childRole.uuid}`}
-                    onClick={() => {
-                      this.setState({
-                        redirect: `/role/edit/${childRole.uuid}`,
-                      });
-                    }}
-                    // onClick={redirectToChildRole(childRole.uuid)}
-                    // onClick={() => {
-                    //   window.location.href = `/role/view/${childRole.uuid}`;
-                    // }}
-                  >
-                    {childRole.childRoleName}
-                  </p>
-                </li>
-              ))}
-            </ul>
-
-            {/* {displayChildRoles.map((el) => (
-              <div> {el.childRole}</div>
-            ))} */}
-
-            <br />
-          </div>
+          {role.childRoles.length > 0 && (
+            <div>
+              <p>Roles that contain (inherit privileges from) {role.role}</p>
+              <ul>
+                {role.childRoles.map((childRole) => (
+                  <li key={childRole.uuid}>
+                    <a href={`/role/edit/${childRole.uuid}`}>
+                      {childRole.childRoleName}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+              <br />
+            </div>
+          )}
 
           <div>
             <p>Inherited Roles:</p>
@@ -428,8 +354,10 @@ class RoleForm extends React.Component {
           <div>
             <p>Privileges:</p>
             <div>
-              {/* TO DO */}
-              {/* <p>{role.role} inherits privileges from these roles</p> */}
+              <p>
+                Greyed out checkboxes represent privileges inherited from other
+                roles, these cannot be removed individually.
+              </p>
               <ul>
                 {allPrivileges.map((el, index) => (
                   <div key={el.privilege}>
@@ -458,7 +386,7 @@ class RoleForm extends React.Component {
           <br />
 
           <button type="button" onClick={saveRole.bind(this)}>
-            Save Role
+            Save
           </button>
           <button type="button" onClick={cancel.bind(this)}>
             Cancel

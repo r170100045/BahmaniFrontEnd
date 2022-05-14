@@ -827,9 +827,12 @@ class ConceptForm extends React.Component {
     if (!isLoading || conceptId === "add") {
       return (
         <Fragment>
-          <button type="button">
-            <a href={`/concept/view/${conceptId}`}>View</a>
-          </button>
+          {conceptId !== "add" && (
+            <button type="button">
+              <a href={`/concept/view/${conceptId}`}>View</a>
+            </button>
+          )}
+
           {conceptId !== "add" && concept.retired && (
             <div>
               <p>

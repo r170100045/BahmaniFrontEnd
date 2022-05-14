@@ -74,7 +74,7 @@ const Concepts = () => {
             label={showRetired ? "Hide Retired" : "Show Retired"}
             labelPlacement="start"
           />
-          <Link to="/concept/add">
+          <Link to="/concept/edit/add">
             <Controls.AddButton />
           </Link>
         </div>
