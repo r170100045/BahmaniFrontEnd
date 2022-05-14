@@ -8,15 +8,15 @@ import {
 } from "../../constants/formStyling";
 import {
   deleteDrugById,
-  getConceptNames,
   getDrugById,
-  postDrug,
-  putDrugById,
-} from "../../api/services";
+  insertDrug,
+  updateDrugById,
+} from "../../services/drugService";
 
 import { Paper } from "@material-ui/core";
 import React from "react";
 import Select from "react-select";
+import { getConceptNames } from "../../services/conceptService";
 
 class DrugForm extends React.Component {
   constructor(props) {
@@ -84,7 +84,7 @@ class DrugForm extends React.Component {
     const { drug, drugId } = this.state;
     drug.retired = false;
     this.setState({ drug }, () => {
-      putDrugById(drugId, drug)
+      updateDrugById(drugId, drug)
         .then(() => {
           this.setState({ redirect: "/drug/view/all" });
         })
@@ -157,7 +157,7 @@ class DrugForm extends React.Component {
       this.setState({ error: true });
     else {
       if (drugId === "add") {
-        postDrug(drug)
+        insertDrug(drug)
           .then(() => {
             this.setState({ redirect: "/drug/view/all" });
           })
@@ -165,7 +165,7 @@ class DrugForm extends React.Component {
             console.log(error);
           });
       } else {
-        putDrugById(drugId, drug)
+        updateDrugById(drugId, drug)
           .then(() => {
             this.setState({ redirect: "/drug/view/all" });
           })
@@ -184,7 +184,7 @@ class DrugForm extends React.Component {
     let { drug, drugId } = this.state;
     drug.retired = true;
     this.setState({ drug }, () => {
-      putDrugById(drugId, drug)
+      updateDrugById(drugId, drug)
         .then(() => {})
         .catch((error) => {
           console.log(error);

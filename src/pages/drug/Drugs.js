@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 
 import Controls from "../../components/controls/Controls";
 import EditIcon from "@material-ui/icons/Edit";
-import { getDrugs } from "../../api/services";
+import { getDrugs } from "../../services/drugService";
 
 const Drugs = () => {
   const [drugs, setDrugs] = useState([]);

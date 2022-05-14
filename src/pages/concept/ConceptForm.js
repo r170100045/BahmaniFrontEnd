@@ -6,16 +6,16 @@ import {
   getConceptClasses,
   getConceptDataTypes,
   getConceptMapTypes,
-  getConceptNames,
+  getConceptNameDetails,
   getConceptReferenceSources,
   getConceptReferenceTerms,
-  getDrugs,
-  postConcept,
-  putConceptById,
-} from "../../api/services";
+  insertConcept,
+  updateConceptById,
+} from "../../services/conceptService";
 
 import { CONCEPT_COMPLEX_HANDLERS } from "../../constants/otherConstants";
 import Select from "react-select";
+import { getDrugs } from "../../services/drugService";
 
 class ConceptForm extends React.Component {
   constructor(props) {
@@ -40,7 +40,7 @@ class ConceptForm extends React.Component {
         displayPrecision: null,
       },
       dataTypeId: {
-        conceptDataTypeId: 1,
+        conceptDataTypeId: 2,
       },
       conceptNames: [
         {
@@ -84,7 +84,7 @@ class ConceptForm extends React.Component {
       concept: initialConceptState,
       redirect: null,
       conceptId: this.props.match.params.id,
-      dataType: 1,
+      dataType: 2,
       classOptions: [],
       conceptOptions: [],
       drugOptions: [],
@@ -169,7 +169,7 @@ class ConceptForm extends React.Component {
     const { concept, conceptId } = this.state;
     concept.retired = false;
     this.setState({ concept: concept }, () => {
-      putConceptById(conceptId, concept)
+      updateConceptById(conceptId, concept)
         .then()
         .catch((error) => console.log(error));
     });
@@ -201,13 +201,13 @@ class ConceptForm extends React.Component {
     console.log("concept - save", concept);
 
     // if (conceptId === "add") {
-    //   postConcept(concept)
+    //   insertConcept(concept)
     //     .then(() => {
     //       this.setState({ redirect: "/concept/view/all" });
     //     })
     //     .catch((error) => console.log(error));
     // } else {
-    //   putConceptById(conceptId, concept)
+    //   updateConceptById(conceptId, concept)
     //     .then(() => {
     //       this.setState({ redirect: "/concept/view/all" });
     //     })
@@ -221,13 +221,13 @@ class ConceptForm extends React.Component {
 
     const { conceptId, concept } = this.state;
     if (conceptId === "add") {
-      postConcept(concept)
+      insertConcept(concept)
         .then((response) => {
           this.setState({ conceptId: response.data.name });
         })
         .catch((error) => console.log(error));
     } else {
-      putConceptById(conceptId, concept)
+      updateConceptById(conceptId, concept)
         .then()
         .catch((error) => console.log(error));
     }
@@ -259,7 +259,7 @@ class ConceptForm extends React.Component {
     const { concept, conceptId } = this.state;
     concept.retired = true;
     this.setState({ concept: concept }, () => {
-      putConceptById(conceptId, concept)
+      updateConceptById(conceptId, concept)
         .then()
         .catch((error) => console.log(error));
     });
@@ -325,13 +325,14 @@ class ConceptForm extends React.Component {
 
   setConceptOptions() {
     return new Promise((resolve, reject) => {
-      getConceptNames()
+      getConceptNameDetails()
         .then((response) => {
           const conceptOptions = [];
           Object.keys(response.data).forEach((key) => {
             conceptOptions.push({
-              label: response.data[key].name,
+              label: response.data[key].conceptName,
               value: response.data[key].conceptId,
+              uuid: response.data[key].uuid,
             });
           });
           this.setState({ conceptOptions }, () => {
@@ -351,6 +352,7 @@ class ConceptForm extends React.Component {
             drugOptions.push({
               label: response.data[key].name,
               value: response.data[key].drugId,
+              conceptUuid: response.data[key].conceptUuid,
             });
           });
           this.setState({ drugOptions }, () => {
@@ -609,6 +611,7 @@ class ConceptForm extends React.Component {
         ];
       }
     });
+    console.log("getDACV", defaultAnswerConceptValue);
     return defaultAnswerConceptValue;
   }
 
@@ -745,8 +748,8 @@ class ConceptForm extends React.Component {
       getValueFor,
       conceptSetsChangeHandler,
       filterOptions,
-      getDefaultAnswerConceptValue,
-      getDefaultAnswerDrugValue,
+      // getDefaultAnswerConceptValue,
+      // getDefaultAnswerDrugValue,
       answerConceptChangeHandler,
       answerDrugChangeHandler,
       fullySpecifiedNameChangeHandler,
@@ -817,8 +820,49 @@ class ConceptForm extends React.Component {
       });
       return defaultConceptSetsValue;
     };
-
     const defaultConceptSetsValue = getDefaultConceptSetsValue();
+
+    const getDefaultAnswerConceptValue = () => {
+      const { conceptAnswers } = this.state.concept;
+      const { conceptOptions } = this.state;
+
+      let defaultAnswerConceptValue = [];
+      conceptAnswers.forEach((concept) => {
+        if (concept.answerConcept) {
+          const eachValueOptions = conceptOptions.filter(
+            (conceptOption) => conceptOption.value === concept.answerConcept
+          );
+          defaultAnswerConceptValue = [
+            ...defaultAnswerConceptValue,
+            ...eachValueOptions,
+          ];
+        }
+      });
+      console.log("defAnsConc", defaultAnswerConceptValue);
+      return defaultAnswerConceptValue;
+    };
+    const defaultAnswerConceptValue = getDefaultAnswerConceptValue();
+
+    const getDefaultAnswerDrugValue = () => {
+      const { conceptAnswers } = this.state.concept;
+      const { drugOptions } = this.state;
+
+      let defaultAnswerDrugValue = [];
+      conceptAnswers.forEach((concept) => {
+        if (concept.answerDrug) {
+          const eachValueOptions = drugOptions.filter(
+            (drugOption) => drugOption.value === concept.answerDrug
+          );
+          defaultAnswerDrugValue = [
+            ...defaultAnswerDrugValue,
+            ...eachValueOptions,
+          ];
+        }
+      });
+      console.log("defAnsDrg", defaultAnswerConceptValue);
+      return defaultAnswerDrugValue;
+    };
+    const defaultAnswerDrugValue = getDefaultAnswerDrugValue();
 
     if (redirect) {
       return <Redirect to={redirect} />;
@@ -1229,7 +1273,8 @@ class ConceptForm extends React.Component {
                     id="answerConcept"
                     name="answerConcept"
                     placeholder="Enter concept name or id"
-                    defaultValue={getDefaultAnswerConceptValue.bind(this)}
+                    // defaultValue={() => getDefaultAnswerConceptValue.bind(this)}
+                    defaultValue={defaultAnswerConceptValue}
                     onChange={answerConceptChangeHandler.bind(this)}
                     options={conceptOptions}
                     filterOption={filterOptions}
@@ -1244,7 +1289,8 @@ class ConceptForm extends React.Component {
                     id="answerDrug"
                     name="answerDrug"
                     placeholder="Enter concept drug name or id"
-                    defaultValue={getDefaultAnswerDrugValue.bind(this)}
+                    // defaultValue={() => getDefaultAnswerDrugValue.bind(this)}
+                    defaultValue={defaultAnswerDrugValue}
                     onChange={answerDrugChangeHandler.bind(this)}
                     options={drugOptions}
                     filterOption={filterOptions}

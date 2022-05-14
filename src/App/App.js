@@ -62,9 +62,6 @@ export default function App() {
           <Route path="/privilege/:action/:id">
             <PrivilegePage />
           </Route>
-          {/* <Route path="/">
-            <TestAutoComplete />
-          </Route> */}
         </Switch>
       </div>
       <CssBaseline />

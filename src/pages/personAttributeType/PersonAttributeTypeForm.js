@@ -184,6 +184,10 @@ class PersonAttributeTypeForm extends React.Component {
     this.setState({ personAttributeType });
   }
 
+  cancelPersonAttributeType() {
+    this.setState({ redirect: "/personAttributeType/view/all" });
+  }
+
   getValueFor(field) {
     return field === null ? "" : field;
   }
@@ -209,6 +213,7 @@ class PersonAttributeTypeForm extends React.Component {
       editPrivilegeChangeHandler,
       searchableChangeHandler,
       getValueFor,
+      cancelPersonAttributeType,
     } = this;
 
     if (redirect) return <Redirect to={redirect} />;
@@ -251,20 +256,6 @@ class PersonAttributeTypeForm extends React.Component {
             </label>
             <br />
 
-            <label htmlFor="editPrivilege">
-              Edit Privilege:
-              <div style={{ width: "300px", display: "inline-block" }}>
-                <Select
-                  id="editPrivilege"
-                  name="editPrivilege"
-                  defaultValue={getDefaultEditPrivilegeValue}
-                  onChange={editPrivilegeChangeHandler.bind(this)}
-                  options={editPrivilegeOptions}
-                />
-              </div>
-            </label>
-            <br />
-
             <label htmlFor="searchable">
               Searchable:
               <input
@@ -290,10 +281,28 @@ class PersonAttributeTypeForm extends React.Component {
             </label>
             <br />
 
-            {/* SELECT -- Edit Privilege */}
+            <label htmlFor="editPrivilege">
+              Edit Privilege:
+              <div style={{ width: "300px", display: "inline-block" }}>
+                <Select
+                  id="editPrivilege"
+                  name="editPrivilege"
+                  defaultValue={getDefaultEditPrivilegeValue}
+                  onChange={editPrivilegeChangeHandler.bind(this)}
+                  options={editPrivilegeOptions}
+                />
+              </div>
+            </label>
+            <br />
 
             <button type="button" onClick={savePersonAttributeType.bind(this)}>
-              Save Person Attribute Type
+              Save
+            </button>
+            <button
+              type="button"
+              onClick={cancelPersonAttributeType.bind(this)}
+            >
+              Cancel
             </button>
             <br />
           </div>

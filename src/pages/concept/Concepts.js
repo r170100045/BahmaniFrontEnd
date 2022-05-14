@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import Controls from "../../components/controls/Controls";
 import EditIcon from "@material-ui/icons/Edit";
 import VisibilityIcon from "@material-ui/icons/Visibility";
-import { getConceptNameDetails } from "../../api/services";
+import { getConceptNameDetails } from "../../services/conceptService";
 
 const Concepts = () => {
   const [concepts, setConcepts] = useState([]);
