@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 
 import Controls from "../../components/controls/Controls";
 import EditIcon from "@material-ui/icons/Edit";
-import { getAllPersonAttributeTypes } from "../../services/personAttributeTypeService";
 import { getUsers } from "../../services/userService";
 
 const Users = () => {
@@ -22,16 +21,16 @@ const Users = () => {
     },
     {
       title: "Given Name",
-      field: "",
+      field: "personId.personNames.givenName",
     },
-    {
-      title: "Family Name",
-      field: "description",
-    },
-    {
-      title: "Roles",
-      field: "",
-    },
+    // {
+    //   title: "Family Name",
+    //   field: "person.familyName",
+    // },
+    // {
+    //   title: "Roles",
+    //   field: "userRoles",
+    // },
   ];
 
   const options = {
@@ -71,7 +70,7 @@ const Users = () => {
     {
       icon: () => <EditIcon color="primary" />,
       tooltip: "Edit",
-      onClick: (event, rowData) => setRedirect(`/user/${rowData.uuid}`),
+      onClick: (event, rowData) => setRedirect(`/user/edit/${rowData.uuid}`),
     },
   ];
 
