@@ -2,7 +2,7 @@ import { Redirect, withRouter } from "react-router-dom";
 
 import React from "react";
 import Select from "react-select";
-import { getPersons } from "../../api/services";
+import { getPersons } from "../../services/userService";
 
 class UserAddPrompt extends React.Component {
   constructor(props) {

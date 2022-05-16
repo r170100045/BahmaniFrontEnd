@@ -1,10 +1,4 @@
 import { Redirect, withRouter } from "react-router-dom";
-import {
-  deleteDrugById,
-  getUser,
-  postDrug,
-  putDrugById,
-} from "../../api/services";
 
 import React from "react";
 import { getRoles } from "../../services/roleService";
