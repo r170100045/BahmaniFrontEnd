@@ -40,7 +40,7 @@ class ConceptForm extends React.Component {
         displayPrecision: null,
       },
       dataTypeId: {
-        conceptDataTypeId: 2,
+        conceptDataTypeId: 1,
       },
       conceptNames: [
         {
@@ -84,7 +84,7 @@ class ConceptForm extends React.Component {
       concept: initialConceptState,
       redirect: null,
       conceptId: this.props.match.params.id,
-      dataType: 2,
+      dataType: 1,
       classOptions: [],
       conceptOptions: [],
       drugOptions: [],
@@ -94,7 +94,6 @@ class ConceptForm extends React.Component {
       mapReferenceTermOptions: [],
       filteredMapReferenceTermOptions: [],
       mapCodeOptions: [],
-
       synonyms: initialConceptState.conceptNames.filter(
         (item) => item.conceptNameType !== "FULLY_SPECIFIED"
       ),
@@ -114,24 +113,6 @@ class ConceptForm extends React.Component {
       this.conceptSourceIdChangeHandler.bind(this);
     this.mapCodeChangeHandler = this.mapCodeChangeHandler.bind(this);
   }
-
-  // componentDidMount() {
-  //   this.setClassOptions()
-  //     .then(() => this.setConceptOptions())
-  //     .then(() => this.setDrugOptions())
-  //     .then(() => this.setDataTypeOptions())
-  //     .then(() => this.setMapRelationshipOptions())
-  //     .then(() => this.setMapSourceOptions())
-  //     .then(() => this.setMapReferenceTermOptions())
-  //     .then(() => this.setFilteredMapReferenceTermOptions())
-  //     .then(() => this.setMapCodeOptions())
-  //     .then(() => this.setFetchedConcept())
-  //     .then(() => this.setDataType())
-  //     .then(() => this.setSynonyms())
-  //     .then(() => this.setState({ isLoading: false }));
-
-  //   // Promise all
-  // }
 
   componentDidMount() {
     Promise.all([

@@ -21,6 +21,18 @@ class ConceptView extends React.Component {
       classId: 1,
       isSet: false,
       conceptSets: [{ conceptId: 4 }, { conceptId: 5 }],
+      conceptNumeric: {
+        hiAbsolute: null,
+        hiCritical: null,
+        hiNormal: null,
+        lowAbsolute: null,
+        lowCritical: null,
+        lowNormal: null,
+        units: null,
+        precise: false,
+        displayPrecision: null,
+      },
+      conceptComplex: "",
     };
 
     this.state = {
@@ -132,6 +144,7 @@ class ConceptView extends React.Component {
 
   setFetchedConcept() {
     const { conceptId } = this.state;
+
     return new Promise((resolve, reject) => {
       getConceptById(conceptId)
         .then((response) => {
@@ -273,6 +286,69 @@ class ConceptView extends React.Component {
               ))}
             </span>
           </div>
+
+          {dataType === 1 && (
+            <div>
+              <span>Numeric</span>
+              <span>
+                <div>
+                  <span>Absolute High</span>
+                  <span>{concept.conceptNumeric.hiAbsolute}</span>
+                </div>
+                <div>
+                  <span>Crirical High</span>
+                  <span>{concept.conceptNumeric.hiCritical}</span>
+                </div>
+                <div>
+                  <span>Normal High</span>
+                  <span>{concept.conceptNumeric.hiNormal}</span>
+                </div>
+                <div>
+                  <span>Normal Low</span>
+                  <span>{concept.conceptNumeric.lowNormal}</span>
+                </div>
+                <div>
+                  <span>Critical Low</span>
+                  <span>{concept.conceptNumeric.lowCritical}</span>
+                </div>
+                <div>
+                  <span>Absolute Low</span>
+                  <span>{concept.conceptNumeric.lowAbsolute}</span>
+                </div>
+                <div>
+                  <span>Units</span>
+                  <span>{concept.conceptNumeric.units}</span>
+                </div>
+                <div>
+                  <span>Allow Decimal?</span>
+                  <span>
+                    {concept.conceptNumeric.precise === true ? "Yes" : "No"}
+                  </span>
+                </div>
+                <div>
+                  <span>Display Precision</span>
+                  <span>{concept.conceptNumeric.displayPrecision}</span>
+                </div>
+              </span>
+            </div>
+          )}
+
+          {dataType === 2 && (
+            <div>
+              <span>
+                TO-DO Make concept answers custom object and loop to display and
+                link
+              </span>
+              <span></span>
+            </div>
+          )}
+
+          {dataType === 13 && (
+            <div>
+              <span>Handler</span>
+              <span>{concept.conceptComplex}</span>
+            </div>
+          )}
 
           <div>
             <span>Mappings:</span>
