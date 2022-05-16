@@ -19,7 +19,16 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function CommonPage(props) {
-  const { action, id, title, viewAll, viewEach, addOrEdit } = props;
+  const {
+    action,
+    id,
+    personId,
+    title,
+    viewAll,
+    viewEach,
+    addOrEdit,
+    addPrompt,
+  } = props;
   const classes = useStyles();
 
   return (
@@ -28,7 +37,8 @@ function CommonPage(props) {
         <p className={classes.pageTitle}>{title}</p>
         {action === "view" && id === "all" && viewAll}
         {action === "view" && id !== "all" && viewEach}
-        {action === "edit" && addOrEdit}
+        {action === "edit" && id === "add" && personId === "add" && addPrompt}
+        {personId !== "add" && action === "edit" && addOrEdit}
       </div>
     </>
   );

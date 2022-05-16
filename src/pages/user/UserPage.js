@@ -5,18 +5,17 @@ import Users from "./Users";
 import { useParams } from "react-router-dom";
 
 export default function ConceptPage() {
-  const { id, action } = useParams();
-
-  // const displayData = id === "add" ? <UserAddPrompt /> : <UserForm id={id} />;
+  const { action, id, personId } = useParams();
 
   return (
     <CommonPage
-      id={id}
       action={action}
+      id={id}
+      personId={personId}
       title="Users"
       viewAll={<Users />}
+      addPrompt={<UserAddPrompt />}
       addOrEdit={<UserForm id={id} />}
-      // displayForm={displayData}
     />
   );
 }

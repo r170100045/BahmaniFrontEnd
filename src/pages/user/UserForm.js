@@ -54,6 +54,7 @@ class UserForm extends React.Component {
       user: initialUserState,
       redirect: null,
       userId: this.props.match.params.id,
+      personId: this.props.match.params.personId,
       isLoading: true,
       error: false,
       password: "",
@@ -83,13 +84,16 @@ class UserForm extends React.Component {
   }
 
   componentDidMount() {
-    const { userId } = this.state;
+    const { userId, personId } = this.state;
 
-    this.setUser(userId)
+    this.setUser(userId, personId)
+      // .then(() => this.setPerson(personId))
       .then(() => this.setRoles())
       .then(() => this.setUserRoles())
       .then(() => this.setState({ isLoading: false }));
   }
+
+  setPerson(personId) {}
 
   setUserRoles() {
     return new Promise((resolve, reject) => {
@@ -122,9 +126,16 @@ class UserForm extends React.Component {
     });
   }
 
-  setUser(userId) {
+  setUser(userId, personId) {
     return new Promise((resolve, reject) => {
-      if (userId !== "add") {
+      if (userId === "add") {
+        if (personId !== "dummy") {
+          // TO-DO get person info, set it in user and resolve
+          resolve();
+        } else {
+          resolve();
+        }
+      } else {
         getUserById(userId)
           .then((response) => {
             this.setState({ user: response.data }, () => {
@@ -132,8 +143,6 @@ class UserForm extends React.Component {
             });
           })
           .catch((e) => reject(e));
-      } else {
-        resolve("success");
       }
     });
   }
@@ -194,7 +203,7 @@ class UserForm extends React.Component {
   }
 
   cancelButtonHandler() {
-    this.setState({ redirect: "/user/view/all" });
+    this.setState({ redirect: "/user/view/all/dummy" });
   }
 
   retireUser() {

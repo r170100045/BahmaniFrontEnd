@@ -115,19 +115,38 @@ class ConceptForm extends React.Component {
     this.mapCodeChangeHandler = this.mapCodeChangeHandler.bind(this);
   }
 
+  // componentDidMount() {
+  //   this.setClassOptions()
+  //     .then(() => this.setConceptOptions())
+  //     .then(() => this.setDrugOptions())
+  //     .then(() => this.setDataTypeOptions())
+  //     .then(() => this.setMapRelationshipOptions())
+  //     .then(() => this.setMapSourceOptions())
+  //     .then(() => this.setMapReferenceTermOptions())
+  //     .then(() => this.setFilteredMapReferenceTermOptions())
+  //     .then(() => this.setMapCodeOptions())
+  //     .then(() => this.setFetchedConcept())
+  //     .then(() => this.setDataType())
+  //     .then(() => this.setSynonyms())
+  //     .then(() => this.setState({ isLoading: false }));
+
+  //   // Promise all
+  // }
+
   componentDidMount() {
-    this.setClassOptions()
-      .then(() => this.setConceptOptions())
-      .then(() => this.setDrugOptions())
-      .then(() => this.setDataTypeOptions())
-      .then(() => this.setMapRelationshipOptions())
-      .then(() => this.setMapSourceOptions())
-      .then(() => this.setMapReferenceTermOptions())
-      .then(() => this.setFilteredMapReferenceTermOptions())
-      .then(() => this.setMapCodeOptions())
+    Promise.all([
+      this.setClassOptions(),
+      this.setConceptOptions(),
+      this.setDrugOptions(),
+      this.setDataTypeOptions(),
+      this.setMapRelationshipOptions(),
+      this.setMapSourceOptions(),
+      this.setMapReferenceTermOptions(),
+      this.setFilteredMapReferenceTermOptions(),
+      this.setMapCodeOptions(),
+    ])
       .then(() => this.setFetchedConcept())
-      .then(() => this.setDataType())
-      .then(() => this.setSynonyms())
+      .then(() => Promise.all([this.setDataType(), this.setSynonyms()]))
       .then(() => this.setState({ isLoading: false }));
   }
 
@@ -335,8 +354,11 @@ class ConceptForm extends React.Component {
               uuid: response.data[key].uuid,
             });
           });
+          return conceptOptions;
+        })
+        .then((conceptOptions) => {
           this.setState({ conceptOptions }, () => {
-            resolve("success");
+            resolve();
           });
         })
         .catch((e) => reject(e));
@@ -838,7 +860,6 @@ class ConceptForm extends React.Component {
           ];
         }
       });
-      console.log("defAnsConc", defaultAnswerConceptValue);
       return defaultAnswerConceptValue;
     };
     const defaultAnswerConceptValue = getDefaultAnswerConceptValue();
@@ -859,7 +880,6 @@ class ConceptForm extends React.Component {
           ];
         }
       });
-      console.log("defAnsDrg", defaultAnswerConceptValue);
       return defaultAnswerDrugValue;
     };
     const defaultAnswerDrugValue = getDefaultAnswerDrugValue();
@@ -868,7 +888,11 @@ class ConceptForm extends React.Component {
       return <Redirect to={redirect} />;
     }
 
-    if (!isLoading || conceptId === "add") {
+    if (isLoading) {
+      return <p>Loading...</p>;
+    }
+
+    if (conceptId === "add") {
       return (
         <Fragment>
           {conceptId !== "add" && (

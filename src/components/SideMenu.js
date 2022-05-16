@@ -37,54 +37,68 @@ export default function SideMenu() {
     <div className={classes.sideMenu}>
       <Paper className={classes.paper}>
         <MenuList>
-          <MenuItem>
-            <Link to="/addressHierarchyLevel/view/all" className={classes.link}>
-              Address Hierarchy
-            </Link>
+          <MenuItem
+            component={Link}
+            to="/addressHierarchyLevel/view/all"
+            className={classes.link}
+          >
+            Address Hierarchy
           </MenuItem>
-          <MenuItem>
-            <Link className={classes.link} to="/concept/view/all">
-              Concepts
-            </Link>
+          <MenuItem
+            component={Link}
+            to="/concept/view/all"
+            className={classes.link}
+          >
+            Concepts
           </MenuItem>
-          <MenuItem>
-            <Link className={classes.link} to="/drug/view/all">
-              Medication Data
-            </Link>
+          <MenuItem
+            component={Link}
+            to="/drug/view/all"
+            className={classes.link}
+          >
+            Medication Data
           </MenuItem>
-          <MenuItem>
-            <Link
-              className={classes.link}
-              to="/patientRelationshipType/view/all"
-            >
-              Patient Relationships
-            </Link>
+          <MenuItem
+            component={Link}
+            to="/patientRelationshipType/view/all"
+            className={classes.link}
+          >
+            Patient Relationships
           </MenuItem>
-
-          <MenuItem>
-            <Link className={classes.link} to="/personAttributeType/view/all">
-              Person Attributes
-            </Link>
+          <MenuItem
+            component={Link}
+            to="/personAttributeType/view/all"
+            className={classes.link}
+          >
+            Person Attributes
           </MenuItem>
-          <MenuItem>
-            <Link className={classes.link} to="/user/view/all">
-              Users
-            </Link>
+          <MenuItem
+            component={Link}
+            to="/user/view/all/dummy"
+            className={classes.link}
+          >
+            Users
           </MenuItem>
-          <MenuItem>
-            <Link className={classes.link} to="/role/view/all">
-              Roles
-            </Link>
+          <MenuItem
+            component={Link}
+            to="/role/view/all"
+            className={classes.link}
+          >
+            Roles
           </MenuItem>
-          <MenuItem>
-            <Link className={classes.link} to="/privilege/view/all">
-              Privileges
-            </Link>
+          <MenuItem
+            component={Link}
+            to="/privilege/view/all"
+            className={classes.link}
+          >
+            Privileges
           </MenuItem>
-          <MenuItem>
-            <Link className={classes.link} to="/visitType/view/all">
-              Visit Types
-            </Link>
+          <MenuItem
+            component={Link}
+            to="/visitType/view/all"
+            className={classes.link}
+          >
+            Visit Types
           </MenuItem>
         </MenuList>
       </Paper>

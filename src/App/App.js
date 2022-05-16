@@ -12,7 +12,7 @@ import PersonAttributeTypePage from "../pages/personAttributeType/PersonAttribut
 import PrivilegePage from "../pages/privilege/PrivilegePage";
 import RolePage from "../pages/role/RolePage";
 import SideMenu from "../components/SideMenu";
-import UserForm from "../pages/user/UserForm";
+import UserAddPrompt from "../pages/user/UserAddPrompt";
 import UserPage from "../pages/user/UserPage";
 import VisitTypePage from "../pages/visitType/VisitTypePage";
 
@@ -50,10 +50,7 @@ export default function App() {
           <Route path="/concept/:action/:id">
             <ConceptPage />
           </Route>
-          {/* <Route path="/user/add/:personId">
-            <UserForm />
-          </Route> */}
-          <Route path="/user/:action/:id">
+          <Route path="/user/:action/:id/:personId">
             <UserPage />
           </Route>
           <Route path="/role/:action/:id">

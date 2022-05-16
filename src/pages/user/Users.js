@@ -58,7 +58,7 @@ const Users = () => {
       <div>
         <MTableToolbar {...props} />
         <div className="text-end" style={{ padding: "0px 10px" }}>
-          <Link to="/user/edit/add">
+          <Link to="/user/edit/add/add">
             <Controls.AddButton />
           </Link>
         </div>
@@ -70,7 +70,8 @@ const Users = () => {
     {
       icon: () => <EditIcon color="primary" />,
       tooltip: "Edit",
-      onClick: (event, rowData) => setRedirect(`/user/edit/${rowData.uuid}`),
+      onClick: (event, rowData) =>
+        setRedirect(`/user/edit/${rowData.uuid}/dummy`),
     },
   ];
 
