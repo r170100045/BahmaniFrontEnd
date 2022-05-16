@@ -8,6 +8,7 @@ import {
   updateRoleById,
 } from "../../services/roleService";
 
+import { GET_VALUE } from "../../constants/otherConstants";
 import React from "react";
 import { getPrivileges } from "../../services/privilegeService";
 
@@ -36,11 +37,11 @@ class RoleForm extends React.Component {
     this.inheritedRoleChangeHandler =
       this.inheritedRoleChangeHandler.bind(this);
     this.privilegeChangeHandler = this.privilegeChangeHandler.bind(this);
+    this.roleInputChangeHandler = this.roleInputChangeHandler.bind(this);
   }
 
   componentDidMount() {
-    this.setAllRoles()
-      .then(() => this.setAllPrivileges())
+    Promise.all([this.setAllRoles(), this.setAllPrivileges()])
       .then(() => this.setRole())
       .then(() => this.setInheritedRoles())
       .then(() => this.setCurrentPrivileges())
@@ -49,30 +50,26 @@ class RoleForm extends React.Component {
   }
 
   setInheritedRoles() {
-    return new Promise((resolve, reject) => {
-      const { allRoles, role } = this.state;
-      const inheritedRoles = [];
+    const { allRoles, role } = this.state;
+    const inheritedRoles = [];
 
-      allRoles.forEach((el) => {
-        if (el !== "Anonymous" && el !== "Authenticated") {
-          if (role.parentRoles.includes(el)) {
-            inheritedRoles.push({
-              role: el,
-              checked: true,
-            });
-          } else {
-            inheritedRoles.push({
-              role: el,
-              checked: false,
-            });
-          }
+    allRoles.forEach((el) => {
+      if (el !== "Anonymous" && el !== "Authenticated") {
+        if (role.parentRoles.includes(el)) {
+          inheritedRoles.push({
+            role: el,
+            checked: true,
+          });
+        } else {
+          inheritedRoles.push({
+            role: el,
+            checked: false,
+          });
         }
-      });
-
-      this.setState({ inheritedRoles }, () => {
-        resolve("success");
-      });
+      }
     });
+
+    this.setState({ inheritedRoles });
   }
 
   setRole() {
@@ -82,48 +79,43 @@ class RoleForm extends React.Component {
         getRoleById(roleId)
           .then((response) => {
             this.setState({ role: response.data }, () => {
-              resolve("success");
+              resolve();
             });
           })
           .catch((e) => reject(e));
       } else {
-        resolve("success");
+        resolve();
       }
     });
   }
 
   setAllRoles() {
-    return new Promise((resolve, reject) => {
-      getRoles()
-        .then((response) => {
-          const allRoles = [];
-          Object.keys(response.data).forEach((key) => {
-            allRoles.push(response.data[key].role);
-          });
-          this.setState({ allRoles }, () => {
-            resolve("success");
-          });
-        })
-        .catch((e) => reject(e));
-    });
+    getRoles()
+      .then((response) => {
+        const allRoles = [];
+        Object.keys(response.data).forEach((key) => {
+          allRoles.push(response.data[key].role);
+        });
+        return allRoles;
+      })
+      .then((allRoles) => {
+        this.setState({ allRoles });
+      })
+      .catch((e) => console.log(e));
   }
 
   setCurrentPrivileges() {
-    return new Promise((resolve, reject) => {
-      const { role, allPrivileges } = this.state;
-      const tempAllPrivileges = [...allPrivileges];
+    const { role, allPrivileges } = this.state;
+    const tempAllPrivileges = [...allPrivileges];
 
-      role.rolePrivileges.forEach((rp) => {
-        const tapIndex = tempAllPrivileges.findIndex(
-          (tap) => tap.privilege === rp
-        );
-        tempAllPrivileges[tapIndex].checked = true;
-      });
-
-      this.setState({ allPrivileges: tempAllPrivileges }, () => {
-        resolve("success");
-      });
+    role.rolePrivileges.forEach((rp) => {
+      const tapIndex = tempAllPrivileges.findIndex(
+        (tap) => tap.privilege === rp
+      );
+      tempAllPrivileges[tapIndex].checked = true;
     });
+
+    this.setState({ allPrivileges: tempAllPrivileges });
   }
 
   disableDisplayPrivileges() {
@@ -159,23 +151,22 @@ class RoleForm extends React.Component {
   }
 
   setAllPrivileges() {
-    return new Promise((resolve, reject) => {
-      getPrivileges()
-        .then((response) => {
-          const allPrivileges = [];
-          Object.keys(response.data).forEach((key) => {
-            allPrivileges.push({
-              privilege: response.data[key].privilege,
-              checked: false,
-              disabled: false,
-            });
+    getPrivileges()
+      .then((response) => {
+        const allPrivileges = [];
+        Object.keys(response.data).forEach((key) => {
+          allPrivileges.push({
+            privilege: response.data[key].privilege,
+            checked: false,
+            disabled: false,
           });
-          this.setState({ allPrivileges }, () => {
-            resolve("success");
-          });
-        })
-        .catch((e) => reject(e));
-    });
+        });
+        return allPrivileges;
+      })
+      .then((allPrivileges) => {
+        this.setState({ allPrivileges });
+      })
+      .catch((e) => console.log(e));
   }
 
   privilegeChangeHandler(event, index) {
@@ -216,15 +207,10 @@ class RoleForm extends React.Component {
     this.setState({ inheritedRoles });
   }
 
-  roleChangeHandler(event) {
+  roleInputChangeHandler(event) {
+    const { name, value } = event.target;
     const { role } = this.state;
-    role.role = event.target.value;
-    this.setState({ role });
-  }
-
-  descriptionChangeHandler(event) {
-    const { role } = this.state;
-    role.description = event.target.value;
+    role[name] = value;
     this.setState({ role });
   }
 
@@ -263,18 +249,12 @@ class RoleForm extends React.Component {
     }
   }
 
-  getValueFor(field) {
-    return field === null ? "" : field;
-  }
-
   render() {
     const { role, roleId, redirect, inheritedRoles, allPrivileges, isLoading } =
       this.state;
     const {
-      roleChangeHandler,
-      descriptionChangeHandler,
+      roleInputChangeHandler,
       saveRole,
-      getValueFor,
       inheritedRoleChangeHandler,
       privilegeChangeHandler,
       cancel,
@@ -283,7 +263,7 @@ class RoleForm extends React.Component {
 
     if (redirect) return <Redirect to={redirect} />;
 
-    if (isLoading) return <p>loading...</p>;
+    if (isLoading) return <p>Loading...</p>;
 
     return (
       <React.Fragment>
@@ -294,9 +274,9 @@ class RoleForm extends React.Component {
               type="text"
               id="role"
               name="role"
-              value={getValueFor(role.role)}
+              value={GET_VALUE(role.role)}
               disabled={roleId === "add" ? false : true}
-              onChange={roleChangeHandler.bind(this)}
+              onChange={roleInputChangeHandler}
             />
           </label>
           <br />
@@ -308,8 +288,8 @@ class RoleForm extends React.Component {
               name="description"
               rows="3"
               cols="20"
-              value={getValueFor(role.description)}
-              onChange={descriptionChangeHandler.bind(this)}
+              value={GET_VALUE(role.description)}
+              onChange={roleInputChangeHandler}
             />
           </label>
           <br />

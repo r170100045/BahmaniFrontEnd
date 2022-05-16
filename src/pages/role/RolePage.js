@@ -12,7 +12,7 @@ export default function RolePage() {
       action={action}
       title="Role Management"
       viewAll={<Roles />}
-      addOrEdit={<RoleForm id={id} />}
+      addOrEdit={<RoleForm />}
     />
   );
 }
