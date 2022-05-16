@@ -12,7 +12,7 @@ export default function VisitTypePage() {
       action={action}
       title="Visit Type Management"
       viewAll={<VisitTypes />}
-      addOrEdit={<VisitTypeForm id={id} />}
+      addOrEdit={<VisitTypeForm />}
     />
   );
 }

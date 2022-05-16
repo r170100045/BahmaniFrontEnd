@@ -6,15 +6,16 @@ import {
   updateVisitTypeById,
 } from "../../services/visitTypeService";
 
+import { GET_VALUE } from "../../constants/otherConstants";
 import React from "react";
 
 class VisitTypeForm extends React.Component {
   constructor(props) {
     super(props);
     const initialVisitTypeState = {
-      name: "",
-      description: "",
-      retireReason: "",
+      name: null,
+      description: null,
+      retireReason: null,
       retired: false,
     };
 
@@ -38,17 +39,12 @@ class VisitTypeForm extends React.Component {
     }
   }
 
-  nameChangeHandler(event) {
+  inputChangeHandler = (event) => {
+    const { name, value } = event.target;
     const { visitType } = this.state;
-    visitType.name = event.target.value;
+    visitType[name] = value;
     this.setState({ visitType });
-  }
-
-  descriptionChangeHandler(event) {
-    const { visitType } = this.state;
-    visitType.description = event.target.value;
-    this.setState({ visitType });
-  }
+  };
 
   saveVisitType() {
     const { visitTypeId, visitType } = this.state;
@@ -75,12 +71,6 @@ class VisitTypeForm extends React.Component {
       .catch((error) => {
         console.log(error);
       });
-  }
-
-  retireReasonChangeHandler(event) {
-    const { visitType } = this.state;
-    visitType.retireReason = event.target.value;
-    this.setState({ visitType });
   }
 
   retireVisitType() {
@@ -115,21 +105,14 @@ class VisitTypeForm extends React.Component {
     this.setState({ redirect: "/visitType/view/all" });
   }
 
-  getValueFor(field) {
-    return field === null ? "" : field;
-  }
-
   render() {
     const { visitType, visitTypeId, redirect } = this.state;
     const {
-      nameChangeHandler,
-      descriptionChangeHandler,
+      inputChangeHandler,
       saveVisitType,
-      retireReasonChangeHandler,
       retireVisitType,
       unretireVisitType,
       deleteVisitType,
-      getValueFor,
       cancelVisitType,
     } = this;
 
@@ -144,8 +127,8 @@ class VisitTypeForm extends React.Component {
               type="text"
               id="name"
               name="name"
-              value={getValueFor(visitType.name)}
-              onChange={nameChangeHandler.bind(this)}
+              value={GET_VALUE(visitType.name)}
+              onChange={inputChangeHandler.bind(this)}
             />
           </label>
           <br />
@@ -157,8 +140,8 @@ class VisitTypeForm extends React.Component {
               name="description"
               rows="3"
               cols="20"
-              value={getValueFor(visitType.description)}
-              onChange={descriptionChangeHandler.bind(this)}
+              value={GET_VALUE(visitType.description)}
+              onChange={inputChangeHandler.bind(this)}
             />
           </label>
           <br />
@@ -184,8 +167,8 @@ class VisitTypeForm extends React.Component {
                 type="text"
                 id="retireReason"
                 name="retireReason"
-                value={getValueFor(visitType.retireReason)}
-                onChange={retireReasonChangeHandler.bind(this)}
+                value={GET_VALUE(visitType.retireReason)}
+                onChange={inputChangeHandler.bind(this)}
               />
             </label>
             <br />

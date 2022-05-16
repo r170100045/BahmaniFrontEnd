@@ -15,7 +15,7 @@ export default function ConceptPage() {
       title="Users"
       viewAll={<Users />}
       addPrompt={<UserAddPrompt />}
-      addOrEdit={<UserForm id={id} />}
+      addOrEdit={<UserForm />}
     />
   );
 }
