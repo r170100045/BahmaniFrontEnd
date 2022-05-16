@@ -13,6 +13,7 @@ import {
   updatePrivilegeById,
 } from "../../services/privilegeService";
 
+import { GET_VALUE } from "../../constants/otherConstants";
 import { Paper } from "@material-ui/core";
 import React from "react";
 
@@ -20,16 +21,19 @@ class PrivilegeForm extends React.Component {
   constructor(props) {
     super(props);
     const initialPrivilegeState = {
-      privilege: "",
-      description: "",
-      uuid: "",
+      privilege: null,
+      description: null,
+      uuid: null,
     };
 
     this.state = {
       privilege: initialPrivilegeState,
       privilegeId: this.props.match.params.id,
       redirect: null,
+      isLoading: true,
     };
+
+    this.inputChangeHandler = this.inputChangeHandler.bind(this);
   }
 
   componentDidMount() {
@@ -37,25 +41,24 @@ class PrivilegeForm extends React.Component {
     if (privilegeId !== "add") {
       getPrivilegeById(privilegeId)
         .then((response) => {
-          this.setState({ privilege: response.data });
+          this.setState({ privilege: response.data }, () => {
+            this.setState({ isLoading: false });
+          });
         })
-        .catch((error) => {
-          console.log(error);
+        .catch((e) => {
+          console.log(e);
         });
+    } else {
+      this.setState({ isLoading: false });
     }
   }
 
-  privilegeChangeHandler(event) {
+  inputChangeHandler = (event) => {
+    const { name, value } = event.target;
     const { privilege } = this.state;
-    privilege.privilege = event.target.value;
+    privilege[name] = value;
     this.setState({ privilege });
-  }
-
-  descriptionChangeHandler(event) {
-    const { privilege } = this.state;
-    privilege.description = event.target.value;
-    this.setState({ privilege });
-  }
+  };
 
   savePrivilege() {
     const { privilegeId, privilege } = this.state;
@@ -93,21 +96,19 @@ class PrivilegeForm extends React.Component {
       });
   }
 
-  getValueFor(field) {
-    return field === null ? "" : field;
-  }
-
   render() {
-    const { privilege, privilegeId, redirect } = this.state;
     const {
-      privilegeChangeHandler,
-      descriptionChangeHandler,
+      inputChangeHandler,
       savePrivilege,
-      getValueFor,
       cancelButtonHandler,
       deletePrivilege,
     } = this;
+
+    const { privilege, privilegeId, redirect, isLoading } = this.state;
+
     if (redirect) return <Redirect to={redirect} />;
+
+    if (isLoading) return <p>Loading...</p>;
 
     return (
       <React.Fragment>
@@ -120,8 +121,8 @@ class PrivilegeForm extends React.Component {
               id="privilege"
               name="privilege"
               disabled={privilegeId === "add" ? false : true}
-              value={getValueFor(privilege.privilege)}
-              onChange={privilegeChangeHandler.bind(this)}
+              value={GET_VALUE(privilege.privilege)}
+              onChange={inputChangeHandler}
             />
           </label>
           <br />
@@ -134,8 +135,8 @@ class PrivilegeForm extends React.Component {
               name="description"
               rows="3"
               cols="20"
-              value={getValueFor(privilege.description)}
-              onChange={descriptionChangeHandler.bind(this)}
+              value={GET_VALUE(privilege.description)}
+              onChange={inputChangeHandler}
             />
           </label>
           <br />

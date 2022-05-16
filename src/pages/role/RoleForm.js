@@ -250,8 +250,6 @@ class RoleForm extends React.Component {
   }
 
   render() {
-    const { role, roleId, redirect, inheritedRoles, allPrivileges, isLoading } =
-      this.state;
     const {
       roleInputChangeHandler,
       saveRole,
@@ -260,6 +258,9 @@ class RoleForm extends React.Component {
       cancel,
       deleteRole,
     } = this;
+
+    const { role, roleId, redirect, inheritedRoles, allPrivileges, isLoading } =
+      this.state;
 
     if (redirect) return <Redirect to={redirect} />;
 

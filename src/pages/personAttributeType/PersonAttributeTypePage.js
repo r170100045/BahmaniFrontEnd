@@ -12,7 +12,7 @@ export default function PersonAttributeTypePage() {
       action={action}
       title="Person Attribute Management"
       viewAll={<PersonAttributeTypes />}
-      addOrEdit={<PersonAttributeTypeForm id={id} />}
+      addOrEdit={<PersonAttributeTypeForm />}
     />
   );
 }

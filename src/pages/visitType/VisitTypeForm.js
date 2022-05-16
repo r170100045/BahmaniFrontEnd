@@ -106,7 +106,6 @@ class VisitTypeForm extends React.Component {
   }
 
   render() {
-    const { visitType, visitTypeId, redirect } = this.state;
     const {
       inputChangeHandler,
       saveVisitType,
@@ -115,6 +114,8 @@ class VisitTypeForm extends React.Component {
       deleteVisitType,
       cancelVisitType,
     } = this;
+
+    const { visitType, visitTypeId, redirect } = this.state;
 
     if (redirect) return <Redirect to={redirect} />;
 

@@ -652,7 +652,7 @@ class ConceptForm extends React.Component {
 
   numericChangeHandler = (event, name, type = "value") => {
     const { concept } = this.state;
-    concept.conceptNumeric[`${name}`] = event.target[`${type}`];
+    concept.conceptNumeric[name] = event.target[type];
     this.setState({ concept });
   };
 

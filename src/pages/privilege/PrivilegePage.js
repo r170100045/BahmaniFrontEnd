@@ -12,7 +12,7 @@ export default function PrivilegePage() {
       action={action}
       title="Privilege Management"
       viewAll={<Privileges />}
-      addOrEdit={<PrivilegeForm id={id} />}
+      addOrEdit={<PrivilegeForm />}
     />
   );
 }

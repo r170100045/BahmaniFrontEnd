@@ -1,3 +1,4 @@
+import { FORMAT_OPTIONS, GET_VALUE } from "../../constants/otherConstants";
 import { Redirect, withRouter } from "react-router-dom";
 import {
   deletePersonAttributeTypeById,
@@ -6,7 +7,6 @@ import {
   updatePersonAttributeTypeById,
 } from "../../services/personAttributeTypeService";
 
-import { FORMAT_OPTIONS } from "../../constants/otherConstants";
 import React from "react";
 import Select from "react-select";
 import { getPrivileges } from "../../services/privilegeService";
@@ -16,12 +16,12 @@ class PersonAttributeTypeForm extends React.Component {
     super(props);
 
     const initialPersonAttributeType = {
-      name: "",
-      description: "",
-      editPrivilege: "",
-      foreignKey: "",
-      format: "",
-      retireReason: "",
+      name: null,
+      description: null,
+      editPrivilege: null,
+      foreignKey: null,
+      format: null,
+      retireReason: null,
       retired: false,
       searchable: false,
     };
@@ -33,6 +33,10 @@ class PersonAttributeTypeForm extends React.Component {
       isLoading: true,
       editPrivilegeOptions: [],
     };
+
+    this.inputChangeHandler = this.inputChangeHandler.bind(this);
+    this.selectTypeInputChangeHandler =
+      this.selectTypeInputChangeHandler.bind(this);
   }
 
   componentDidMount() {
@@ -59,41 +63,28 @@ class PersonAttributeTypeForm extends React.Component {
         .catch((e) => reject(e));
     });
   }
-
   setFetchedPersonAttributeType() {
-    const { personAttributeTypeId } = this.state;
-
     return new Promise((resolve, reject) => {
+      const { personAttributeTypeId } = this.state;
+
       if (personAttributeTypeId !== "add") {
         getPersonAttributeTypeById(personAttributeTypeId)
           .then((response) => {
             console.log(response.data);
             this.setState({ personAttributeType: response.data }, () =>
-              resolve("success")
+              resolve()
             );
           })
           .catch((e) => reject(e));
       } else {
-        resolve("success");
+        resolve();
       }
     });
   }
 
-  nameChangeHandler(event) {
-    const { personAttributeType } = this.state;
-    personAttributeType.name = event.target.value;
-    this.setState({ personAttributeType });
-  }
-
-  descriptionChangeHandler(event) {
-    const { personAttributeType } = this.state;
-    personAttributeType.description = event.target.value;
-    this.setState({ personAttributeType });
-  }
-
   savePersonAttributeType() {
     const { personAttributeTypeId, personAttributeType } = this.state;
-    console.log("pat", personAttributeType);
+
     if (personAttributeTypeId === "add")
       this.insertPersonAttributeTypeWithData(personAttributeType);
     else
@@ -124,12 +115,6 @@ class PersonAttributeTypeForm extends React.Component {
       .catch((error) => {
         console.log(error);
       });
-  }
-
-  retireReasonChangeHandler(event) {
-    const { personAttributeType } = this.state;
-    personAttributeType.retireReason = event.target.value;
-    this.setState({ personAttributeType });
   }
 
   retirePersonAttributeType() {
@@ -166,6 +151,12 @@ class PersonAttributeTypeForm extends React.Component {
       });
   }
 
+  selectTypeInputChangeHandler(selectedOption, name) {
+    const { personAttributeType } = this.state;
+    personAttributeType[name] = selectedOption.value;
+    this.setState({ personAttributeType });
+  }
+
   formatChangeHandler(selectedOption) {
     const { personAttributeType } = this.state;
     personAttributeType.format = selectedOption.value;
@@ -178,21 +169,28 @@ class PersonAttributeTypeForm extends React.Component {
     this.setState({ personAttributeType });
   }
 
-  searchableChangeHandler(event) {
+  inputChangeHandler = (event, type = "value") => {
+    const { name } = event.target;
     const { personAttributeType } = this.state;
-    personAttributeType.searchable = event.target.checked;
+    personAttributeType[name] = event.target[type];
     this.setState({ personAttributeType });
-  }
+  };
 
   cancelPersonAttributeType() {
     this.setState({ redirect: "/personAttributeType/view/all" });
   }
 
-  getValueFor(field) {
-    return field === null ? "" : field;
-  }
-
   render() {
+    const {
+      inputChangeHandler,
+      savePersonAttributeType,
+      retirePersonAttributeType,
+      unretirePersonAttributeType,
+      deletePersonAttributeType,
+      cancelPersonAttributeType,
+      selectTypeInputChangeHandler,
+    } = this;
+
     const {
       personAttributeType,
       personAttributeTypeId,
@@ -201,22 +199,9 @@ class PersonAttributeTypeForm extends React.Component {
       editPrivilegeOptions,
     } = this.state;
 
-    const {
-      nameChangeHandler,
-      descriptionChangeHandler,
-      savePersonAttributeType,
-      retireReasonChangeHandler,
-      retirePersonAttributeType,
-      unretirePersonAttributeType,
-      deletePersonAttributeType,
-      formatChangeHandler,
-      editPrivilegeChangeHandler,
-      searchableChangeHandler,
-      getValueFor,
-      cancelPersonAttributeType,
-    } = this;
-
     if (redirect) return <Redirect to={redirect} />;
+
+    if (isLoading) return <p>Loading...</p>;
 
     const getDefaultFormatValue = FORMAT_OPTIONS.filter(
       (option) => option.value === personAttributeType.format
@@ -236,8 +221,8 @@ class PersonAttributeTypeForm extends React.Component {
                 type="text"
                 id="name"
                 name="name"
-                value={getValueFor(personAttributeType.name)}
-                onChange={nameChangeHandler.bind(this)}
+                value={GET_VALUE(personAttributeType.name)}
+                onChange={inputChangeHandler}
               />
             </label>
             <br />
@@ -249,7 +234,9 @@ class PersonAttributeTypeForm extends React.Component {
                   id="format"
                   name="format"
                   defaultValue={getDefaultFormatValue}
-                  onChange={formatChangeHandler.bind(this)}
+                  onChange={(selectedOption) =>
+                    selectTypeInputChangeHandler(selectedOption, "format")
+                  }
                   options={FORMAT_OPTIONS}
                 />
               </div>
@@ -262,8 +249,8 @@ class PersonAttributeTypeForm extends React.Component {
                 type="checkbox"
                 id="searchable"
                 name="searchable"
-                onChange={searchableChangeHandler.bind(this)}
-                checked={getValueFor(personAttributeType.searchable)}
+                onChange={(e) => inputChangeHandler(e, "checked")}
+                checked={GET_VALUE(personAttributeType.searchable)}
               />
             </label>
             <br />
@@ -275,8 +262,8 @@ class PersonAttributeTypeForm extends React.Component {
                 name="description"
                 rows="3"
                 cols="20"
-                value={getValueFor(personAttributeType.description)}
-                onChange={descriptionChangeHandler.bind(this)}
+                value={GET_VALUE(personAttributeType.description)}
+                onChange={inputChangeHandler}
               />
             </label>
             <br />
@@ -288,7 +275,12 @@ class PersonAttributeTypeForm extends React.Component {
                   id="editPrivilege"
                   name="editPrivilege"
                   defaultValue={getDefaultEditPrivilegeValue}
-                  onChange={editPrivilegeChangeHandler.bind(this)}
+                  onChange={(selectedOption) =>
+                    selectTypeInputChangeHandler(
+                      selectedOption,
+                      "editPrivilege"
+                    )
+                  }
                   options={editPrivilegeOptions}
                 />
               </div>
@@ -319,8 +311,8 @@ class PersonAttributeTypeForm extends React.Component {
                   type="text"
                   id="retireReason"
                   name="retireReason"
-                  value={getValueFor(personAttributeType.retireReason)}
-                  onChange={retireReasonChangeHandler.bind(this)}
+                  value={GET_VALUE(personAttributeType.retireReason)}
+                  onChange={inputChangeHandler}
                 />
               </label>
               <br />
@@ -368,8 +360,6 @@ class PersonAttributeTypeForm extends React.Component {
         </React.Fragment>
       );
     }
-
-    return <p>Loading...</p>;
   }
 }
 export default withRouter(PersonAttributeTypeForm);
