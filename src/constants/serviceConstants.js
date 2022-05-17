@@ -12,6 +12,7 @@ export const PATIENT_RELATIONSHIP_TYPE = `${BASE_URL}/relationship_type`;
 export const PRIVILEGE = `${BASE_URL}/privilege`;
 export const VISIT_TYPE = `${BASE_URL}/visit_type`;
 export const PERSON_NAME = `${BASE_URL}/personname`;
+export const PERSON = `${BASE_URL}/person`;
 export const PERSON_ATTRIBUTE_TYPE = `${BASE_URL}/person_attribute_type`;
 export const USER = `${BASE_URL}/users`;
 export const ADDRESS_HIERARCHY_LEVEL = `${BASE_URL}/addresshierarchylevel`;

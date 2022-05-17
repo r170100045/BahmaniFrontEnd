@@ -1,9 +1,9 @@
 import { Redirect, withRouter } from "react-router-dom";
+import { getPersonById, getUserById } from "../../services/userService";
 
 import { GET_VALUE } from "../../constants/otherConstants";
 import React from "react";
 import { getRoles } from "../../services/roleService";
-import { getUserById } from "../../services/userService";
 
 class UserForm extends React.Component {
   constructor(props) {
@@ -53,8 +53,9 @@ class UserForm extends React.Component {
       isLoading: true,
       error: false,
       errors: [],
-      password: "",
-      passwordRetype: "",
+      changePassword: false,
+      password: null,
+      passwordRetype: null,
       roles: [],
       showAdvancedOptions: false,
     };
@@ -82,7 +83,9 @@ class UserForm extends React.Component {
       const tempRoles = [...roles];
       user.userRoles.forEach((uRole) => {
         const idx = tempRoles.findIndex((role) => role.role === uRole);
-        tempRoles[idx].checked = true;
+        if (tempRoles[idx]) {
+          tempRoles[idx].checked = true;
+        }
       });
       this.setState({ roles: tempRoles }, () => resolve());
     });
@@ -108,14 +111,36 @@ class UserForm extends React.Component {
     return new Promise((resolve, reject) => {
       if (userId === "add") {
         if (personId !== "dummy") {
-          // TO-DO get person info, set it in user and resolve
-          resolve();
+          getPersonById(personId)
+            .then((response) => {
+              const personObj = {
+                uuid: null,
+                givenName: null,
+                middleName: null,
+                familyName: null,
+                gender: null,
+              };
+
+              personObj.uuid = response.data.uuid;
+              personObj.givenName = response.data.givenName;
+              personObj.middleName = response.data.middleName;
+              personObj.familyName = response.data.familyName;
+              personObj.gender = response.data.gender;
+
+              const { user } = this.state;
+              user.person = personObj;
+              this.setState({ user }, () => {
+                resolve();
+              });
+            })
+            .catch((e) => reject(e));
         } else {
           resolve();
         }
       } else {
         getUserById(userId)
           .then((response) => {
+            console.log("rd", response.data);
             this.setState({ user: response.data }, () => {
               resolve();
             });
@@ -207,9 +232,18 @@ class UserForm extends React.Component {
     this.setState({ showAdvancedOptions: !showAdvancedOptions });
   }
 
-  stateChangeHandler(event) {
-    const { name, value } = event.target;
-    this.setState({ [name]: value });
+  stateChangeHandler(event, type = "value") {
+    const { name } = event.target;
+
+    if (name === "changePassword" && event.target[type] === true) {
+      this.setState({
+        [name]: event.target[type],
+        password: null,
+        passwordRetype: null,
+      });
+    } else {
+      this.setState({ [name]: event.target[type] });
+    }
   }
 
   userRoleChangeHandler(event, index) {
@@ -279,6 +313,7 @@ class UserForm extends React.Component {
       isLoading,
       roles,
       error,
+      changePassword,
       password,
       passwordRetype,
       showAdvancedOptions,
@@ -400,33 +435,49 @@ class UserForm extends React.Component {
             />
             <span>User can log in with either Username or System Id</span>
             <br />
-            <label htmlFor="password">User's Password: </label>
+
+            <label htmlFor="changePassword">Change Password:</label>
             <input
-              type="password"
-              id="password"
-              name="password"
-              onChange={stateChangeHandler}
-              value={GET_VALUE(password)}
+              type="checkbox"
+              id="changePassword"
+              name="changePassword"
+              onChange={(e) => stateChangeHandler(e, "checked")}
+              checked={GET_VALUE(changePassword)}
             />
-            <span>
-              Password should be 8 characters long and should have both upper
-              and lower case characters , at least one digit , at least one non
-              digit
-            </span>
             <br />
-            <label htmlFor="passwordRetype">Confirm Password: </label>
-            <input
-              type="password"
-              id="passwordRetype"
-              name="passwordRetype"
-              onChange={stateChangeHandler}
-              value={GET_VALUE(passwordRetype)}
-            />
-            <span>
-              Retype the password (for accuracy). It should match the password
-              entered above
-            </span>
-            <br />
+
+            {changePassword && (
+              <div>
+                <label htmlFor="password">User's Password: </label>
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  onChange={stateChangeHandler}
+                  value={GET_VALUE(password)}
+                />
+                <span>
+                  Password should be 8 characters long and should have both
+                  upper and lower case characters , at least one digit , at
+                  least one non digit
+                </span>
+                <br />
+                <label htmlFor="passwordRetype">Confirm Password: </label>
+                <input
+                  type="password"
+                  id="passwordRetype"
+                  name="passwordRetype"
+                  onChange={stateChangeHandler}
+                  value={GET_VALUE(passwordRetype)}
+                />
+                <span>
+                  Retype the password (for accuracy). It should match the
+                  password entered above
+                </span>
+                <br />
+              </div>
+            )}
+
             <label htmlFor="forcePasswordChange">Force Password Change </label>
             <input
               type="checkbox"
@@ -435,6 +486,10 @@ class UserForm extends React.Component {
               checked={user.forcePasswordChange}
               onChange={(e) => userInputChangeHandler(e, "checked")}
             />
+            <span>
+              Optionally require that this user change their password on next
+              login
+            </span>
             <br />
 
             <div>

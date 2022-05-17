@@ -24,10 +24,12 @@ class UserAddPrompt extends React.Component {
         const personOptions = [];
 
         Object.keys(response.data).forEach((key) => {
-          personOptions.push({
-            value: response.data[key].uuid,
-            label: response.data[key].concatenatedName,
-          });
+          if (response.data[key].personName) {
+            personOptions.push({
+              value: response.data[key].personUuid,
+              label: response.data[key].personName,
+            });
+          }
         });
 
         this.setState({ personOptions });
