@@ -10,7 +10,7 @@ export default function PatientRelationshipTypePage() {
     <CommonPage
       id={id}
       action={action}
-      title="Medication Data: Drugs Management"
+      title="Medication Data: Concept Drugs Management"
       viewAll={<Drugs />}
       addOrEdit={<DrugForm />}
     />

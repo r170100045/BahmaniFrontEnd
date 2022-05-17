@@ -8,6 +8,13 @@ import {
 
 import { GET_VALUE } from "../../constants/otherConstants";
 import React from "react";
+import {
+  buttonGroupStyle,
+  inputStyle,
+  paperStyle,
+  subHeadingStyle,
+} from "../../constants/formStyling";
+import { Paper, TextField } from "@material-ui/core";
 
 class PatientRelationshipTypeForm extends React.Component {
   constructor(props) {
@@ -132,101 +139,109 @@ class PatientRelationshipTypeForm extends React.Component {
 
     return (
       <React.Fragment>
-        <div>
-          <label htmlFor="aisToB">
-            A is to B:
-            <input
-              type="text"
-              id="aisToB"
-              name="aisToB"
-              value={GET_VALUE(relationshipType.aisToB)}
-              onChange={inputChangeHandler}
-            />
-          </label>
+        <Paper style={paperStyle}>
+          <TextField
+            style={inputStyle}
+            label="A is to B"
+            type="text"
+            id="aisToB"
+            name="aisToB"
+            value={GET_VALUE(relationshipType.aisToB)}
+            onChange={inputChangeHandler}
+          />
           <br />
 
-          <label htmlFor="bisToA">
-            B is to A:
-            <input
-              type="text"
-              id="bisToA"
-              name="bisToA"
-              value={GET_VALUE(relationshipType.bisToA)}
-              onChange={inputChangeHandler}
-            />
-          </label>
+          <TextField
+            style={inputStyle}
+            label="B is to A"
+            type="text"
+            id="bisToA"
+            name="bisToA"
+            value={GET_VALUE(relationshipType.bisToA)}
+            onChange={inputChangeHandler}
+          />
           <br />
 
-          <label htmlFor="description">
-            Description:
-            <textarea
-              id="description"
-              name="description"
-              rows="3"
-              cols="20"
-              value={GET_VALUE(relationshipType.description)}
-              onChange={inputChangeHandler}
-            />
-          </label>
+          <TextField
+            style={inputStyle}
+            multiline
+            label="Description"
+            id="description"
+            name="description"
+            rows="3"
+            cols="20"
+            value={GET_VALUE(relationshipType.description)}
+            onChange={inputChangeHandler}
+          />
           <br />
+          <div style={buttonGroupStyle}>
+            <button type="button" onClick={saveRelationshipType.bind(this)}>
+              Save Relationship Type
+            </button>
+            <button type="button" onClick={cancelRelationshipType.bind(this)}>
+              Cancel
+            </button>
+          </div>
 
-          <button type="button" onClick={saveRelationshipType.bind(this)}>
-            Save
-          </button>
-          <button type="button" onClick={cancelRelationshipType.bind(this)}>
-            Cancel
-          </button>
           <br />
-        </div>
+        </Paper>
 
         {relationshipTypeId !== "add" && !relationshipType.retired && (
-          <div>
+          <Paper style={paperStyle}>
             <hr />
 
-            <p>Retire Relationship Type</p>
+            <p style={subHeadingStyle}>Retire Relationship Type</p>
 
-            <label htmlFor="retireReason">
-              Reason:
-              <input
-                type="text"
-                id="retireReason"
-                name="retireReason"
-                value={GET_VALUE(relationshipType.retireReason)}
-                onChange={inputChangeHandler}
-              />
-            </label>
+            <TextField
+              style={inputStyle}
+              label="Reason"
+              type="text"
+              id="retireReason"
+              name="retireReason"
+              value={GET_VALUE(relationshipType.retireReason)}
+              onChange={inputChangeHandler}
+            />
             <br />
 
-            <button type="button" onClick={retireRelationshipType.bind(this)}>
-              Retire Relationship Type
-            </button>
+            <div style={buttonGroupStyle}>
+              <button type="button" onClick={retireRelationshipType.bind(this)}>
+                Retire Relationship Type
+              </button>
+            </div>
+
             <br />
-          </div>
+          </Paper>
         )}
-
         {relationshipTypeId !== "add" && relationshipType.retired && (
-          <div>
+          <Paper style={paperStyle}>
             <hr />
 
-            <p>Unretire Relationship Type</p>
+            <p style={subHeadingStyle}>Unretire Relationship Type</p>
+            <div style={buttonGroupStyle}>
+              <button
+                type="button"
+                onClick={unretireRelationshipType.bind(this)}
+              >
+                Unretire Relationship Type
+              </button>
+            </div>
 
-            <button type="button" onClick={unretireRelationshipType.bind(this)}>
-              Unretire Relationship Type
-            </button>
             <br />
-          </div>
+          </Paper>
         )}
 
         {relationshipTypeId !== "add" && (
-          <div>
+          <Paper style={paperStyle}>
             <hr />
 
-            <p>Delete Relationship Type Forever</p>
-
-            <button type="button" onClick={deleteRelationshipType.bind(this)}>
-              Delete Relationship Type Forever
-            </button>
-          </div>
+            <p style={subHeadingStyle}>Delete Relationship Type Forever</p>
+            <div style={buttonGroupStyle}>
+              <button type="button" onClick={deleteRelationshipType.bind(this)}>
+                Delete Relationship Type Forever
+              </button>
+            </div>
+            <br />
+          </Paper>
         )}
       </React.Fragment>
     );

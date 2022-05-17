@@ -3,6 +3,7 @@ import React, { useState } from "react";
 
 import { Link } from "react-router-dom";
 import { blue } from "@material-ui/core/colors";
+import { withRouter } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
   sideMenu: {
@@ -23,83 +24,59 @@ const useStyles = makeStyles((theme) => ({
     fontSize: 16,
   },
   activeLink: {
+    backgroundColor: "#daaeae",
     textDecoration: "none",
     color: "#5f6163",
-    fontSize: 16,
   },
 }));
 
+const navItems = [
+  {
+    href: "/addressHierarchyLevel/view/all",
+    basehref: "/addressHierarchyLevel",
+    title: "Address Hierarchy",
+  },
+  { href: "/concept/view/all", basehref: "/concept", title: "Concepts" },
+  { href: "/drug/view/all", basehref: "/drug", title: "Medication Data" },
+  {
+    href: "/patientRelationshipType/view/all",
+    basehref: "/patientRelationshipType",
+    title: "Patient Relationships",
+  },
+  {
+    href: "/personAttributeType/view/all",
+    basehref: "/personAttributeType",
+    title: "Person Attributes",
+  },
+  { href: "/user/view/all/dummy", basehref: "/user", title: "Users" },
+  { href: "/role/view/all", basehref: "/role", title: "Roles" },
+  { href: "/privilege/view/all", basehref: "/privilege", title: "Privileges" },
+  { href: "/visitType/view/all", basehref: "/visitType", title: "Visit Types" },
+];
+
+const NavLink = withRouter((props) => {
+  const classes = useStyles();
+  const isActive = props.location.pathname.includes(props.navItem.basehref);
+  return (
+    <MenuItem
+      className={isActive ? classes.activeLink : classes.link}
+      to={props.navItem.href}
+      component={Link}
+    >
+      {props.navItem.title}
+    </MenuItem>
+  );
+});
 export default function SideMenu() {
   const classes = useStyles();
-  const [linkClass, setLinkClass] = useState("link");
   //window.location.pathname && and change the class of that link classes.active
   return (
     <div className={classes.sideMenu}>
       <Paper className={classes.paper}>
         <MenuList>
-          <MenuItem
-            component={Link}
-            to="/addressHierarchyLevel/view/all"
-            className={classes.link}
-          >
-            Address Hierarchy
-          </MenuItem>
-          <MenuItem
-            component={Link}
-            to="/concept/view/all"
-            className={classes.link}
-          >
-            Concepts
-          </MenuItem>
-          <MenuItem
-            component={Link}
-            to="/drug/view/all"
-            className={classes.link}
-          >
-            Medication Data
-          </MenuItem>
-          <MenuItem
-            component={Link}
-            to="/patientRelationshipType/view/all"
-            className={classes.link}
-          >
-            Patient Relationships
-          </MenuItem>
-          <MenuItem
-            component={Link}
-            to="/personAttributeType/view/all"
-            className={classes.link}
-          >
-            Person Attributes
-          </MenuItem>
-          <MenuItem
-            component={Link}
-            to="/user/view/all/dummy"
-            className={classes.link}
-          >
-            Users
-          </MenuItem>
-          <MenuItem
-            component={Link}
-            to="/role/view/all"
-            className={classes.link}
-          >
-            Roles
-          </MenuItem>
-          <MenuItem
-            component={Link}
-            to="/privilege/view/all"
-            className={classes.link}
-          >
-            Privileges
-          </MenuItem>
-          <MenuItem
-            component={Link}
-            to="/visitType/view/all"
-            className={classes.link}
-          >
-            Visit Types
-          </MenuItem>
+          {navItems.map((navItem) => (
+            <NavLink key={navItem.href} navItem={navItem} />
+          ))}
         </MenuList>
       </Paper>
     </div>

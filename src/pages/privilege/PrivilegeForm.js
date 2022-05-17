@@ -14,7 +14,13 @@ import {
 } from "../../services/privilegeService";
 
 import { GET_VALUE } from "../../constants/otherConstants";
-import { Paper } from "@material-ui/core";
+import {
+  Button,
+  Input,
+  Paper,
+  TextareaAutosize,
+  TextField,
+} from "@material-ui/core";
 import React from "react";
 
 class PrivilegeForm extends React.Component {
@@ -113,55 +119,41 @@ class PrivilegeForm extends React.Component {
     return (
       <React.Fragment>
         <Paper style={paperStyle}>
-          <label htmlFor="privilege" style={labelStyle}>
-            Privilege Name :
-            <input
-              style={inputStyle}
-              type="text"
-              id="privilege"
-              name="privilege"
-              disabled={privilegeId === "add" ? false : true}
-              value={GET_VALUE(privilege.privilege)}
-              onChange={inputChangeHandler}
-            />
-          </label>
+          <TextField
+            style={inputStyle}
+            label="Privilege Name"
+            type="text"
+            id="privilege"
+            name="privilege"
+            disabled={privilegeId === "add" ? false : true}
+            value={GET_VALUE(privilege.privilege)}
+            onChange={inputChangeHandler}
+          />
           <br />
 
-          <label htmlFor="description" style={labelStyle}>
-            Description :
-            <textarea
-              style={inputStyle}
-              id="description"
-              name="description"
-              rows="3"
-              cols="20"
-              value={GET_VALUE(privilege.description)}
-              onChange={inputChangeHandler}
-            />
-          </label>
+          <TextField
+            style={inputStyle}
+            label="Description"
+            id="description"
+            name="description"
+            rows="3"
+            cols="20"
+            multiline
+            value={GET_VALUE(privilege.description)}
+            onChange={inputChangeHandler}
+          />
           <br />
-
-          <button
-            type="button"
-            style={buttonStyle}
-            onClick={savePrivilege.bind(this)}
-          >
-            Save
-          </button>
-          <button
-            type="button"
-            style={buttonStyle}
-            onClick={cancelButtonHandler.bind(this)}
-          >
-            Cancel
-          </button>
-          <button
-            type="button"
-            style={buttonStyle}
-            onClick={deletePrivilege.bind(this)}
-          >
-            Delete
-          </button>
+          <div style={buttonGroupStyle}>
+            <Button type="button" onClick={savePrivilege.bind(this)}>
+              Save Visit Type
+            </Button>
+            <Button type="button" onClick={cancelButtonHandler.bind(this)}>
+              Cancel
+            </Button>
+            <Button type="button" onClick={deletePrivilege.bind(this)}>
+              Delete
+            </Button>
+          </div>
 
           <br />
         </Paper>

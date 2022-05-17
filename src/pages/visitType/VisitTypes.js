@@ -46,9 +46,12 @@ const VisitTypes = () => {
       <div>
         <MTableToolbar {...props} />
         <div className="text-end" style={{ padding: "0px 10px" }}>
-          <Link to="/visitType/edit/add">
+          {/* <Link to="/visitType/edit/add">
             <Controls.AddButton />
-          </Link>
+          </Link> */}
+          <Controls.AddButton
+            onClick={() => setRedirect("/visitType/edit/add")}
+          />
         </div>
       </div>
     ),

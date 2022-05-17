@@ -6,6 +6,7 @@ import {
   inputStyle,
   labelStyle,
   paperStyle,
+  subHeadingStyle,
 } from "../../constants/formStyling";
 import {
   deleteDrugById,
@@ -14,7 +15,7 @@ import {
   updateDrugById,
 } from "../../services/drugService";
 
-import { Paper } from "@material-ui/core";
+import { Paper, TextField } from "@material-ui/core";
 import React from "react";
 import Select from "react-select";
 import { getConceptNames } from "../../services/conceptService";
@@ -190,26 +191,23 @@ class DrugForm extends React.Component {
 
     if (redirect) return <Redirect to={redirect} />;
 
-    if (isLoading) return <p>Loading...</p>;
+    if (!isLoading || drugId === "add") {
+      return (
+        <React.Fragment>
+          {error && <p>Fill the required fields</p>}
+          {drug.retired && (
+            <p>
+              This drug is retired by ... ... - {drug.retireReason}{" "}
+              <button type="button" onClick={unretireDrug.bind(this)}>
+                Unretire this drug
+              </button>
+            </p>
+          )}
+          <hr />
 
-    return (
-      <React.Fragment>
-        {error && <p>Fill the required fields</p>}
-        <p>Concept Drug Management</p>
-        {drug.retired && (
-          <p>
-            This drug is retired by ... ... - {drug.retireReason}{" "}
-            <button type="button" onClick={unretireDrug.bind(this)}>
-              Unretire this drug
-            </button>
-          </p>
-        )}
-        <hr />
-
-        <Paper style={paperStyle}>
-          <label htmlFor="name" style={labelStyle}>
-            Name*:
-            <input
+          <Paper style={paperStyle}>
+            <TextField
+              label="Name"
               style={inputStyle}
               type="text"
               id="name"
@@ -217,135 +215,147 @@ class DrugForm extends React.Component {
               onChange={drugInputChangeHandler}
               value={GET_VALUE(drug.name)}
             />
-          </label>
-          <br />
+            <br />
 
-          <label htmlFor="conceptId" style={labelStyle}>
-            Concept*:
-            <div style={{ width: "300px", display: "inline-block" }}>
-              <Select
-                style={inputStyle}
-                id="conceptId"
-                name="conceptId"
-                placeholder="Enter concept name or id"
-                defaultValue={getDefaultConceptIdValue}
-                onChange={conceptIdChangeHandler.bind(this)}
-                options={options}
-                filterOption={FILTER_OPTIONS}
+            <label htmlFor="conceptId" style={inputStyle}>
+              Concept*:
+              <div style={{ width: "300px", display: "inline-block" }}>
+                <Select
+                  style={inputStyle}
+                  id="conceptId"
+                  name="conceptId"
+                  placeholder="Enter concept name or id"
+                  defaultValue={getDefaultConceptIdValue}
+                  onChange={conceptIdChangeHandler.bind(this)}
+                  options={options}
+                  filterOption={FILTER_OPTIONS}
+                />
+              </div>
+            </label>
+
+            <br />
+            <label htmlFor="combination" style={inputStyle}>
+              Combination:
+              <input
+                type="checkbox"
+                id="combination"
+                name="combination"
+                onChange={(e) => drugInputChangeHandler(e, "checked")}
+                checked={GET_VALUE(drug.combination)}
               />
-            </div>
-          </label>
+            </label>
+            <br />
 
-          <br />
-          <label htmlFor="combination" style={labelStyle}>
-            Combination:
-            <input
-              type="checkbox"
-              id="combination"
-              name="combination"
-              onChange={(e) => drugInputChangeHandler(e, "checked")}
-              checked={GET_VALUE(drug.combination)}
-            />
-          </label>
-          <br />
+            <label htmlFor="dosageForm" style={inputStyle}>
+              Dosage Form:
+              <div style={{ width: "300px", display: "inline-block" }}>
+                <Select
+                  id="dosageForm"
+                  name="dosageForm"
+                  placeholder="Enter concept name or id"
+                  defaultValue={getDefaultDosageFormValue}
+                  onChange={dosageFormChangeHandler.bind(this)}
+                  options={options}
+                  filterOption={FILTER_OPTIONS}
+                />
+              </div>
+            </label>
 
-          <label htmlFor="dosageForm" style={labelStyle}>
-            Dosage Form:
-            <div style={{ width: "300px", display: "inline-block" }}>
-              <Select
-                id="dosageForm"
-                name="dosageForm"
-                placeholder="Enter concept name or id"
-                defaultValue={getDefaultDosageFormValue}
-                onChange={dosageFormChangeHandler.bind(this)}
-                options={options}
-                filterOption={FILTER_OPTIONS}
-              />
-            </div>
-          </label>
+            <br />
 
-          <br />
-          <label htmlFor="strength" style={labelStyle}>
-            Strength:
-            <input
+            <TextField
+              style={inputStyle}
+              label="Strength"
               type="text"
               id="strength"
               name="strength"
               onChange={drugInputChangeHandler}
               value={GET_VALUE(drug.strength)}
             />
-          </label>
-          <br />
-
-          <label htmlFor="minimumDailyDose" style={labelStyle}>
-            Minimum Daily Dose:
-            <input
-              type="number"
-              id="minimumDailyDose"
-              name="minimumDailyDose"
-              onChange={drugInputChangeHandler}
-              value={GET_VALUE(drug.minimumDailyDose)}
-              step="any"
-            />
-          </label>
-          <br />
-
-          <label htmlFor="maximumDailyDose" style={labelStyle}>
-            Maximum Daily Dose:
-            <input
-              type="number"
-              id="maximumDailyDose"
-              name="maximumDailyDose"
-              onChange={drugInputChangeHandler}
-              value={GET_VALUE(drug.maximumDailyDose)}
-              step="any"
-            />
-          </label>
-          <br />
-          <button
-            type="button"
-            style={buttonStyle}
-            onClick={submitDrugFormHandler.bind(this)}
-          >
-            Save Concept Drug
-          </button>
-          <button
-            type="button"
-            style={buttonStyle}
-            onClick={cancelButtonHandler.bind(this)}
-          >
-            Cancel
-          </button>
-        </Paper>
-        <hr />
-
-        {drugId !== "add" && (
-          <div>
-            <p>Retire this Drug</p>
-            <label htmlFor="retireReason">Reason: </label>
-            <input
-              type="text"
-              id="retireReason"
-              name="retireReason"
-              onChange={drugInputChangeHandler}
-              value={GET_VALUE(drug.retireReason)}
-            />
             <br />
             <button type="button" onClick={retireDrug.bind(this)}>
               Retire this Drug
             </button>
 
-            <hr />
-
-            <p>Permanently Delete Concept Drug</p>
+            <label htmlFor="minimumDailyDose" style={inputStyle}>
+              Minimum Daily Dose:
+              <input
+                type="number"
+                id="minimumDailyDose"
+                name="minimumDailyDose"
+                onChange={drugInputChangeHandler}
+                value={GET_VALUE(drug.minimumDailyDose)}
+                step="any"
+              />
+            </label>
             <br />
-            <button type="button" onClick={deleteDrug.bind(this)}>
-              Permanently Delete Concept Drug
-            </button>
-          </div>
-        )}
-      </React.Fragment>
-    );
+
+            <label htmlFor="maximumDailyDose" style={inputStyle}>
+              Maximum Daily Dose:
+              <input
+                type="number"
+                id="maximumDailyDose"
+                name="maximumDailyDose"
+                onChange={drugInputChangeHandler}
+                value={GET_VALUE(drug.maximumDailyDose)}
+                step="any"
+              />
+            </label>
+            <br />
+            <div style={buttonGroupStyle}>
+              <button
+                type="button"
+                style={buttonStyle}
+                onClick={submitDrugFormHandler.bind(this)}
+              >
+                Save Concept Drug
+              </button>
+              <button
+                type="button"
+                style={buttonStyle}
+                onClick={cancelButtonHandler.bind(this)}
+              >
+                Cancel
+              </button>
+            </div>
+          </Paper>
+          <hr />
+
+          {drugId !== "add" && (
+            <Paper style={paperStyle}>
+              <p style={subHeadingStyle}>Retire this Drug</p>
+              <TextField
+                style={inputStyle}
+                label="Reason"
+                type="text"
+                id="retireReason"
+                name="retireReason"
+                onChange={drugInputChangeHandler}
+                value={GET_VALUE(drug.retireReason)}
+              />
+              <br />
+              <div style={buttonGroupStyle}>
+                <button type="button" onClick={retireDrug.bind(this)}>
+                  Retire this Drug
+                </button>
+              </div>
+
+              <hr />
+
+              <p style={subHeadingStyle}>Permanently Delete Concept Drug</p>
+              <br />
+              <div style={buttonGroupStyle}>
+                <button type="button" onClick={deleteDrug.bind(this)}>
+                  Permanently Delete Concept Drug
+                </button>
+              </div>
+            </Paper>
+          )}
+        </React.Fragment>
+      );
+    }
+
+    return <p>Loading...</p>;
   }
 }
 

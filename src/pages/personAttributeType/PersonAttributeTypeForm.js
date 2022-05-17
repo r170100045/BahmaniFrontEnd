@@ -10,6 +10,13 @@ import {
 import React from "react";
 import Select from "react-select";
 import { getPrivileges } from "../../services/privilegeService";
+import { Input, Paper, TextField } from "@material-ui/core";
+import {
+  buttonGroupStyle,
+  inputStyle,
+  paperStyle,
+  subHeadingStyle,
+} from "../../constants/formStyling";
 
 class PersonAttributeTypeForm extends React.Component {
   constructor(props) {
@@ -214,23 +221,23 @@ class PersonAttributeTypeForm extends React.Component {
     if (!isLoading || personAttributeTypeId === "add") {
       return (
         <React.Fragment>
-          <div>
-            <label htmlFor="name">
-              Name:
-              <input
-                type="text"
-                id="name"
-                name="name"
-                value={GET_VALUE(personAttributeType.name)}
-                onChange={inputChangeHandler}
-              />
-            </label>
+          <Paper style={paperStyle}>
+            <TextField
+              style={inputStyle}
+              label="Name"
+              type="text"
+              id="name"
+              name="name"
+              value={GET_VALUE(personAttributeType.name)}
+              onChange={inputChangeHandler}
+            />
             <br />
 
-            <label htmlFor="format">
+            <label htmlFor="format" style={inputStyle}>
               Format:
               <div style={{ width: "300px", display: "inline-block" }}>
                 <Select
+                  style={inputStyle}
                   id="format"
                   name="format"
                   defaultValue={getDefaultFormatValue}
@@ -243,35 +250,11 @@ class PersonAttributeTypeForm extends React.Component {
             </label>
             <br />
 
-            <label htmlFor="searchable">
-              Searchable:
-              <input
-                type="checkbox"
-                id="searchable"
-                name="searchable"
-                onChange={(e) => inputChangeHandler(e, "checked")}
-                checked={GET_VALUE(personAttributeType.searchable)}
-              />
-            </label>
-            <br />
-
-            <label htmlFor="description">
-              Description:
-              <textarea
-                id="description"
-                name="description"
-                rows="3"
-                cols="20"
-                value={GET_VALUE(personAttributeType.description)}
-                onChange={inputChangeHandler}
-              />
-            </label>
-            <br />
-
-            <label htmlFor="editPrivilege">
+            <label htmlFor="editPrivilege" style={inputStyle}>
               Edit Privilege:
               <div style={{ width: "300px", display: "inline-block" }}>
                 <Select
+                  style={inputStyle}
                   id="editPrivilege"
                   name="editPrivilege"
                   defaultValue={getDefaultEditPrivilegeValue}
@@ -287,75 +270,114 @@ class PersonAttributeTypeForm extends React.Component {
             </label>
             <br />
 
-            <button type="button" onClick={savePersonAttributeType.bind(this)}>
-              Save
-            </button>
-            <button
-              type="button"
-              onClick={cancelPersonAttributeType.bind(this)}
-            >
-              Cancel
-            </button>
+            <label htmlFor="searchable" style={inputStyle}>
+              Searchable:
+              <input
+                style={inputStyle}
+                type="checkbox"
+                id="searchable"
+                name="searchable"
+                onChange={(e) => inputChangeHandler(e, "checked")}
+                checked={GET_VALUE(personAttributeType.searchable)}
+              />
+            </label>
             <br />
-          </div>
 
+            <TextField
+              label="Description"
+              id="description"
+              name="description"
+              rows="3"
+              cols="20"
+              multiline
+              style={inputStyle}
+              value={GET_VALUE(personAttributeType.description)}
+              onChange={inputChangeHandler}
+            />
+            <br />
+            <br />
+
+            {/* SELECT -- Edit Privilege */}
+            <div style={buttonGroupStyle}>
+              <button
+                type="button"
+                onClick={savePersonAttributeType.bind(this)}
+              >
+                Save Person Attribute Type
+              </button>
+              <button
+                type="button"
+                onClick={cancelPersonAttributeType.bind(this)}
+              >
+                Cancel
+              </button>
+            </div>
+
+            <br />
+          </Paper>
           {personAttributeTypeId !== "add" && !personAttributeType.retired && (
-            <div>
+            <Paper style={paperStyle}>
               <hr />
 
-              <p>Retire Person Attribute Type</p>
+              <p style={subHeadingStyle}>Retire Person Attribute Type</p>
 
-              <label htmlFor="retireReason">
-                Reason:
-                <input
-                  type="text"
-                  id="retireReason"
-                  name="retireReason"
-                  value={GET_VALUE(personAttributeType.retireReason)}
-                  onChange={inputChangeHandler}
-                />
-              </label>
+              <TextField
+                style={inputStyle}
+                label="Reason"
+                type="text"
+                id="retireReason"
+                name="retireReason"
+                value={GET_VALUE(personAttributeType.retireReason)}
+                onChange={inputChangeHandler}
+              />
               <br />
+              <div style={buttonGroupStyle}>
+                <button
+                  type="button"
+                  onClick={retirePersonAttributeType.bind(this)}
+                >
+                  Retire Person Attribute Type
+                </button>
+              </div>
 
-              <button
-                type="button"
-                onClick={retirePersonAttributeType.bind(this)}
-              >
-                Retire Person Attribute Type
-              </button>
               <br />
-            </div>
+            </Paper>
           )}
-
           {personAttributeTypeId !== "add" && personAttributeType.retired && (
-            <div>
+            <Paper style={paperStyle}>
               <hr />
 
-              <p>Unretire Person Attribute Type</p>
+              <p style={subHeadingStyle}>Unretire Person Attribute Type</p>
 
-              <button
-                type="button"
-                onClick={unretirePersonAttributeType.bind(this)}
-              >
-                Unretire Person Attribute Type
-              </button>
+              <div style={buttonGroupStyle}>
+                <button
+                  type="button"
+                  onClick={unretirePersonAttributeType.bind(this)}
+                >
+                  Unretire Person Attribute Type
+                </button>
+              </div>
+
               <br />
-            </div>
+            </Paper>
           )}
 
           {personAttributeTypeId !== "add" && (
-            <div>
+            <Paper style={paperStyle}>
               <hr />
 
-              <p>Delete Person Attribute Type Forever</p>
-
-              <button
-                type="button"
-                onClick={deletePersonAttributeType.bind(this)}
-              >
+              <p style={subHeadingStyle}>
                 Delete Person Attribute Type Forever
-              </button>
-            </div>
+              </p>
+              <div style={buttonGroupStyle}>
+                <button
+                  type="button"
+                  onClick={deletePersonAttributeType.bind(this)}
+                >
+                  Delete Person Attribute Type Forever
+                </button>
+              </div>
+            </Paper>
           )}
         </React.Fragment>
       );

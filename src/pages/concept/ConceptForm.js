@@ -19,6 +19,8 @@ import {
 
 import Select from "react-select";
 import { getDrugs } from "../../services/drugService";
+import { Paper, TextField } from "@material-ui/core";
+import { conceptPaperStyle, paperStyle } from "../../constants/formStyling";
 
 class ConceptForm extends React.Component {
   constructor(props) {
@@ -868,13 +870,12 @@ class ConceptForm extends React.Component {
 
     if (conceptId === "add") {
       return (
-        <Fragment>
+        <Paper style={conceptPaperStyle}>
           {conceptId !== "add" && (
             <button type="button">
               <a href={`/concept/view/${conceptId}`}>View</a>
             </button>
           )}
-
           {conceptId !== "add" && concept.retired && (
             <div>
               <p>
@@ -957,16 +958,14 @@ class ConceptForm extends React.Component {
             ))}
             <br />
 
-            <label htmlFor="fullySpecifiedName">
-              Fully Specified Name:
-              <input
-                type="text"
-                id="fullySpecifiedName"
-                name="fullySpecifiedName"
-                onChange={fullySpecifiedNameChangeHandler.bind(this)}
-                value={getValueFor(fullySpecifiedName)}
-              />
-            </label>
+            <TextField
+              label="Fully Specified Name"
+              type="text"
+              id="fullySpecifiedName"
+              name="fullySpecifiedName"
+              onChange={fullySpecifiedNameChangeHandler.bind(this)}
+              value={getValueFor(fullySpecifiedName)}
+            />
             <br />
 
             <label>Synonyms:</label>
@@ -1033,28 +1032,25 @@ class ConceptForm extends React.Component {
             ))} */}
 
             <br />
-            <label htmlFor="shortName">
-              Short Name:
-              <input
-                type="text"
-                id="shortName"
-                name="shortName"
-                onChange={shortNameChangeHandler.bind(this)}
-                value={getValueFor(concept.shortName)}
-              />
-            </label>
+
+            <TextField
+              label="Short Name"
+              type="text"
+              id="shortName"
+              name="shortName"
+              onChange={shortNameChangeHandler.bind(this)}
+              value={getValueFor(concept.shortName)}
+            />
             <br />
 
-            <label htmlFor="description">
-              Description:
-              <input
-                type="text"
-                id="description"
-                name="description"
-                onChange={descriptionChangeHandler.bind(this)}
-                value={getValueFor(concept.description)}
-              />
-            </label>
+            <TextField
+              label="Description"
+              type="text"
+              id="description"
+              name="description"
+              onChange={descriptionChangeHandler.bind(this)}
+              value={getValueFor(concept.description)}
+            />
             <br />
 
             <label htmlFor="classId">
@@ -1315,16 +1311,14 @@ class ConceptForm extends React.Component {
               </div>
             )}
 
-            <label htmlFor="version">
-              Version:
-              <input
-                type="text"
-                id="version"
-                name="version"
-                onChange={versionChangeHandler.bind(this)}
-                value={getValueFor(concept.version)}
-              />
-            </label>
+            <TextField
+              label="Version"
+              type="text"
+              id="version"
+              name="version"
+              onChange={versionChangeHandler.bind(this)}
+              value={getValueFor(concept.version)}
+            />
             <br />
 
             <button type="button" onClick={saveConcept.bind(this)}>
@@ -1364,7 +1358,7 @@ class ConceptForm extends React.Component {
               </button>
             </div>
           )}
-        </Fragment>
+        </Paper>
       );
     }
     return <p>Loading...</p>;

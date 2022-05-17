@@ -11,6 +11,12 @@ import {
 import { GET_VALUE } from "../../constants/otherConstants";
 import React from "react";
 import { getPrivileges } from "../../services/privilegeService";
+import { Paper, TextField } from "@material-ui/core";
+import {
+  buttonGroupStyle,
+  conceptPaperStyle,
+  inputStyle,
+} from "../../constants/formStyling";
 
 class RoleForm extends React.Component {
   constructor(props) {
@@ -268,7 +274,7 @@ class RoleForm extends React.Component {
 
     return (
       <React.Fragment>
-        <div>
+        <Paper style={conceptPaperStyle}>
           <label htmlFor="role">
             Role :
             <input
@@ -283,8 +289,9 @@ class RoleForm extends React.Component {
           <br />
 
           <label htmlFor="description">
-            Description :
-            <textarea
+            <TextField
+              style={inputStyle}
+              label="Description"
               id="description"
               name="description"
               rows="3"
@@ -365,22 +372,23 @@ class RoleForm extends React.Component {
             </div>
           )}
           <br />
-
-          <button type="button" onClick={saveRole.bind(this)}>
-            Save
-          </button>
-          <button type="button" onClick={cancel.bind(this)}>
-            Cancel
-          </button>
-
-          {roleId !== "add" && (
-            <button type="button" onClick={deleteRole.bind(this)}>
-              Delete
+          <div style={buttonGroupStyle}>
+            <button type="button" onClick={saveRole.bind(this)}>
+              Save Role
             </button>
-          )}
+            <button type="button" onClick={cancel.bind(this)}>
+              Cancel
+            </button>
+
+            {roleId !== "add" && (
+              <button type="button" onClick={deleteRole.bind(this)}>
+                Delete
+              </button>
+            )}
+          </div>
 
           <br />
-        </div>
+        </Paper>
       </React.Fragment>
     );
   }

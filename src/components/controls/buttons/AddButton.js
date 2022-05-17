@@ -5,10 +5,10 @@ import { blue } from "@material-ui/core/colors";
 
 const ColorButton = withStyles((theme) => ({
   root: {
-    color: theme.palette.getContrastText(blue["A700"]),
-    backgroundColor: blue["A700"],
+    color: blue[700],
+    textDecoration: "none",
     "&:hover": {
-      backgroundColor: blue[900],
+      backgroundColor: blue[50],
     },
   },
 }))(Button);
@@ -25,7 +25,7 @@ export default function AddButton(props) {
 
   return (
     <ColorButton
-      variant="contained"
+      variant="outlined"
       color="primary"
       size="medium"
       startIcon={<AddIcon />}

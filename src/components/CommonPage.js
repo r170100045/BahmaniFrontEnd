@@ -10,7 +10,7 @@ const useStyles = makeStyles((theme) => ({
   pageTitle: {
     textAlign: "left",
     fontSize: "20px",
-    marginTop: "10vh",
+    margin: "auto 24px ",
     padding: "10px",
     textTransform: "capitalize",
     fontWeight: "bolder",

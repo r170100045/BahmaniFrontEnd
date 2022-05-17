@@ -8,6 +8,14 @@ import {
 
 import { GET_VALUE } from "../../constants/otherConstants";
 import React from "react";
+import { Paper, TextField, Button } from "@material-ui/core";
+import {
+  buttonGroupStyle,
+  buttonStyle,
+  subHeadingStyle,
+  inputStyle,
+  paperStyle,
+} from "../../constants/formStyling";
 
 class VisitTypeForm extends React.Component {
   constructor(props) {
@@ -121,88 +129,86 @@ class VisitTypeForm extends React.Component {
 
     return (
       <React.Fragment>
-        <div>
-          <label htmlFor="name">
-            Name :
-            <input
-              type="text"
-              id="name"
-              name="name"
-              value={GET_VALUE(visitType.name)}
-              onChange={inputChangeHandler.bind(this)}
-            />
-          </label>
+        <Paper style={paperStyle}>
+          <TextField
+            style={inputStyle}
+            label="Name"
+            type="text"
+            id="name"
+            name="name"
+            value={GET_VALUE(visitType.name)}
+            onChange={inputChangeHandler.bind(this)}
+          />
           <br />
+          <TextField
+            style={inputStyle}
+            label="Description"
+            id="description"
+            name="description"
+            rows="3"
+            cols="20"
+            multiline
+            value={GET_VALUE(visitType.description)}
+            onChange={inputChangeHandler.bind(this)}
+          />
+          <br />
+          <div style={buttonGroupStyle}>
+            <Button type="button" onClick={saveVisitType.bind(this)}>
+              Save
+            </Button>
+            <Button type="button" onClick={cancelVisitType.bind(this)}>
+              Cancel
+            </Button>
+          </div>
 
-          <label htmlFor="description">
-            Description :
-            <textarea
-              id="description"
-              name="description"
-              rows="3"
-              cols="20"
-              value={GET_VALUE(visitType.description)}
-              onChange={inputChangeHandler.bind(this)}
-            />
-          </label>
           <br />
-
-          <button type="button" onClick={saveVisitType.bind(this)}>
-            Save
-          </button>
-          <button type="button" onClick={cancelVisitType.bind(this)}>
-            Cancel
-          </button>
-          <br />
-        </div>
+        </Paper>
 
         {visitTypeId !== "add" && !visitType.retired && (
-          <div>
-            <hr />
-
-            <p>Retire Visit Type</p>
-
-            <label htmlFor="retireReason">
-              Reason:
-              <input
-                type="text"
-                id="retireReason"
-                name="retireReason"
-                value={GET_VALUE(visitType.retireReason)}
-                onChange={inputChangeHandler.bind(this)}
-              />
-            </label>
+          <Paper style={paperStyle}>
+            <TextField
+              style={inputStyle}
+              label="Reason to retire"
+              type="text"
+              id="retireReason"
+              name="retireReason"
+              multiline
+              value={GET_VALUE(visitType.retireReason)}
+              onChange={inputChangeHandler.bind(this)}
+            />
             <br />
+            <div style={buttonGroupStyle}>
+              <Button type="button" onClick={retireVisitType.bind(this)}>
+                Retire Visit Type
+              </Button>
+            </div>
 
-            <button type="button" onClick={retireVisitType.bind(this)}>
-              Retire Visit Type
-            </button>
             <br />
-          </div>
+          </Paper>
         )}
 
         {visitTypeId !== "add" && visitType.retired && (
-          <div>
+          <Paper style={paperStyle}>
             <hr />
 
-            <p>Unretire Visit Type</p>
+            <p style={subHeadingStyle}>Unretire Visit Type</p>
+            <div style={buttonGroupStyle}>
+              <Button type="button" onClick={unretireVisitType.bind(this)}>
+                Unretire Visit Type
+              </Button>
+            </div>
 
-            <button type="button" onClick={unretireVisitType.bind(this)}>
-              Unretire Visit Type
-            </button>
             <br />
-          </div>
+          </Paper>
         )}
 
         {visitTypeId !== "add" && (
-          <div>
-            <hr />
-
-            <p>Delete Visit Type Forever</p>
-
-            <button type="button" onClick={deleteVisitType.bind(this)}>
-              Delete Visit Type Forever
-            </button>
+          <div style={paperStyle}>
+            <div style={buttonGroupStyle}>
+              <Button type="button" onClick={deleteVisitType.bind(this)}>
+                Delete Visit Type Forever
+              </Button>
+            </div>
             <br />
           </div>
         )}

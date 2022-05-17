@@ -1,4 +1,18 @@
-export const paperStyle = { margin: "0px 30px" };
+export const paperStyle = {
+  padding: "24px 24px",
+  margin: "10px 30px",
+  display: "flex",
+  justifyContentcontent: "space-between",
+  flexDirection: "column",
+};
+export const conceptPaperStyle = {
+  margin: "10px 30px",
+  paddingLeft: 10,
+  display: "flex",
+  justifyContentcontent: "space-between",
+  flexDirection: "column",
+};
+
 export const labelStyle = {
   padding: "10px",
   color: "black",
@@ -6,9 +20,9 @@ export const labelStyle = {
   justifyContent: "space-between",
   width: "40%",
 };
-export const inputStyle = { marginLeft: "30px", width: "300px" };
+export const inputStyle = { width: "30rem" };
 export const buttonGroupStyle = {};
 export const buttonStyle = {
-  marginLeft: 7,
   marginBottom: 7,
 };
+export const subHeadingStyle = {};
