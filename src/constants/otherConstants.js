@@ -35,3 +35,15 @@ export const CONCEPT_COMPLEX_HANDLERS = [
   { value: "ProviderObsHandler", label: "ProviderObsHandler" },
   { value: "MediaHandler", label: "MediaHandler" },
 ];
+
+export const GET_VALUE = (field) => {
+  return field === null ? "" : field;
+};
+
+export const FILTER_OPTIONS = (option, inputValue) => {
+  const { label, value } = option;
+  return (
+    (label != null && label.toLowerCase().includes(inputValue.toLowerCase())) ||
+    value.toString().toLowerCase().includes(inputValue.toLowerCase())
+  );
+};

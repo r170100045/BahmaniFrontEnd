@@ -1,5 +1,6 @@
 import { Redirect, withRouter } from "react-router-dom";
 
+import { FILTER_OPTIONS } from "../../constants/otherConstants";
 import React from "react";
 import Select from "react-select";
 import { getPersons } from "../../services/userService";
@@ -45,21 +46,12 @@ class UserAddPrompt extends React.Component {
     });
   }
 
-  filterOptions(option, inputValue) {
-    const { label, value } = option;
-    return (
-      (label != null &&
-        label.toLowerCase().includes(inputValue.toLowerCase())) ||
-      value.toString().toLowerCase().includes(inputValue.toLowerCase())
-    );
-  }
-
   cancelButtonHandler() {
     this.setState({ redirect: "/user/view/all/dummy" });
   }
 
   render() {
-    const { filterOptions, personChangeHandler } = this;
+    const { personChangeHandler } = this;
 
     const {
       redirect,
@@ -100,7 +92,7 @@ class UserAddPrompt extends React.Component {
                       placeholder="Enter user name or uuid"
                       onChange={personChangeHandler.bind(this)}
                       options={personOptions}
-                      filterOption={filterOptions}
+                      filterOption={FILTER_OPTIONS}
                     />
                   </div>
                 </div>

@@ -1,3 +1,7 @@
+import {
+  CONCEPT_COMPLEX_HANDLERS,
+  FILTER_OPTIONS,
+} from "../../constants/otherConstants";
 import React, { Fragment } from "react";
 import { Redirect, withRouter } from "react-router-dom";
 import {
@@ -13,7 +17,6 @@ import {
   updateConceptById,
 } from "../../services/conceptService";
 
-import { CONCEPT_COMPLEX_HANDLERS } from "../../constants/otherConstants";
 import Select from "react-select";
 import { getDrugs } from "../../services/drugService";
 
@@ -656,15 +659,6 @@ class ConceptForm extends React.Component {
     this.setState({ concept });
   };
 
-  filterOptions(option, inputValue) {
-    const { label, value } = option;
-    return (
-      (label != null &&
-        label.toLowerCase().includes(inputValue.toLowerCase())) ||
-      value.toString().toLowerCase().includes(inputValue.toLowerCase())
-    );
-  }
-
   fullySpecifiedNameChangeHandler(event) {
     const { concept } = this.state;
     const fullySpecifiedNameIndex = concept.conceptNames.findIndex(
@@ -750,7 +744,6 @@ class ConceptForm extends React.Component {
       isSetChangeHandler,
       getValueFor,
       conceptSetsChangeHandler,
-      filterOptions,
       // getDefaultAnswerConceptValue,
       // getDefaultAnswerDrugValue,
       answerConceptChangeHandler,
@@ -1282,7 +1275,7 @@ class ConceptForm extends React.Component {
                     defaultValue={defaultAnswerConceptValue}
                     onChange={answerConceptChangeHandler.bind(this)}
                     options={conceptOptions}
-                    filterOption={filterOptions}
+                    filterOption={FILTER_OPTIONS}
                   />
                 </div>
                 <br />
@@ -1298,7 +1291,7 @@ class ConceptForm extends React.Component {
                     defaultValue={defaultAnswerDrugValue}
                     onChange={answerDrugChangeHandler.bind(this)}
                     options={drugOptions}
-                    filterOption={filterOptions}
+                    filterOption={FILTER_OPTIONS}
                   />
                 </div>
                 <br />

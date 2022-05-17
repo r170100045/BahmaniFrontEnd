@@ -6,16 +6,17 @@ import {
   updatePatientRelationshipTypeById,
 } from "../../services/patientRelationshipTypeService";
 
+import { GET_VALUE } from "../../constants/otherConstants";
 import React from "react";
 
 class PatientRelationshipTypeForm extends React.Component {
   constructor(props) {
     super(props);
     const initialRelationshipTypeState = {
-      aisToB: "",
-      bisToA: "",
-      description: "",
-      retireReason: "",
+      aisToB: null,
+      bisToA: null,
+      description: null,
+      retireReason: null,
       retired: false,
     };
 
@@ -23,7 +24,10 @@ class PatientRelationshipTypeForm extends React.Component {
       relationshipType: initialRelationshipTypeState,
       relationshipTypeId: this.props.match.params.id,
       redirect: null,
+      isLoading: true,
     };
+
+    this.inputChangeHandler = this.inputChangeHandler.bind(this);
   }
 
   componentDidMount() {
@@ -31,31 +35,24 @@ class PatientRelationshipTypeForm extends React.Component {
     if (relationshipTypeId !== "add") {
       getPatientRelationshipTypeById(relationshipTypeId)
         .then((response) => {
-          this.setState({ relationshipType: response.data });
+          this.setState({ relationshipType: response.data }, () => {
+            this.setState({ isLoading: false });
+          });
         })
         .catch((error) => {
           console.log(error);
         });
+    } else {
+      this.setState({ isLoading: false });
     }
   }
 
-  aisToBChangeHandler(event) {
+  inputChangeHandler = (event) => {
+    const { name, value } = event.target;
     const { relationshipType } = this.state;
-    relationshipType.aisToB = event.target.value;
+    relationshipType[name] = value;
     this.setState({ relationshipType });
-  }
-
-  bisToAChangeHandler(event) {
-    const { relationshipType } = this.state;
-    relationshipType.bisToA = event.target.value;
-    this.setState({ relationshipType });
-  }
-
-  descriptionChangeHandler(event) {
-    const { relationshipType } = this.state;
-    relationshipType.description = event.target.value;
-    this.setState({ relationshipType });
-  }
+  };
 
   saveRelationshipType() {
     const { relationshipTypeId, relationshipType } = this.state;
@@ -83,12 +80,6 @@ class PatientRelationshipTypeForm extends React.Component {
       .catch((error) => {
         console.log(error);
       });
-  }
-
-  retireReasonChangeHandler(event) {
-    const { relationshipType } = this.state;
-    relationshipType.retireReason = event.target.value;
-    this.setState({ relationshipType });
   }
 
   retireRelationshipType() {
@@ -123,26 +114,21 @@ class PatientRelationshipTypeForm extends React.Component {
     this.setState({ redirect: "/patientRelationshipType/view/all" });
   }
 
-  getValueFor(field) {
-    return field === null ? "" : field;
-  }
-
   render() {
-    const { relationshipType, relationshipTypeId, redirect } = this.state;
+    const { relationshipType, relationshipTypeId, redirect, isLoading } =
+      this.state;
     const {
-      aisToBChangeHandler,
-      bisToAChangeHandler,
-      descriptionChangeHandler,
       saveRelationshipType,
-      retireReasonChangeHandler,
       retireRelationshipType,
       unretireRelationshipType,
       deleteRelationshipType,
-      getValueFor,
       cancelRelationshipType,
+      inputChangeHandler,
     } = this;
 
     if (redirect) return <Redirect to={redirect} />;
+
+    if (isLoading) return <p>Loading...</p>;
 
     return (
       <React.Fragment>
@@ -153,8 +139,8 @@ class PatientRelationshipTypeForm extends React.Component {
               type="text"
               id="aisToB"
               name="aisToB"
-              value={getValueFor(relationshipType.aisToB)}
-              onChange={aisToBChangeHandler.bind(this)}
+              value={GET_VALUE(relationshipType.aisToB)}
+              onChange={inputChangeHandler}
             />
           </label>
           <br />
@@ -165,8 +151,8 @@ class PatientRelationshipTypeForm extends React.Component {
               type="text"
               id="bisToA"
               name="bisToA"
-              value={getValueFor(relationshipType.bisToA)}
-              onChange={bisToAChangeHandler.bind(this)}
+              value={GET_VALUE(relationshipType.bisToA)}
+              onChange={inputChangeHandler}
             />
           </label>
           <br />
@@ -178,8 +164,8 @@ class PatientRelationshipTypeForm extends React.Component {
               name="description"
               rows="3"
               cols="20"
-              value={getValueFor(relationshipType.description)}
-              onChange={descriptionChangeHandler.bind(this)}
+              value={GET_VALUE(relationshipType.description)}
+              onChange={inputChangeHandler}
             />
           </label>
           <br />
@@ -205,8 +191,8 @@ class PatientRelationshipTypeForm extends React.Component {
                 type="text"
                 id="retireReason"
                 name="retireReason"
-                value={getValueFor(relationshipType.retireReason)}
-                onChange={retireReasonChangeHandler.bind(this)}
+                value={GET_VALUE(relationshipType.retireReason)}
+                onChange={inputChangeHandler}
               />
             </label>
             <br />

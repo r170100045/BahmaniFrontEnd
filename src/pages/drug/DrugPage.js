@@ -12,7 +12,7 @@ export default function PatientRelationshipTypePage() {
       action={action}
       title="Medication Data: Drugs Management"
       viewAll={<Drugs />}
-      addOrEdit={<DrugForm id={id} />}
+      addOrEdit={<DrugForm />}
     />
   );
 }

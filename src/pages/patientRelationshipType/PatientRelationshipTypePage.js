@@ -12,7 +12,7 @@ export default function PatientRelationshipTypePage() {
       action={action}
       title="Patient Relationship Management"
       viewAll={<PatientRelationshipTypes />}
-      addOrEdit={<PatientRelationshipTypeForm id={id} />}
+      addOrEdit={<PatientRelationshipTypeForm />}
     />
   );
 }
