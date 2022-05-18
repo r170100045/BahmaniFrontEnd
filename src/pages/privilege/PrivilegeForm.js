@@ -1,3 +1,10 @@
+import {
+  Button,
+  Input,
+  Paper,
+  TextField,
+  TextareaAutosize,
+} from "@material-ui/core";
 import { Redirect, withRouter } from "react-router-dom";
 import {
   buttonGroupStyle,
@@ -13,15 +20,11 @@ import {
   updatePrivilegeById,
 } from "../../services/privilegeService";
 
+import ErrorLoadingData from "../../utils/ErrorLoadingData";
 import { GET_VALUE } from "../../constants/otherConstants";
-import {
-  Button,
-  Input,
-  Paper,
-  TextareaAutosize,
-  TextField,
-} from "@material-ui/core";
+import LoadingData from "../../utils/LoadingData";
 import React from "react";
+import SuccessMessage from "../../utils/SuccessMessage";
 
 class PrivilegeForm extends React.Component {
   constructor(props) {
@@ -37,8 +40,23 @@ class PrivilegeForm extends React.Component {
       privilegeId: this.props.match.params.id,
       redirect: null,
       isLoading: true,
+      showSuccessMessage: false,
+      successMessage: null,
+      error: false,
+      errors: {
+        globalErrorMessage: "Please fix all errors and try again.",
+        httpRequest: null,
+        httpRequestHasError: false,
+        privilege: "privilege name is required",
+        privilegeHasError: false,
+      },
     };
 
+    this.viewAll = "/privilege/view/all";
+
+    this.savePrivilege = this.savePrivilege.bind(this);
+    this.cancelPrivilege = this.cancelPrivilege.bind(this);
+    this.deletePrivilege = this.deletePrivilege.bind(this);
     this.inputChangeHandler = this.inputChangeHandler.bind(this);
   }
 
@@ -51,14 +69,125 @@ class PrivilegeForm extends React.Component {
             this.setState({ isLoading: false });
           });
         })
-        .catch((e) => {
-          console.log(e);
+        .catch((error) => {
+          console.log(error);
+          this.setHttpError("getPrivilegeById", error.message);
         });
     } else {
       this.setState({ isLoading: false });
     }
   }
 
+  // error validation starts
+  setHttpError(apiName, eMessage) {
+    const { errors } = this.state;
+    errors.httpRequestHasError = true;
+    errors.httpRequest = "error: " + apiName + " api call failed : " + eMessage;
+    this.setState({ errors }, () => {
+      setTimeout(
+        function () {
+          this.setState({ redirect: this.viewAll });
+        }.bind(this),
+        4000
+      );
+    });
+  }
+
+  nonEmpty(object) {
+    return object && object.trim().length > 0;
+  }
+
+  resetErrorsToFalse() {
+    return new Promise((resolve) => {
+      const { errors } = this.state;
+      errors.privilegeHasError = false;
+      this.setState({ errors, error: false }, () => resolve());
+    });
+  }
+
+  validate(privilege) {
+    return new Promise((resolve) => {
+      this.resetErrorsToFalse().then(() => {
+        const { errors } = this.state;
+        let error = false;
+
+        if (!this.nonEmpty(privilege.privilege)) {
+          error = true;
+          errors.privilegeHasError = true;
+        }
+
+        this.setState({ error, errors, privilege }, () => {
+          resolve();
+        });
+      });
+    });
+  }
+  // error validation ends
+
+  // save starts
+  savePrivilege(successMessage = "updated") {
+    const { privilegeId, privilege } = this.state;
+    this.validate(privilege).then(() => {
+      const { error } = this.state;
+      if (!error) {
+        if (privilegeId === "add") this.insertPrivilegeWithData(privilege);
+        else
+          this.updatePrivilegeWithData(privilegeId, privilege, successMessage);
+      }
+    });
+  }
+
+  insertPrivilegeWithData(privilege) {
+    insertPrivilege(privilege)
+      .then(() => {
+        this.successAndRedirect("saved");
+      })
+      .catch((error) => {
+        console.log(error);
+        this.setHttpError("insertPrivilege", error.message);
+      });
+  }
+
+  updatePrivilegeWithData(privilegeId, privilege, successMessage) {
+    updatePrivilegeById(privilegeId, privilege)
+      .then(() => {
+        this.successAndRedirect(successMessage);
+      })
+      .catch((error) => {
+        console.log(error);
+        this.setHttpError("updatePrivilegeById", error.message);
+      });
+  }
+
+  successAndRedirect(successMessage) {
+    this.setState({ showSuccessMessage: true, successMessage }, () => {
+      setTimeout(
+        function () {
+          this.setState({ redirect: this.viewAll });
+        }.bind(this),
+        500
+      );
+    });
+  }
+  // save ends
+
+  cancelPrivilege() {
+    this.setState({ redirect: this.viewAll });
+  }
+
+  deletePrivilege() {
+    const { privilegeId } = this.state;
+    deletePrivilegeById(privilegeId)
+      .then(() => {
+        this.successAndRedirect("deleted");
+      })
+      .catch((error) => {
+        console.log(error);
+        this.setHttpError("deletePrivilegeById", error.message);
+      });
+  }
+
+  // input change handlers
   inputChangeHandler = (event) => {
     const { name, value } = event.target;
     const { privilege } = this.state;
@@ -66,58 +195,43 @@ class PrivilegeForm extends React.Component {
     this.setState({ privilege });
   };
 
-  savePrivilege() {
-    const { privilegeId, privilege } = this.state;
-    if (privilegeId === "add") {
-      insertPrivilege(privilege)
-        .then(() => {
-          this.setState({ redirect: "/privilege/view/all" });
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    } else {
-      updatePrivilegeById(privilegeId, privilege)
-        .then(() => {
-          this.setState({ redirect: "/privilege/view/all" });
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    }
-  }
-
-  cancelButtonHandler() {
-    this.setState({ redirect: "/privilege/view/all" });
-  }
-
-  deletePrivilege() {
-    let { privilegeId } = this.state;
-    deletePrivilegeById(privilegeId)
-      .then(() => {
-        this.setState({ redirect: "/privilege/view/all" });
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }
-
   render() {
     const {
-      inputChangeHandler,
       savePrivilege,
-      cancelButtonHandler,
+      cancelPrivilege,
       deletePrivilege,
+      inputChangeHandler,
     } = this;
 
-    const { privilege, privilegeId, redirect, isLoading } = this.state;
+    const {
+      privilege,
+      privilegeId,
+      redirect,
+      isLoading,
+      error,
+      errors,
+      showSuccessMessage,
+      successMessage,
+    } = this.state;
 
     if (redirect) return <Redirect to={redirect} />;
 
-    if (isLoading) return <p>Loading...</p>;
+    if (showSuccessMessage) return <SuccessMessage action={successMessage} />;
+
+    if (isLoading)
+      return (
+        <div>
+          {!errors.httpRequestHasError && <LoadingData />}
+          {errors.httpRequestHasError && (
+            <ErrorLoadingData message={errors.httpRequest} />
+          )}
+        </div>
+      );
 
     return (
       <React.Fragment>
+        {error && <span>{errors.globalErrorMessage}</span>}
+
         <Paper style={paperStyle}>
           <TextField
             style={inputStyle}
@@ -127,8 +241,9 @@ class PrivilegeForm extends React.Component {
             name="privilege"
             disabled={privilegeId === "add" ? false : true}
             value={GET_VALUE(privilege.privilege)}
-            onChange={inputChangeHandler}
+            onChange={(e) => inputChangeHandler(e)}
           />
+          <span>{error && errors.privilegeHasError && errors.privilege}</span>
           <br />
 
           <TextField
@@ -140,20 +255,25 @@ class PrivilegeForm extends React.Component {
             cols="20"
             multiline
             value={GET_VALUE(privilege.description)}
-            onChange={inputChangeHandler}
+            onChange={(e) => inputChangeHandler(e)}
           />
           <br />
           <div style={buttonGroupStyle}>
-            <Button type="button" onClick={savePrivilege.bind(this)}>
-              Save Visit Type
+            <Button type="button" onClick={() => savePrivilege()}>
+              Save
             </Button>
-            <Button type="button" onClick={cancelButtonHandler.bind(this)}>
+            <Button type="button" onClick={() => cancelPrivilege()}>
               Cancel
             </Button>
-            <Button type="button" onClick={deletePrivilege.bind(this)}>
-              Delete
-            </Button>
           </div>
+
+          {privilegeId !== "add" && (
+            <div style={buttonGroupStyle}>
+              <Button type="button" onClick={() => deletePrivilege()}>
+                Delete
+              </Button>
+            </div>
+          )}
 
           <br />
         </Paper>

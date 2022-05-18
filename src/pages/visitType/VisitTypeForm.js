@@ -40,7 +40,7 @@ class VisitTypeForm extends React.Component {
       successMessage: null,
       error: false,
       errors: {
-        globalErrorMessage: "clear all the errors",
+        globalErrorMessage: "Please fix all errors and try again.",
         httpRequest: null,
         httpRequestHasError: false,
         name: "name is required",
@@ -51,6 +51,31 @@ class VisitTypeForm extends React.Component {
     };
 
     this.viewAll = "/visitType/view/all";
+
+    this.saveVisitType = this.saveVisitType.bind(this);
+    this.retireVisitType = this.retireVisitType.bind(this);
+    this.unretireVisitType = this.unretireVisitType.bind(this);
+    this.cancelVisitType = this.cancelVisitType.bind(this);
+    this.deleteVisitType = this.deleteVisitType.bind(this);
+    this.inputChangeHandler = this.inputChangeHandler.bind(this);
+  }
+
+  componentDidMount() {
+    const { visitTypeId } = this.state;
+    if (visitTypeId !== "add") {
+      getVisitTypeById(visitTypeId)
+        .then((response) => {
+          this.setState({ visitType: response.data }, () => {
+            this.setState({ isLoading: false });
+          });
+        })
+        .catch((error) => {
+          console.log(error);
+          this.setHttpError("getVisitTypeById", error.message);
+        });
+    } else {
+      this.setState({ isLoading: false });
+    }
   }
 
   // error validation starts
@@ -108,24 +133,6 @@ class VisitTypeForm extends React.Component {
   }
   // error validation ends
 
-  componentDidMount() {
-    const { visitTypeId } = this.state;
-    if (visitTypeId !== "add") {
-      getVisitTypeById(visitTypeId)
-        .then((response) => {
-          this.setState({ visitType: response.data }, () => {
-            this.setState({ isLoading: false });
-          });
-        })
-        .catch((error) => {
-          console.log(error);
-          this.setHttpError("getVisitTypeById", error.message);
-        });
-    } else {
-      this.setState({ isLoading: false });
-    }
-  }
-
   // save starts
   saveVisitType(successMessage = "updated") {
     const { visitTypeId, visitType } = this.state;
@@ -168,7 +175,7 @@ class VisitTypeForm extends React.Component {
         function () {
           this.setState({ redirect: this.viewAll });
         }.bind(this),
-        1000
+        500
       );
     });
   }
@@ -199,7 +206,7 @@ class VisitTypeForm extends React.Component {
     const { visitTypeId } = this.state;
     deleteVisitTypeById(visitTypeId)
       .then(() => {
-        this.setState({ redirect: this.viewAll });
+        this.successAndRedirect("deleted");
       })
       .catch((error) => {
         console.log(error);
@@ -262,7 +269,7 @@ class VisitTypeForm extends React.Component {
             id="name"
             name="name"
             value={GET_VALUE(visitType.name)}
-            onChange={inputChangeHandler.bind(this)}
+            onChange={(e) => inputChangeHandler(e)}
           />
           <span>{error && errors.nameHasError && errors.name}</span>
 
@@ -276,15 +283,15 @@ class VisitTypeForm extends React.Component {
             cols="20"
             multiline
             value={GET_VALUE(visitType.description)}
-            onChange={inputChangeHandler.bind(this)}
+            onChange={(e) => inputChangeHandler(e)}
           />
 
           <br />
           <div style={buttonGroupStyle}>
-            <Button type="button" onClick={saveVisitType.bind(this)}>
+            <Button type="button" onClick={() => saveVisitType()}>
               Save
             </Button>
-            <Button type="button" onClick={cancelVisitType.bind(this)}>
+            <Button type="button" onClick={() => cancelVisitType()}>
               Cancel
             </Button>
           </div>
@@ -302,7 +309,7 @@ class VisitTypeForm extends React.Component {
               name="retireReason"
               multiline
               value={GET_VALUE(visitType.retireReason)}
-              onChange={inputChangeHandler.bind(this)}
+              onChange={(e) => inputChangeHandler(e)}
             />
             <span>
               {error && errors.retireReasonHasError && errors.retireReason}
@@ -310,7 +317,7 @@ class VisitTypeForm extends React.Component {
 
             <br />
             <div style={buttonGroupStyle}>
-              <Button type="button" onClick={retireVisitType.bind(this)}>
+              <Button type="button" onClick={() => retireVisitType()}>
                 Retire Visit Type
               </Button>
             </div>
@@ -325,7 +332,7 @@ class VisitTypeForm extends React.Component {
 
             <p style={subHeadingStyle}>Unretire Visit Type</p>
             <div style={buttonGroupStyle}>
-              <Button type="button" onClick={unretireVisitType.bind(this)}>
+              <Button type="button" onClick={() => unretireVisitType()}>
                 Unretire Visit Type
               </Button>
             </div>
@@ -337,7 +344,7 @@ class VisitTypeForm extends React.Component {
         {visitTypeId !== "add" && (
           <div style={paperStyle}>
             <div style={buttonGroupStyle}>
-              <Button type="button" onClick={deleteVisitType.bind(this)}>
+              <Button type="button" onClick={() => deleteVisitType()}>
                 Delete Visit Type Forever
               </Button>
             </div>
