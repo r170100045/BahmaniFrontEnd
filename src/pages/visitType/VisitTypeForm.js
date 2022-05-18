@@ -60,6 +60,7 @@ class VisitTypeForm extends React.Component {
     this.inputChangeHandler = this.inputChangeHandler.bind(this);
   }
 
+  // component mount starts
   componentDidMount() {
     const { visitTypeId } = this.state;
     if (visitTypeId !== "add") {
@@ -77,6 +78,7 @@ class VisitTypeForm extends React.Component {
       this.setState({ isLoading: false });
     }
   }
+  // component mount ends
 
   // error validation starts
   setHttpError(apiName, eMessage) {
@@ -103,6 +105,17 @@ class VisitTypeForm extends React.Component {
       errors.nameHasError = false;
       errors.retireReasonHasError = false;
       this.setState({ errors, error: false }, () => resolve());
+    });
+  }
+
+  successAndRedirect(successMessage) {
+    this.setState({ showSuccessMessage: true, successMessage }, () => {
+      setTimeout(
+        function () {
+          this.setState({ redirect: this.viewAll });
+        }.bind(this),
+        500
+      );
     });
   }
 
@@ -167,17 +180,6 @@ class VisitTypeForm extends React.Component {
         console.log(error);
         this.setHttpError("updateVisitTypeById", error.message);
       });
-  }
-
-  successAndRedirect(successMessage) {
-    this.setState({ showSuccessMessage: true, successMessage }, () => {
-      setTimeout(
-        function () {
-          this.setState({ redirect: this.viewAll });
-        }.bind(this),
-        500
-      );
-    });
   }
   // save ends
 
