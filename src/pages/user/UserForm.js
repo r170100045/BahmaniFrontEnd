@@ -1,4 +1,5 @@
 import { Redirect, withRouter } from "react-router-dom";
+import { getPersonById, getUserById } from "../../services/userService";
 
 import { GET_VALUE } from "../../constants/otherConstants";
 import { Paper } from "@material-ui/core";
@@ -55,8 +56,9 @@ class UserForm extends React.Component {
       isLoading: true,
       error: false,
       errors: [],
-      password: "",
-      passwordRetype: "",
+      changePassword: false,
+      password: null,
+      passwordRetype: null,
       roles: [],
       showAdvancedOptions: false,
     };
@@ -84,7 +86,9 @@ class UserForm extends React.Component {
       const tempRoles = [...roles];
       user.userRoles.forEach((uRole) => {
         const idx = tempRoles.findIndex((role) => role.role === uRole);
-        tempRoles[idx].checked = true;
+        if (tempRoles[idx]) {
+          tempRoles[idx].checked = true;
+        }
       });
       this.setState({ roles: tempRoles }, () => resolve());
     });
@@ -110,14 +114,36 @@ class UserForm extends React.Component {
     return new Promise((resolve, reject) => {
       if (userId === "add") {
         if (personId !== "dummy") {
-          // TO-DO get person info, set it in user and resolve
-          resolve();
+          getPersonById(personId)
+            .then((response) => {
+              const personObj = {
+                uuid: null,
+                givenName: null,
+                middleName: null,
+                familyName: null,
+                gender: null,
+              };
+
+              personObj.uuid = response.data.uuid;
+              personObj.givenName = response.data.givenName;
+              personObj.middleName = response.data.middleName;
+              personObj.familyName = response.data.familyName;
+              personObj.gender = response.data.gender;
+
+              const { user } = this.state;
+              user.person = personObj;
+              this.setState({ user }, () => {
+                resolve();
+              });
+            })
+            .catch((e) => reject(e));
         } else {
           resolve();
         }
       } else {
         getUserById(userId)
           .then((response) => {
+            console.log("rd", response.data);
             this.setState({ user: response.data }, () => {
               resolve();
             });
@@ -209,9 +235,18 @@ class UserForm extends React.Component {
     this.setState({ showAdvancedOptions: !showAdvancedOptions });
   }
 
-  stateChangeHandler(event) {
-    const { name, value } = event.target;
-    this.setState({ [name]: value });
+  stateChangeHandler(event, type = "value") {
+    const { name } = event.target;
+
+    if (name === "changePassword" && event.target[type] === true) {
+      this.setState({
+        [name]: event.target[type],
+        password: null,
+        passwordRetype: null,
+      });
+    } else {
+      this.setState({ [name]: event.target[type] });
+    }
   }
 
   userRoleChangeHandler(event, index) {
@@ -281,6 +316,7 @@ class UserForm extends React.Component {
       isLoading,
       roles,
       error,
+      changePassword,
       password,
       passwordRetype,
       showAdvancedOptions,
@@ -402,33 +438,49 @@ class UserForm extends React.Component {
               />
               <span>User can log in with either Username or System Id</span>
               <br />
-              <label htmlFor="password">User's Password: </label>
+
+              <label htmlFor="changePassword">Change Password:</label>
               <input
-                type="password"
-                id="password"
-                name="password"
-                onChange={stateChangeHandler}
-                value={GET_VALUE(password)}
+                type="checkbox"
+                id="changePassword"
+                name="changePassword"
+                onChange={(e) => stateChangeHandler(e, "checked")}
+                checked={GET_VALUE(changePassword)}
               />
-              <span>
-                Password should be 8 characters long and should have both upper
-                and lower case characters , at least one digit , at least one
-                non digit
-              </span>
               <br />
-              <label htmlFor="passwordRetype">Confirm Password: </label>
-              <input
-                type="password"
-                id="passwordRetype"
-                name="passwordRetype"
-                onChange={stateChangeHandler}
-                value={GET_VALUE(passwordRetype)}
-              />
-              <span>
-                Retype the password (for accuracy). It should match the password
-                entered above
-              </span>
-              <br />
+
+              {changePassword && (
+                <div>
+                  <label htmlFor="password">User's Password: </label>
+                  <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    onChange={stateChangeHandler}
+                    value={GET_VALUE(password)}
+                  />
+                  <span>
+                    Password should be 8 characters long and should have both
+                    upper and lower case characters , at least one digit , at
+                    least one non digit
+                  </span>
+                  <br />
+                  <label htmlFor="passwordRetype">Confirm Password: </label>
+                  <input
+                    type="password"
+                    id="passwordRetype"
+                    name="passwordRetype"
+                    onChange={stateChangeHandler}
+                    value={GET_VALUE(passwordRetype)}
+                  />
+                  <span>
+                    Retype the password (for accuracy). It should match the
+                    password entered above
+                  </span>
+                  <br />
+                </div>
+              )}
+
               <label htmlFor="forcePasswordChange">
                 Force Password Change{" "}
               </label>
@@ -439,6 +491,10 @@ class UserForm extends React.Component {
                 checked={user.forcePasswordChange}
                 onChange={(e) => userInputChangeHandler(e, "checked")}
               />
+              <span>
+                Optionally require that this user change their password on next
+                login
+              </span>
               <br />
 
               <div>
@@ -465,6 +521,159 @@ class UserForm extends React.Component {
                 {getAdvancedOptionsText}
               </button>
             </fieldset>
+
+            {showAdvancedOptions && (
+              <div>
+                <div>
+                  <span>
+                    <label htmlFor="secretQuestion">Secret Question: </label>
+                    <input
+                      type="text"
+                      id="secretQuestion"
+                      name="secretQuestion"
+                      onChange={userInputChangeHandler}
+                      value={GET_VALUE(user.secretQuestion)}
+                    />
+                  </span>
+                  <span>Optional</span>
+                </div>
+                <div>
+                  <span>
+                    <label htmlFor="secretAnswer">Secret Answer: </label>
+                    <input
+                      type="text"
+                      id="secretAnswer"
+                      name="secretAnswer"
+                      onChange={userInputChangeHandler}
+                      value={GET_VALUE(user.secretAnswer)}
+                    />
+                  </span>
+                  <span>Optional</span>
+                </div>
+                <div>
+                  <span>UUID: </span>
+                  <span>{user.uuid}</span>
+                </div>
+                <div>
+                  <span>User Properties</span>
+                  <span>
+                    <div>
+                      <span>Name </span>
+                      <span>Value</span>
+                    </div>
+                    {user.userProperty.map((uProperty, index) => (
+                      <div key={index}>
+                        <span>
+                          <label htmlFor={uProperty.property}>
+                            {uProperty.property}
+                          </label>
+                          <input
+                            type="text"
+                            id={uProperty.property}
+                            name={uProperty.property}
+                            onChange={(e) =>
+                              userPropertyChangeHandler(e, index)
+                            }
+                            value={GET_VALUE(uProperty.propertyValue)}
+                          />
+                        </span>
+                      </div>
+                    ))}
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {userId !== "add" && (
+              <fieldset>
+                <legend>Login Info</legend>
+                <div>
+                  <span>System Id: </span>{" "}
+                  {userId === "add" ? (
+                    <span>System Id will be generated after saving</span>
+                  ) : (
+                    <span>{user.systemId}</span>
+                  )}
+                </div>
+                <br />
+
+                <label htmlFor="username">Username: </label>
+                <input
+                  type="text"
+                  id="username"
+                  name="username"
+                  onChange={userInputChangeHandler}
+                  value={GET_VALUE(user.username)}
+                />
+                <span>User can log in with either Username or System Id</span>
+                <br />
+                <label htmlFor="password">User's Password: </label>
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  onChange={stateChangeHandler}
+                  value={GET_VALUE(password)}
+                />
+                <span>
+                  Password should be 8 characters long and should have both
+                  upper and lower case characters , at least one digit , at
+                  least one non digit
+                </span>
+                <br />
+                <label htmlFor="passwordRetype">Confirm Password: </label>
+                <input
+                  type="password"
+                  id="passwordRetype"
+                  name="passwordRetype"
+                  onChange={stateChangeHandler}
+                  value={GET_VALUE(passwordRetype)}
+                />
+                <span>
+                  Retype the password (for accuracy). It should match the
+                  password entered above
+                </span>
+                <br />
+                <label htmlFor="forcePasswordChange">
+                  Force Password Change{" "}
+                </label>
+                <input
+                  type="checkbox"
+                  id="forcePasswordChange"
+                  name="forcePasswordChange"
+                  checked={user.forcePasswordChange}
+                  onChange={(e) => userInputChangeHandler(e, "checked")}
+                />
+                <br />
+
+                <div>
+                  <span>Roles: </span>
+                  <span>
+                    <ul>
+                      {roles.map((el, index) => (
+                        <div key={el.role}>
+                          <input
+                            type="checkbox"
+                            name={el.role}
+                            checked={el.checked}
+                            id={el.role}
+                            onChange={(e) => userRoleChangeHandler(e, index)}
+                          />{" "}
+                          <label htmlFor={el.role}>{el.role}</label>
+                        </div>
+                      ))}
+                    </ul>
+                  </span>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={toggleAdvancedOptions.bind(this)}
+                >
+                  {getAdvancedOptionsText}
+                </button>
+              </fieldset>
+            )}
 
             {showAdvancedOptions && (
               <div>

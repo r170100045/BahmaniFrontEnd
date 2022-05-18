@@ -21,16 +21,27 @@ const Users = () => {
     },
     {
       title: "Given Name",
-      field: "personId.personNames.givenName",
+      field: "givenName",
     },
-    // {
-    //   title: "Family Name",
-    //   field: "person.familyName",
-    // },
-    // {
-    //   title: "Roles",
-    //   field: "userRoles",
-    // },
+    {
+      title: "Family Name",
+      field: "familyName",
+    },
+    {
+      title: "Roles",
+      field: "userRoles",
+      render: (rowData) => (
+        <p>
+          {rowData.userRoles.map((role, index) =>
+            index === rowData.userRoles.length - 1 ? (
+              <span>{role}</span>
+            ) : (
+              <span>{role + " | "}</span>
+            )
+          )}
+        </p>
+      ),
+    },
   ];
 
   const options = {

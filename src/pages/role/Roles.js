@@ -22,10 +22,32 @@ const Roles = () => {
     {
       title: "Inherited Roles",
       field: "parentRoles",
+      render: (rowData) => (
+        <p>
+          {rowData.parentRoles.map((parentRole, index) =>
+            index === rowData.parentRoles.length - 1 ? (
+              <span>{parentRole}</span>
+            ) : (
+              <span>{parentRole + " | "}</span>
+            )
+          )}
+        </p>
+      ),
     },
     {
       title: "Privileges",
       field: "rolePrivileges",
+      render: (rowData) => (
+        <p>
+          {rowData.rolePrivileges.map((rolePrivilege, index) =>
+            index === rowData.rolePrivileges.length - 1 ? (
+              <span>{rolePrivilege}</span>
+            ) : (
+              <span>{rolePrivilege + " | "}</span>
+            )
+          )}
+        </p>
+      ),
     },
   ];
 
