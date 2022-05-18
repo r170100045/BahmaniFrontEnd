@@ -61,6 +61,7 @@ class PrivilegeForm extends React.Component {
     this.inputChangeHandler = this.inputChangeHandler.bind(this);
   }
 
+  // component mount starts
   componentDidMount() {
     const { privilegeId } = this.state;
     if (privilegeId !== "add") {
@@ -78,6 +79,7 @@ class PrivilegeForm extends React.Component {
       this.setState({ isLoading: false });
     }
   }
+  // component mount ends
 
   // error validation starts
   setHttpError(apiName, eMessage) {
@@ -103,6 +105,17 @@ class PrivilegeForm extends React.Component {
       const { errors } = this.state;
       errors.privilegeHasError = false;
       this.setState({ errors, error: false }, () => resolve());
+    });
+  }
+
+  successAndRedirect(successMessage) {
+    this.setState({ showSuccessMessage: true, successMessage }, () => {
+      setTimeout(
+        function () {
+          this.setState({ redirect: this.viewAll });
+        }.bind(this),
+        500
+      );
     });
   }
 
@@ -158,17 +171,6 @@ class PrivilegeForm extends React.Component {
         console.log(error);
         this.setHttpError("updatePrivilegeById", error.message);
       });
-  }
-
-  successAndRedirect(successMessage) {
-    this.setState({ showSuccessMessage: true, successMessage }, () => {
-      setTimeout(
-        function () {
-          this.setState({ redirect: this.viewAll });
-        }.bind(this),
-        500
-      );
-    });
   }
   // save ends
 
