@@ -6,8 +6,7 @@ import { yellow } from "@material-ui/core/colors";
 
 const ColorButton = withStyles((theme) => ({
   root: {
-    color: theme.palette.getContrastText(yellow[100]),
-    backgroundColor: yellow[100],
+    color: yellow[700],
     "&:hover": {
       backgroundColor: yellow[50],
     },
@@ -28,7 +27,7 @@ export default function RetireButton(props) {
 
   return (
     <ColorButton
-      variant="contained"
+      variant="outlined"
       color="primary"
       size="medium"
       startIcon={icon}

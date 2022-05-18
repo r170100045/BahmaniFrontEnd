@@ -71,9 +71,7 @@ const Drugs = () => {
             label={showRetired ? "Hide Retired" : "Show Retired"}
             labelPlacement="start"
           />
-          <Link to="/drug/edit/add">
-            <Controls.AddButton />
-          </Link>
+          <Controls.AddButton onClick={() => setRedirect("/drug/edit/add")} />
         </div>
       </div>
     ),

@@ -1,4 +1,12 @@
+import { Button, Paper, TextField } from "@material-ui/core";
 import { Redirect, withRouter } from "react-router-dom";
+import {
+  buttonGroupStyle,
+  buttonStyle,
+  inputStyle,
+  paperStyle,
+  subHeadingStyle,
+} from "../../constants/formStyling";
 import {
   deleteVisitTypeById,
   getVisitTypeById,
@@ -6,16 +14,9 @@ import {
   updateVisitTypeById,
 } from "../../services/visitTypeService";
 
+import Controls from "../../components/controls/Controls";
 import { GET_VALUE } from "../../constants/otherConstants";
 import React from "react";
-import { Paper, TextField, Button } from "@material-ui/core";
-import {
-  buttonGroupStyle,
-  buttonStyle,
-  subHeadingStyle,
-  inputStyle,
-  paperStyle,
-} from "../../constants/formStyling";
 
 class VisitTypeForm extends React.Component {
   constructor(props) {
@@ -153,12 +154,11 @@ class VisitTypeForm extends React.Component {
           />
           <br />
           <div style={buttonGroupStyle}>
-            <Button type="button" onClick={saveVisitType.bind(this)}>
-              Save
-            </Button>
-            <Button type="button" onClick={cancelVisitType.bind(this)}>
-              Cancel
-            </Button>
+            <Controls.SaveButton onClick={saveVisitType.bind(this)} />
+            <Controls.CancelButton
+              type="button"
+              onClick={cancelVisitType.bind(this)}
+            />
           </div>
 
           <br />
@@ -178,9 +178,10 @@ class VisitTypeForm extends React.Component {
             />
             <br />
             <div style={buttonGroupStyle}>
-              <Button type="button" onClick={retireVisitType.bind(this)}>
-                Retire Visit Type
-              </Button>
+              <Controls.RetireButton
+                retired={false}
+                onClick={retireVisitType.bind(this)}
+              />
             </div>
 
             <br />
@@ -205,9 +206,7 @@ class VisitTypeForm extends React.Component {
         {visitTypeId !== "add" && (
           <div style={paperStyle}>
             <div style={buttonGroupStyle}>
-              <Button type="button" onClick={deleteVisitType.bind(this)}>
-                Delete Visit Type Forever
-              </Button>
+              <Controls.DeleteButton onClick={deleteVisitType.bind(this)} />
             </div>
             <br />
           </div>

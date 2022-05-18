@@ -54,9 +54,7 @@ const Roles = () => {
       <div>
         <MTableToolbar {...props} />
         <div className="text-end" style={{ padding: "0px 10px" }}>
-          <Link to="/role/edit/add">
-            <Controls.AddButton />
-          </Link>
+          <Controls.AddButton onClick={() => setRedirect("/role/edit/add")} />
         </div>
       </div>
     ),

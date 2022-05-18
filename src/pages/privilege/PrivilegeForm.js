@@ -1,3 +1,10 @@
+import {
+  Button,
+  Input,
+  Paper,
+  TextField,
+  TextareaAutosize,
+} from "@material-ui/core";
 import { Redirect, withRouter } from "react-router-dom";
 import {
   buttonGroupStyle,
@@ -13,14 +20,8 @@ import {
   updatePrivilegeById,
 } from "../../services/privilegeService";
 
+import Controls from "../../components/controls/Controls";
 import { GET_VALUE } from "../../constants/otherConstants";
-import {
-  Button,
-  Input,
-  Paper,
-  TextareaAutosize,
-  TextField,
-} from "@material-ui/core";
 import React from "react";
 
 class PrivilegeForm extends React.Component {
@@ -144,15 +145,11 @@ class PrivilegeForm extends React.Component {
           />
           <br />
           <div style={buttonGroupStyle}>
-            <Button type="button" onClick={savePrivilege.bind(this)}>
-              Save Visit Type
-            </Button>
-            <Button type="button" onClick={cancelButtonHandler.bind(this)}>
-              Cancel
-            </Button>
-            <Button type="button" onClick={deletePrivilege.bind(this)}>
-              Delete
-            </Button>
+            <Controls.SaveButton onClick={savePrivilege.bind(this)} />
+            <Controls.CancelButton onClick={cancelButtonHandler.bind(this)} />
+            {privilegeId !== "add" && (
+              <Controls.DeleteButton onClick={deletePrivilege.bind(this)} />
+            )}
           </div>
 
           <br />

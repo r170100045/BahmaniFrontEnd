@@ -5,10 +5,9 @@ import { green } from "@material-ui/core/colors";
 
 const ColorButton = withStyles((theme) => ({
   root: {
-    color: theme.palette.getContrastText(green["A700"]),
-    backgroundColor: green["A700"],
+    color: green[700],
     "&:hover": {
-      backgroundColor: green[300],
+      backgroundColor: green[50],
     },
   },
 }))(Button);
@@ -19,13 +18,13 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function DeleteButton(props) {
+export default function SaveButton(props) {
   const classes = useStyles();
   const { onClick, ...other } = props;
 
   return (
     <ColorButton
-      variant="contained"
+      variant="outlined"
       color="primary"
       size="medium"
       startIcon={<SaveIcon />}

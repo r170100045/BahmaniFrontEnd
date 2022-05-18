@@ -6,7 +6,6 @@ import { blue } from "@material-ui/core/colors";
 const ColorButton = withStyles((theme) => ({
   root: {
     color: blue[700],
-    textDecoration: "none",
     "&:hover": {
       backgroundColor: blue[50],
     },

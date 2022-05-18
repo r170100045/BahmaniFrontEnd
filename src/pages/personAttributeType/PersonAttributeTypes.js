@@ -59,9 +59,9 @@ const PersonAttributeTypes = () => {
       <div>
         <MTableToolbar {...props} />
         <div className="text-end" style={{ padding: "0px 10px" }}>
-          <Link to="/personAttributeType/edit/add">
-            <Controls.AddButton />
-          </Link>
+          <Controls.AddButton
+            onClick={() => setRedirect("/personAttributeType/edit/add")}
+          />
         </div>
       </div>
     ),

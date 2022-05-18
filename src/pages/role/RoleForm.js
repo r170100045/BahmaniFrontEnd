@@ -17,6 +17,7 @@ import {
   conceptPaperStyle,
   inputStyle,
 } from "../../constants/formStyling";
+import Controls from "../../components/controls/Controls";
 
 class RoleForm extends React.Component {
   constructor(props) {
@@ -373,17 +374,11 @@ class RoleForm extends React.Component {
           )}
           <br />
           <div style={buttonGroupStyle}>
-            <button type="button" onClick={saveRole.bind(this)}>
-              Save Role
-            </button>
-            <button type="button" onClick={cancel.bind(this)}>
-              Cancel
-            </button>
+            <Controls.SaveButton onClick={saveRole.bind(this)} />
+            <Controls.CancelButton onClick={cancel.bind(this)} />
 
             {roleId !== "add" && (
-              <button type="button" onClick={deleteRole.bind(this)}>
-                Delete
-              </button>
+              <Controls.DeleteButton onClick={deleteRole.bind(this)} />
             )}
           </div>
 
