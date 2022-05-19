@@ -5,7 +5,6 @@ import { GET_VALUE } from "../../constants/otherConstants";
 import { Paper } from "@material-ui/core";
 import React from "react";
 import { getRoles } from "../../services/roleService";
-import { getUserById } from "../../services/userService";
 import { paperStyle } from "../../constants/formStyling";
 
 class UserForm extends React.Component {
