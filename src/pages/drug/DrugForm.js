@@ -1,4 +1,5 @@
 import { FILTER_OPTIONS, GET_VALUE } from "../../constants/otherConstants";
+import { Paper, TextField } from "@material-ui/core";
 import { Redirect, withRouter } from "react-router-dom";
 import {
   buttonGroupStyle,
@@ -15,9 +16,9 @@ import {
   updateDrugById,
 } from "../../services/drugService";
 
-import { Paper, TextField } from "@material-ui/core";
 import React from "react";
 import Select from "react-select";
+import { SingleSelect } from "react-select-material-ui";
 import { getConceptNames } from "../../services/conceptService";
 
 class DrugForm extends React.Component {
@@ -217,21 +218,17 @@ class DrugForm extends React.Component {
             />
             <br />
 
-            <label htmlFor="conceptId" style={inputStyle}>
-              Concept*:
-              <div style={{ width: "300px", display: "inline-block" }}>
-                <Select
-                  style={inputStyle}
-                  id="conceptId"
-                  name="conceptId"
-                  placeholder="Enter concept name or id"
-                  defaultValue={getDefaultConceptIdValue}
-                  onChange={conceptIdChangeHandler.bind(this)}
-                  options={options}
-                  filterOption={FILTER_OPTIONS}
-                />
-              </div>
-            </label>
+            <SingleSelect
+              label="Concept*"
+              style={inputStyle}
+              id="conceptId"
+              name="conceptId"
+              placeholder="Enter concept name or id"
+              defaultValue={GET_VALUE(drug.conceptId)}
+              onChange={conceptIdChangeHandler.bind(this)}
+              options={options}
+              filterOption={FILTER_OPTIONS}
+            />
 
             <br />
             <label htmlFor="combination" style={inputStyle}>

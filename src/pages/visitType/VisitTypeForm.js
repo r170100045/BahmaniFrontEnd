@@ -46,9 +46,9 @@ class VisitTypeForm extends React.Component {
         globalErrorMessage: "Please fix all errors and try again.",
         httpRequest: null,
         httpRequestHasError: false,
-        name: "Name is mandatory",
+        name: "name can not be empty",
         nameHasError: false,
-        retireReason: "reason to retire is required",
+        retireReason: "reason to retire can not be empty",
         retireReasonHasError: false,
       },
     };
@@ -60,28 +60,8 @@ class VisitTypeForm extends React.Component {
     this.unretireVisitType = this.unretireVisitType.bind(this);
     this.cancelVisitType = this.cancelVisitType.bind(this);
     this.deleteVisitType = this.deleteVisitType.bind(this);
-    this.inputChangeHandler = this.inputChangeHandler.bind(this);
+    this.visitTypeChangeHandler = this.visitTypeChangeHandler.bind(this);
   }
-
-  // component mount starts
-  componentDidMount() {
-    const { visitTypeId } = this.state;
-    if (visitTypeId !== "add") {
-      getVisitTypeById(visitTypeId)
-        .then((response) => {
-          this.setState({ visitType: response.data }, () => {
-            this.setState({ isLoading: false });
-          });
-        })
-        .catch((error) => {
-          console.log(error);
-          this.setHttpError("getVisitTypeById", error.message);
-        });
-    } else {
-      this.setState({ isLoading: false });
-    }
-  }
-  // component mount ends
 
   // error validation starts
   setHttpError(apiName, eMessage) {
@@ -148,6 +128,26 @@ class VisitTypeForm extends React.Component {
     });
   }
   // error validation ends
+
+  // component mount starts
+  componentDidMount() {
+    const { visitTypeId } = this.state;
+    if (visitTypeId !== "add") {
+      getVisitTypeById(visitTypeId)
+        .then((response) => {
+          this.setState({ visitType: response.data }, () => {
+            this.setState({ isLoading: false });
+          });
+        })
+        .catch((error) => {
+          console.log(error);
+          this.setHttpError("getVisitTypeById", error.message);
+        });
+    } else {
+      this.setState({ isLoading: false });
+    }
+  }
+  // component mount ends
 
   // save starts
   saveVisitType(successMessage = "updated") {
@@ -220,7 +220,7 @@ class VisitTypeForm extends React.Component {
   }
 
   // input change handlers
-  inputChangeHandler = (event) => {
+  visitTypeChangeHandler = (event) => {
     const { name, value } = event.target;
     const { visitType } = this.state;
     visitType[name] = value;
@@ -234,7 +234,7 @@ class VisitTypeForm extends React.Component {
       unretireVisitType,
       cancelVisitType,
       deleteVisitType,
-      inputChangeHandler,
+      visitTypeChangeHandler,
     } = this;
 
     const {
@@ -274,7 +274,7 @@ class VisitTypeForm extends React.Component {
             id="name"
             name="name"
             value={GET_VALUE(visitType.name)}
-            onChange={(e) => inputChangeHandler(e)}
+            onChange={(e) => visitTypeChangeHandler(e)}
           />
           <span style={inputError}>
             {error && errors.nameHasError && errors.name}
@@ -290,7 +290,7 @@ class VisitTypeForm extends React.Component {
             cols="20"
             multiline
             value={GET_VALUE(visitType.description)}
-            onChange={(e) => inputChangeHandler(e)}
+            onChange={(e) => visitTypeChangeHandler(e)}
           />
 
           <br />
@@ -315,7 +315,7 @@ class VisitTypeForm extends React.Component {
               name="retireReason"
               multiline
               value={GET_VALUE(visitType.retireReason)}
-              onChange={(e) => inputChangeHandler(e)}
+              onChange={(e) => visitTypeChangeHandler(e)}
             />
             <span>
               {error && errors.retireReasonHasError && errors.retireReason}

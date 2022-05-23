@@ -23,17 +23,20 @@ import {
 } from "../../services/roleService";
 
 import Controls from "../../components/controls/Controls";
+import ErrorLoadingData from "../../utils/ErrorLoadingData";
 import { GET_VALUE } from "../../constants/otherConstants";
+import LoadingData from "../../utils/LoadingData";
 import React from "react";
+import SuccessMessage from "../../utils/SuccessMessage";
 import { getPrivileges } from "../../services/privilegeService";
 
 class RoleForm extends React.Component {
   constructor(props) {
     super(props);
     const initialRoleState = {
-      role: "",
-      description: "",
-      uuid: "",
+      role: null,
+      description: null,
+      uuid: null,
       parentRoles: [],
       childRoles: [],
       rolePrivileges: [],
@@ -42,19 +45,36 @@ class RoleForm extends React.Component {
     this.state = {
       role: initialRoleState,
       roleId: this.props.match.params.id,
-      redirect: null,
       allRoles: [],
       inheritedRoles: [],
       allPrivileges: [],
+      redirect: null,
       isLoading: true,
+      showSuccessMessage: false,
+      successMessage: null,
+      error: false,
+      errors: {
+        globalErrorMessage: "Please fix all errors and try again.",
+        httpRequest: null,
+        httpRequestHasError: false,
+        role: "role can not be empty",
+        roleHasError: false,
+      },
     };
 
+    this.viewAll = "/role/view/all";
+
+    this.saveRole = this.saveRole.bind(this);
+    this.cancelRole = this.cancelRole.bind(this);
+    this.deleteRole = this.deleteRole.bind(this);
+    this.roleChangeHandler = this.roleChangeHandler.bind(this);
+    this.roleRolePrivilegesChangeHandler =
+      this.roleRolePrivilegesChangeHandler.bind(this);
     this.inheritedRoleChangeHandler =
       this.inheritedRoleChangeHandler.bind(this);
-    this.privilegeChangeHandler = this.privilegeChangeHandler.bind(this);
-    this.roleInputChangeHandler = this.roleInputChangeHandler.bind(this);
   }
 
+  // component mount starts
   componentDidMount() {
     Promise.all([this.setAllRoles(), this.setAllPrivileges()])
       .then(() => this.setRole())
@@ -62,6 +82,66 @@ class RoleForm extends React.Component {
       .then(() => this.setCurrentPrivileges())
       .then(() => this.disableDisplayPrivileges())
       .then(() => this.setState({ isLoading: false }));
+  }
+
+  setAllRoles() {
+    getRoles()
+      .then((response) => {
+        const allRoles = [];
+        Object.keys(response.data).forEach((key) => {
+          allRoles.push(response.data[key].role);
+        });
+        return allRoles;
+      })
+      .then((allRoles) => {
+        this.setState({ allRoles });
+      })
+      .catch((error) => {
+        console.log(error);
+        this.setHttpError("getRoles", error.message);
+      });
+  }
+
+  setAllPrivileges() {
+    getPrivileges()
+      .then((response) => {
+        const allPrivileges = [];
+        Object.keys(response.data).forEach((key) => {
+          allPrivileges.push({
+            privilege: response.data[key].privilege,
+            checked: false,
+            disabled: false,
+          });
+        });
+        return allPrivileges;
+      })
+      .then((allPrivileges) => {
+        this.setState({ allPrivileges });
+      })
+      .catch((error) => {
+        console.log(error);
+        this.setHttpError("getPrivileges", error.message);
+      });
+  }
+
+  setRole() {
+    return new Promise((resolve) => {
+      const { roleId } = this.state;
+      if (roleId !== "add") {
+        getRoleById(roleId)
+          .then((response) => {
+            this.setState({ role: response.data }, () => {
+              resolve();
+            });
+          })
+          .catch((error) => {
+            console.log(error);
+            this.setHttpError("getRoleById", error.message);
+          });
+      } else {
+        resolve();
+      }
+    });
   }
 
   setInheritedRoles() {
@@ -87,38 +167,6 @@ class RoleForm extends React.Component {
     this.setState({ inheritedRoles });
   }
 
-  setRole() {
-    return new Promise((resolve, reject) => {
-      const { roleId } = this.state;
-      if (roleId !== "add") {
-        getRoleById(roleId)
-          .then((response) => {
-            this.setState({ role: response.data }, () => {
-              resolve();
-            });
-          })
-          .catch((e) => reject(e));
-      } else {
-        resolve();
-      }
-    });
-  }
-
-  setAllRoles() {
-    getRoles()
-      .then((response) => {
-        const allRoles = [];
-        Object.keys(response.data).forEach((key) => {
-          allRoles.push(response.data[key].role);
-        });
-        return allRoles;
-      })
-      .then((allRoles) => {
-        this.setState({ allRoles });
-      })
-      .catch((e) => console.log(e));
-  }
-
   setCurrentPrivileges() {
     const { role, allPrivileges } = this.state;
     const tempAllPrivileges = [...allPrivileges];
@@ -134,12 +182,12 @@ class RoleForm extends React.Component {
   }
 
   disableDisplayPrivileges() {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       const { role, allPrivileges } = this.state;
       const tempAllPrivileges = [...allPrivileges];
 
       if (role.parentRoles.length === 0) {
-        resolve("success");
+        resolve();
       } else {
         role.parentRoles.forEach((el, index) => {
           getRoleByName(el)
@@ -155,36 +203,139 @@ class RoleForm extends React.Component {
             .then(() => {
               if (index === role.parentRoles.length - 1) {
                 this.setState({ allPrivileges: tempAllPrivileges }, () => {
-                  resolve("success");
+                  resolve();
                 });
               }
             })
-            .catch((e) => console.log(e.message));
+            .catch((error) => {
+              console.log(error);
+              this.setHttpError("getRoleByName", error.message);
+            });
         });
       }
     });
   }
+  // component mount ends
 
-  setAllPrivileges() {
-    getPrivileges()
-      .then((response) => {
-        const allPrivileges = [];
-        Object.keys(response.data).forEach((key) => {
-          allPrivileges.push({
-            privilege: response.data[key].privilege,
-            checked: false,
-            disabled: false,
-          });
-        });
-        return allPrivileges;
-      })
-      .then((allPrivileges) => {
-        this.setState({ allPrivileges });
-      })
-      .catch((e) => console.log(e));
+  // error validation starts
+  setHttpError(apiName, eMessage) {
+    const { errors } = this.state;
+    errors.httpRequestHasError = true;
+    errors.httpRequest = "error: " + apiName + " api call failed : " + eMessage;
+    this.setState({ errors }, () => {
+      setTimeout(
+        function () {
+          this.setState({ redirect: this.viewAll });
+        }.bind(this),
+        4000
+      );
+    });
   }
 
-  privilegeChangeHandler(event, index) {
+  nonEmpty(object) {
+    return object && object.trim().length > 0;
+  }
+
+  resetErrorsToFalse() {
+    return new Promise((resolve) => {
+      const { errors } = this.state;
+      errors.roleHasError = false;
+      this.setState({ errors, error: false }, () => resolve());
+    });
+  }
+
+  successAndRedirect(successMessage) {
+    this.setState({ showSuccessMessage: true, successMessage }, () => {
+      setTimeout(
+        function () {
+          this.setState({ redirect: this.viewAll });
+        }.bind(this),
+        500
+      );
+    });
+  }
+
+  validate(role) {
+    return new Promise((resolve) => {
+      this.resetErrorsToFalse().then(() => {
+        const { errors } = this.state;
+        let error = false;
+
+        if (!this.nonEmpty(role.role)) {
+          error = true;
+          errors.roleHasError = true;
+        }
+
+        this.setState({ error, errors, role }, () => {
+          resolve();
+        });
+      });
+    });
+  }
+  // error validation ends
+
+  // save starts
+  saveRole(successMessage = "updated") {
+    const { roleId, role } = this.state;
+    this.validate(role).then(() => {
+      const { error } = this.state;
+      if (!error) {
+        if (roleId === "add") this.insertRoleWithData(role);
+        else this.updateRoleWithData(roleId, role, successMessage);
+      }
+    });
+  }
+
+  insertRoleWithData(role) {
+    insertRole(role)
+      .then(() => {
+        this.successAndRedirect("saved");
+      })
+      .catch((error) => {
+        console.log(error);
+        this.setHttpError("insertRole", error.message);
+      });
+  }
+
+  updateRoleWithData(roleId, role, successMessage) {
+    console.log("role", role);
+    updateRoleById(roleId, role)
+      .then(() => {
+        this.successAndRedirect(successMessage);
+      })
+      .catch((error) => {
+        console.log(error);
+        console.log("in updateRoleById");
+        this.setHttpError("updateRoleById", error.message);
+      });
+  }
+  // save ends
+
+  cancelRole() {
+    this.setState({ redirect: this.viewAll });
+  }
+
+  deleteRole() {
+    const { roleId } = this.state;
+    deleteRoleById(roleId)
+      .then(() => {
+        this.successAndRedirect("deleted");
+      })
+      .catch((error) => {
+        console.log(error);
+        this.setHttpError("deleteRoleById", error.message);
+      });
+  }
+
+  // input change handlers
+  roleChangeHandler(event) {
+    const { name, value } = event.target;
+    const { role } = this.state;
+    role[name] = value;
+    this.setState({ role });
+  }
+
+  roleRolePrivilegesChangeHandler(event, index) {
     const { allPrivileges, role } = this.state;
     allPrivileges[index].checked = event.target.checked;
 
@@ -204,6 +355,7 @@ class RoleForm extends React.Component {
     this.setState({ allPrivileges });
   }
 
+  // state change handlers
   inheritedRoleChangeHandler(event, index) {
     const { inheritedRoles, role } = this.state;
     inheritedRoles[index].checked = event.target.checked;
@@ -222,68 +374,47 @@ class RoleForm extends React.Component {
     this.setState({ inheritedRoles });
   }
 
-  roleInputChangeHandler(event) {
-    const { name, value } = event.target;
-    const { role } = this.state;
-    role[name] = value;
-    this.setState({ role });
-  }
-
-  cancel() {
-    this.setState({ redirect: "/role/view/all" });
-  }
-
-  deleteRole() {
-    const { roleId } = this.state;
-    deleteRoleById(roleId)
-      .then((res) => {
-        this.setState({ redirect: "/role/view/all" });
-      })
-      .catch((e) => console.log(e.message));
-  }
-
-  saveRole() {
-    const { roleId, role } = this.state;
-    console.log("role", role);
-    if (roleId === "add") {
-      insertRole(role)
-        .then(() => {
-          this.setState({ redirect: "/role/view/all" });
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    } else {
-      updateRoleById(roleId, role)
-        .then(() => {
-          this.setState({ redirect: "/role/view/all" });
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    }
-  }
-
   render() {
     const {
-      roleInputChangeHandler,
       saveRole,
-      inheritedRoleChangeHandler,
-      privilegeChangeHandler,
-      cancel,
+      cancelRole,
       deleteRole,
+      roleChangeHandler,
+      roleRolePrivilegesChangeHandler,
+      inheritedRoleChangeHandler,
     } = this;
 
-    const { role, roleId, redirect, inheritedRoles, allPrivileges, isLoading } =
-      this.state;
+    const {
+      role,
+      roleId,
+      inheritedRoles,
+      allPrivileges,
+      redirect,
+      isLoading,
+      error,
+      errors,
+      showSuccessMessage,
+      successMessage,
+    } = this.state;
 
     if (redirect) return <Redirect to={redirect} />;
 
-    if (isLoading) return <p>Loading...</p>;
+    if (showSuccessMessage) return <SuccessMessage action={successMessage} />;
+
+    if (isLoading)
+      return (
+        <div>
+          {!errors.httpRequestHasError && <LoadingData />}
+          {errors.httpRequestHasError && (
+            <ErrorLoadingData message={errors.httpRequest} />
+          )}
+        </div>
+      );
 
     return (
       <React.Fragment>
         <Paper style={paperStyle}>
+          {error && <span>{errors.globalErrorMessage}</span>}
           <TextField
             style={inputStyle}
             label="Role"
@@ -292,8 +423,9 @@ class RoleForm extends React.Component {
             name="role"
             value={GET_VALUE(role.role)}
             disabled={roleId === "add" ? false : true}
-            onChange={roleInputChangeHandler}
+            onChange={(e) => roleChangeHandler(e)}
           />
+          <span>{error && errors.roleHasError && errors.role}</span>
           <br />
 
           <label htmlFor="description">
@@ -305,7 +437,7 @@ class RoleForm extends React.Component {
               rows="3"
               cols="20"
               value={GET_VALUE(role.description)}
-              onChange={roleInputChangeHandler}
+              onChange={(e) => roleChangeHandler(e)}
             />
           </label>
           <br />
@@ -367,7 +499,9 @@ class RoleForm extends React.Component {
                             checked={el.checked}
                             disabled={el.disabled}
                             id={el.privilege}
-                            onChange={(e) => privilegeChangeHandler(e, index)}
+                            onChange={(e) =>
+                              roleRolePrivilegesChangeHandler(e, index)
+                            }
                           />
                         }
                         label={el.privilege}
@@ -388,11 +522,11 @@ class RoleForm extends React.Component {
           )}
           <br />
           <div style={buttonGroupStyle}>
-            <Controls.SaveButton onClick={saveRole.bind(this)} />
-            <Controls.CancelButton onClick={cancel.bind(this)} />
+            <Controls.SaveButton onClick={() => saveRole()} />
+            <Controls.CancelButton onClick={() => cancelRole()} />
 
             {roleId !== "add" && (
-              <Controls.DeleteButton onClick={deleteRole.bind(this)} />
+              <Controls.DeleteButton onClick={() => deleteRole()} />
             )}
           </div>
 

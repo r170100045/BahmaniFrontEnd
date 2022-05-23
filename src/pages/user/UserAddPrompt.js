@@ -1,4 +1,4 @@
-import { Redirect, withRouter } from "react-router-dom";
+import { Redirect, Link as RouterLink, withRouter } from "react-router-dom";
 
 import { FILTER_OPTIONS } from "../../constants/otherConstants";
 import React from "react";
@@ -101,12 +101,19 @@ class UserAddPrompt extends React.Component {
 
                 <div>
                   <button type="button" disabled={personNotSelected}>
-                    <a
+                    <RouterLink
+                      to={`/user/edit/add/${personUUID}`}
+                      disabled={personNotSelected}
+                    >
+                      Next
+                    </RouterLink>
+
+                    {/* <a
                       href={`/user/edit/add/${personUUID}`}
                       disabled={personNotSelected}
                     >
                       Next
-                    </a>
+                    </a> */}
                   </button>
                 </div>
               </div>
@@ -117,7 +124,8 @@ class UserAddPrompt extends React.Component {
               type="button"
               // onClick={cancelButtonHandler.bind(this)}
             >
-              <a href={`/user/view/all/dummy`}>Cancel</a>
+              <RouterLink to={`/user/view/all/dummy`}>Cancel</RouterLink>
+              {/* <a href={`/user/view/all/dummy`}>Cancel</a> */}
               {/* Cancel */}
             </button>
           </div>

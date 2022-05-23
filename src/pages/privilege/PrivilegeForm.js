@@ -50,7 +50,7 @@ class PrivilegeForm extends React.Component {
         globalErrorMessage: "Please fix all errors and try again.",
         httpRequest: null,
         httpRequestHasError: false,
-        privilege: "privilege name is required",
+        privilege: "privilege name can not be empty",
         privilegeHasError: false,
       },
     };
@@ -60,7 +60,7 @@ class PrivilegeForm extends React.Component {
     this.savePrivilege = this.savePrivilege.bind(this);
     this.cancelPrivilege = this.cancelPrivilege.bind(this);
     this.deletePrivilege = this.deletePrivilege.bind(this);
-    this.inputChangeHandler = this.inputChangeHandler.bind(this);
+    this.privilegeChangeHandler = this.privilegeChangeHandler.bind(this);
   }
 
   // component mount starts
@@ -193,7 +193,7 @@ class PrivilegeForm extends React.Component {
   }
 
   // input change handlers
-  inputChangeHandler = (event) => {
+  privilegeChangeHandler = (event) => {
     const { name, value } = event.target;
     const { privilege } = this.state;
     privilege[name] = value;
@@ -205,7 +205,7 @@ class PrivilegeForm extends React.Component {
       savePrivilege,
       cancelPrivilege,
       deletePrivilege,
-      inputChangeHandler,
+      privilegeChangeHandler,
     } = this;
 
     const {
@@ -235,9 +235,9 @@ class PrivilegeForm extends React.Component {
 
     return (
       <React.Fragment>
-        {error && <span style={globalError}>{errors.globalErrorMessage}</span>}
-
         <Paper style={paperStyle}>
+          {error && <span>{errors.globalErrorMessage}</span>}
+
           <TextField
             style={inputStyle}
             label="Privilege Name"
@@ -246,7 +246,7 @@ class PrivilegeForm extends React.Component {
             name="privilege"
             disabled={privilegeId === "add" ? false : true}
             value={GET_VALUE(privilege.privilege)}
-            onChange={(e) => inputChangeHandler(e)}
+            onChange={(e) => privilegeChangeHandler(e)}
           />
           <span style={inputError}>
             {error && errors.privilegeHasError && errors.privilege}
@@ -262,7 +262,7 @@ class PrivilegeForm extends React.Component {
             cols="20"
             multiline
             value={GET_VALUE(privilege.description)}
-            onChange={(e) => inputChangeHandler(e)}
+            onChange={(e) => privilegeChangeHandler(e)}
           />
           <br />
           <div style={buttonGroupStyle}>
