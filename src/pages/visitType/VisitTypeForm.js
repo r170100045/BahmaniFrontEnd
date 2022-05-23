@@ -3,6 +3,8 @@ import { Redirect, withRouter } from "react-router-dom";
 import {
   buttonGroupStyle,
   buttonStyle,
+  globalError,
+  inputError,
   inputStyle,
   paperStyle,
   subHeadingStyle,
@@ -44,7 +46,7 @@ class VisitTypeForm extends React.Component {
         globalErrorMessage: "Please fix all errors and try again.",
         httpRequest: null,
         httpRequestHasError: false,
-        name: "name is required",
+        name: "Name is mandatory",
         nameHasError: false,
         retireReason: "reason to retire is required",
         retireReasonHasError: false,
@@ -260,7 +262,7 @@ class VisitTypeForm extends React.Component {
 
     return (
       <React.Fragment>
-        {error && <span>{errors.globalErrorMessage}</span>}
+        {error && <span style={globalError}>{errors.globalErrorMessage}</span>}
 
         <Paper style={paperStyle}>
           <TextField
@@ -272,7 +274,9 @@ class VisitTypeForm extends React.Component {
             value={GET_VALUE(visitType.name)}
             onChange={(e) => inputChangeHandler(e)}
           />
-          <span>{error && errors.nameHasError && errors.name}</span>
+          <span style={inputError}>
+            {error && errors.nameHasError && errors.name}
+          </span>
 
           <br />
           <TextField

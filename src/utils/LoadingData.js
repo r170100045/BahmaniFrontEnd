@@ -7,8 +7,10 @@ class LoadingData extends React.Component {
       <div
         style={{
           display: "flex",
+          flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
+          height: "80vh",
         }}
       >
         <LoadingSpin />

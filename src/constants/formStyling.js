@@ -1,9 +1,18 @@
+import { red } from "@material-ui/core/colors";
+
 export const paperStyle = {
   padding: "24px 24px",
   margin: "10px 30px",
   display: "flex",
   justifyContentcontent: "space-between",
   flexDirection: "column",
+};
+export const globalError = {
+  marginLeft: "30px",
+  color: red[400],
+};
+export const inputError = {
+  color: red[400],
 };
 export const conceptPaperStyle = {
   margin: "10px 30px",
