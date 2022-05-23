@@ -1,11 +1,16 @@
+import {
+  Checkbox,
+  FormControlLabel,
+  Grid,
+  Paper,
+  TextField,
+} from "@material-ui/core";
 import { Redirect, withRouter } from "react-router-dom";
 import { getPersonById, getUserById } from "../../services/userService";
 
 import { GET_VALUE } from "../../constants/otherConstants";
-import { Paper } from "@material-ui/core";
 import React from "react";
 import { getRoles } from "../../services/roleService";
-import { getUserById } from "../../services/userService";
 import { paperStyle } from "../../constants/formStyling";
 
 class UserForm extends React.Component {
@@ -428,8 +433,8 @@ class UserForm extends React.Component {
               </div>
               <br />
 
-              <label htmlFor="username">Username: </label>
-              <input
+              <TextField
+                label="Username"
                 type="text"
                 id="username"
                 name="username"
@@ -500,7 +505,7 @@ class UserForm extends React.Component {
               <div>
                 <span>Roles: </span>
                 <span>
-                  <ul>
+                  {/* <ul>
                     {roles.map((el, index) => (
                       <div key={el.role}>
                         <input
@@ -513,7 +518,30 @@ class UserForm extends React.Component {
                         <label htmlFor={el.role}>{el.role}</label>
                       </div>
                     ))}
-                  </ul>
+                  </ul> */}
+                  <Grid container>
+                    {roles.map((el, index) => (
+                      <Grid item md={4} xs={12} sm={6}>
+                        <div key={el.role}>
+                          <FormControlLabel
+                            control={
+                              <Checkbox
+                                label="entry"
+                                type="checkbox"
+                                name={el.role}
+                                checked={el.checked}
+                                id={el.role}
+                                onChange={(e) =>
+                                  userRoleChangeHandler(e, index)
+                                }
+                              />
+                            }
+                            label={el.role}
+                          />
+                        </div>
+                      </Grid>
+                    ))}
+                  </Grid>
                 </span>
               </div>
 

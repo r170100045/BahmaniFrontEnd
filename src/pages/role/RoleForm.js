@@ -1,4 +1,18 @@
+import {
+  Checkbox,
+  FormControl,
+  FormControlLabel,
+  Grid,
+  Paper,
+  TextField,
+} from "@material-ui/core";
 import { Redirect, withRouter } from "react-router-dom";
+import {
+  buttonGroupStyle,
+  conceptPaperStyle,
+  inputStyle,
+  paperStyle,
+} from "../../constants/formStyling";
 import {
   deleteRoleById,
   getRoleById,
@@ -8,16 +22,10 @@ import {
   updateRoleById,
 } from "../../services/roleService";
 
+import Controls from "../../components/controls/Controls";
 import { GET_VALUE } from "../../constants/otherConstants";
 import React from "react";
 import { getPrivileges } from "../../services/privilegeService";
-import { Paper, TextField } from "@material-ui/core";
-import {
-  buttonGroupStyle,
-  conceptPaperStyle,
-  inputStyle,
-} from "../../constants/formStyling";
-import Controls from "../../components/controls/Controls";
 
 class RoleForm extends React.Component {
   constructor(props) {
@@ -275,18 +283,17 @@ class RoleForm extends React.Component {
 
     return (
       <React.Fragment>
-        <Paper style={conceptPaperStyle}>
-          <label htmlFor="role">
-            Role :
-            <input
-              type="text"
-              id="role"
-              name="role"
-              value={GET_VALUE(role.role)}
-              disabled={roleId === "add" ? false : true}
-              onChange={roleInputChangeHandler}
-            />
-          </label>
+        <Paper style={paperStyle}>
+          <TextField
+            style={inputStyle}
+            label="Role"
+            type="text"
+            id="role"
+            name="role"
+            value={GET_VALUE(role.role)}
+            disabled={roleId === "add" ? false : true}
+            onChange={roleInputChangeHandler}
+          />
           <br />
 
           <label htmlFor="description">
@@ -347,21 +354,28 @@ class RoleForm extends React.Component {
                 Greyed out checkboxes represent privileges inherited from other
                 roles, these cannot be removed individually.
               </p>
-              <ul>
+              <Grid container spacing={1}>
                 {allPrivileges.map((el, index) => (
-                  <div key={el.privilege}>
-                    <input
-                      type="checkbox"
-                      name={el.privilege}
-                      checked={el.checked}
-                      disabled={el.disabled}
-                      id={el.privilege}
-                      onChange={(e) => privilegeChangeHandler(e, index)}
-                    />{" "}
-                    <label htmlFor={el.privilege}>{el.privilege}</label>
-                  </div>
+                  <Grid item md={4} xs={12} sm={6}>
+                    <div key={el.privilege}>
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            label={el.privilege}
+                            type="checkbox"
+                            name={el.privilege}
+                            checked={el.checked}
+                            disabled={el.disabled}
+                            id={el.privilege}
+                            onChange={(e) => privilegeChangeHandler(e, index)}
+                          />
+                        }
+                        label={el.privilege}
+                      />
+                    </div>
+                  </Grid>
                 ))}
-              </ul>
+              </Grid>
             </div>
           </div>
 

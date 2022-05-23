@@ -1,5 +1,12 @@
 import { FORMAT_OPTIONS, GET_VALUE } from "../../constants/otherConstants";
+import { Input, Paper, TextField } from "@material-ui/core";
 import { Redirect, withRouter } from "react-router-dom";
+import {
+  buttonGroupStyle,
+  inputStyle,
+  paperStyle,
+  subHeadingStyle,
+} from "../../constants/formStyling";
 import {
   deletePersonAttributeTypeById,
   getPersonAttributeTypeById,
@@ -9,14 +16,8 @@ import {
 
 import React from "react";
 import Select from "react-select";
+import { SingleSelect } from "react-select-material-ui";
 import { getPrivileges } from "../../services/privilegeService";
-import { Input, Paper, TextField } from "@material-ui/core";
-import {
-  buttonGroupStyle,
-  inputStyle,
-  paperStyle,
-  subHeadingStyle,
-} from "../../constants/formStyling";
 
 class PersonAttributeTypeForm extends React.Component {
   constructor(props) {
@@ -158,9 +159,14 @@ class PersonAttributeTypeForm extends React.Component {
       });
   }
 
-  selectTypeInputChangeHandler(selectedOption, name) {
+  // selectTypeInputChangeHandler(selectedOption, name) {
+  //   const { personAttributeType } = this.state;
+  //   personAttributeType[name] = selectedOption.value;
+  //   this.setState({ personAttributeType });
+  // }
+  selectTypeInputChangeHandler(value, name) {
     const { personAttributeType } = this.state;
-    personAttributeType[name] = selectedOption.value;
+    personAttributeType[name] = value;
     this.setState({ personAttributeType });
   }
 
@@ -196,6 +202,7 @@ class PersonAttributeTypeForm extends React.Component {
       deletePersonAttributeType,
       cancelPersonAttributeType,
       selectTypeInputChangeHandler,
+      editPrivilegeChangeHandler,
     } = this;
 
     const {
@@ -233,7 +240,7 @@ class PersonAttributeTypeForm extends React.Component {
             />
             <br />
 
-            <label htmlFor="format" style={inputStyle}>
+            {/* <label htmlFor="format" style={inputStyle}>
               Format:
               <div style={{ width: "300px", display: "inline-block" }}>
                 <Select
@@ -248,6 +255,18 @@ class PersonAttributeTypeForm extends React.Component {
                 />
               </div>
             </label>
+            <br /> */}
+            <SingleSelect
+              label="Format"
+              style={inputStyle}
+              id="format"
+              name="format"
+              defaultValue={getDefaultFormatValue}
+              onChange={(value) =>
+                selectTypeInputChangeHandler(value, "format")
+              }
+              options={FORMAT_OPTIONS}
+            />
             <br />
 
             <label htmlFor="editPrivilege" style={inputStyle}>
@@ -259,10 +278,7 @@ class PersonAttributeTypeForm extends React.Component {
                   name="editPrivilege"
                   defaultValue={getDefaultEditPrivilegeValue}
                   onChange={(selectedOption) =>
-                    selectTypeInputChangeHandler(
-                      selectedOption,
-                      "editPrivilege"
-                    )
+                    editPrivilegeChangeHandler(selectedOption, "editPrivilege")
                   }
                   options={editPrivilegeOptions}
                 />
