@@ -1,13 +1,21 @@
+import {
+  Checkbox,
+  FormControlLabel,
+  Paper,
+  TextField,
+} from "@material-ui/core";
 import { FILTER_OPTIONS, GET_VALUE } from "../../constants/otherConstants";
-import { Paper, TextField } from "@material-ui/core";
 import { Redirect, withRouter } from "react-router-dom";
 import {
   buttonGroupStyle,
   buttonStyle,
+  checkboxLabelStyle,
+  deleteButtonStyle,
   inputStyle,
   labelStyle,
   paperStyle,
   subHeadingStyle,
+  unretireStyleHeading,
 } from "../../constants/formStyling";
 import {
   deleteDrugById,
@@ -16,6 +24,7 @@ import {
   updateDrugById,
 } from "../../services/drugService";
 
+import Controls from "../../components/controls/Controls";
 import React from "react";
 import Select from "react-select";
 import { SingleSelect } from "react-select-material-ui";
@@ -197,14 +206,14 @@ class DrugForm extends React.Component {
         <React.Fragment>
           {error && <p>Fill the required fields</p>}
           {drug.retired && (
-            <p>
+            <p style={unretireStyleHeading}>
               This drug is retired by ... ... - {drug.retireReason}{" "}
-              <button type="button" onClick={unretireDrug.bind(this)}>
-                Unretire this drug
-              </button>
+              <Controls.RetireButton
+                retired={drug.retired}
+                onClick={unretireDrug.bind(this)}
+              />
             </p>
           )}
-          <hr />
 
           <Paper style={paperStyle}>
             <TextField
@@ -231,32 +240,31 @@ class DrugForm extends React.Component {
             />
 
             <br />
-            <label htmlFor="combination" style={inputStyle}>
-              Combination:
-              <input
-                type="checkbox"
-                id="combination"
-                name="combination"
-                onChange={(e) => drugInputChangeHandler(e, "checked")}
-                checked={GET_VALUE(drug.combination)}
-              />
-            </label>
-            <br />
-
-            <label htmlFor="dosageForm" style={inputStyle}>
-              Dosage Form:
-              <div style={{ width: "300px", display: "inline-block" }}>
-                <Select
-                  id="dosageForm"
-                  name="dosageForm"
-                  placeholder="Enter concept name or id"
-                  defaultValue={getDefaultDosageFormValue}
-                  onChange={dosageFormChangeHandler.bind(this)}
-                  options={options}
-                  filterOption={FILTER_OPTIONS}
+            <FormControlLabel
+              control={
+                <Checkbox
+                  type="checkbox"
+                  id="combination"
+                  name="combination"
+                  onChange={(e) => drugInputChangeHandler(e, "checked")}
+                  checked={GET_VALUE(drug.combination)}
                 />
-              </div>
-            </label>
+              }
+              label={<span style={checkboxLabelStyle}>Combination</span>}
+            />
+            <br />
+            <SingleSelect
+              label="Dosage Form"
+              style={inputStyle}
+              id="dosageForm"
+              name="dosageForm"
+              placeholder="Enter concept name or id"
+              defaultValue={getDefaultDosageFormValue}
+              onChange={dosageFormChangeHandler.bind(this)}
+              options={options}
+              filterOption={FILTER_OPTIONS}
+              required
+            />
 
             <br />
 
@@ -270,50 +278,34 @@ class DrugForm extends React.Component {
               value={GET_VALUE(drug.strength)}
             />
             <br />
-            <button type="button" onClick={retireDrug.bind(this)}>
-              Retire this Drug
-            </button>
 
-            <label htmlFor="minimumDailyDose" style={inputStyle}>
-              Minimum Daily Dose:
-              <input
-                type="number"
-                id="minimumDailyDose"
-                name="minimumDailyDose"
-                onChange={drugInputChangeHandler}
-                value={GET_VALUE(drug.minimumDailyDose)}
-                step="any"
-              />
-            </label>
+            <TextField
+              style={inputStyle}
+              label="Minimum Daily Dose"
+              type="number"
+              id="minimumDailyDose"
+              name="minimumDailyDose"
+              onChange={drugInputChangeHandler}
+              value={GET_VALUE(drug.minimumDailyDose)}
+              step="any"
+              required
+            />
+
             <br />
-
-            <label htmlFor="maximumDailyDose" style={inputStyle}>
-              Maximum Daily Dose:
-              <input
-                type="number"
-                id="maximumDailyDose"
-                name="maximumDailyDose"
-                onChange={drugInputChangeHandler}
-                value={GET_VALUE(drug.maximumDailyDose)}
-                step="any"
-              />
-            </label>
+            <TextField
+              stylel={inputStyle}
+              label="Maximum Daily Dose"
+              type="number"
+              id="maximumDailyDose"
+              name="maximumDailyDose"
+              onChange={drugInputChangeHandler}
+              value={GET_VALUE(drug.maximumDailyDose)}
+              step="any"
+            />
             <br />
             <div style={buttonGroupStyle}>
-              <button
-                type="button"
-                style={buttonStyle}
-                onClick={submitDrugFormHandler.bind(this)}
-              >
-                Save Concept Drug
-              </button>
-              <button
-                type="button"
-                style={buttonStyle}
-                onClick={cancelButtonHandler.bind(this)}
-              >
-                Cancel
-              </button>
+              <Controls.SaveButton onClick={submitDrugFormHandler.bind(this)} />
+              <Controls.CancelButton onClick={cancelButtonHandler.bind(this)} />
             </div>
           </Paper>
           <hr />
@@ -332,22 +324,17 @@ class DrugForm extends React.Component {
               />
               <br />
               <div style={buttonGroupStyle}>
-                <button type="button" onClick={retireDrug.bind(this)}>
-                  Retire this Drug
-                </button>
-              </div>
-
-              <hr />
-
-              <p style={subHeadingStyle}>Permanently Delete Concept Drug</p>
-              <br />
-              <div style={buttonGroupStyle}>
-                <button type="button" onClick={deleteDrug.bind(this)}>
-                  Permanently Delete Concept Drug
-                </button>
+                <Controls.RetireButton
+                  retired={drug.retired}
+                  onClick={retireDrug.bind(this)}
+                />
               </div>
             </Paper>
           )}
+          <Controls.DeleteButton
+            style={deleteButtonStyle}
+            onClick={deleteDrug.bind(this)}
+          />
         </React.Fragment>
       );
     }

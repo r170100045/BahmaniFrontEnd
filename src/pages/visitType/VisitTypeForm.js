@@ -3,6 +3,7 @@ import { Redirect, withRouter } from "react-router-dom";
 import {
   buttonGroupStyle,
   buttonStyle,
+  deleteButtonStyle,
   globalError,
   inputError,
   inputStyle,
@@ -97,7 +98,7 @@ class VisitTypeForm extends React.Component {
         function () {
           this.setState({ redirect: this.viewAll });
         }.bind(this),
-        500
+        5000000
       );
     });
   }
@@ -264,9 +265,10 @@ class VisitTypeForm extends React.Component {
 
     return (
       <React.Fragment>
-        {error && <span style={globalError}>{errors.globalErrorMessage}</span>}
-
         <Paper style={paperStyle}>
+          {error && (
+            <span style={globalError}>{errors.globalErrorMessage}</span>
+          )}
           <TextField
             style={inputStyle}
             label="Name"
@@ -275,6 +277,7 @@ class VisitTypeForm extends React.Component {
             name="name"
             value={GET_VALUE(visitType.name)}
             onChange={(e) => visitTypeChangeHandler(e)}
+            required
           />
           <span style={inputError}>
             {error && errors.nameHasError && errors.name}
@@ -349,12 +352,10 @@ class VisitTypeForm extends React.Component {
         )}
 
         {visitTypeId !== "add" && (
-          <div style={paperStyle}>
-            <div style={buttonGroupStyle}>
-              <Controls.DeleteButton onClick={() => deleteVisitType()} />
-            </div>
-            <br />
-          </div>
+          <Controls.DeleteButton
+            style={deleteButtonStyle}
+            onClick={() => deleteVisitType()}
+          />
         )}
       </React.Fragment>
     );

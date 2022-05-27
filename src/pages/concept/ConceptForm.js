@@ -1,9 +1,24 @@
 import {
+  Button,
+  Checkbox,
+  FormControlLabel,
+  Paper,
+  TextField,
+} from "@material-ui/core";
+import {
   CONCEPT_COMPLEX_HANDLERS,
   FILTER_OPTIONS,
 } from "../../constants/otherConstants";
+import { MultipleSelect, SingleSelect } from "react-select-material-ui";
 import React, { Fragment } from "react";
 import { Redirect, withRouter } from "react-router-dom";
+import {
+  checkboxLabelStyle,
+  conceptPaperStyle,
+  deleteButtonStyle,
+  inputStyle,
+  paperStyle,
+} from "../../constants/formStyling";
 import {
   deleteConceptById,
   getConceptById,
@@ -17,10 +32,9 @@ import {
   updateConceptById,
 } from "../../services/conceptService";
 
+import Controls from "../../components/controls/Controls";
 import Select from "react-select";
 import { getDrugs } from "../../services/drugService";
-import { Paper, TextField } from "@material-ui/core";
-import { conceptPaperStyle, paperStyle } from "../../constants/formStyling";
 
 class ConceptForm extends React.Component {
   constructor(props) {
@@ -1052,40 +1066,37 @@ class ConceptForm extends React.Component {
               value={getValueFor(concept.description)}
             />
             <br />
-
-            <label htmlFor="classId">
-              Class:
-              <div style={{ width: "300px", display: "inline-block" }}>
-                <Select
-                  id="classId"
-                  name="classId"
-                  defaultValue={
-                    concept.classId === 1
-                      ? { label: "Test", value: 1 }
-                      : getDefaultClassIdValue
-                  }
-                  onChange={classIdChangeHandler.bind(this)}
-                  options={classOptions}
-                />
-              </div>
-            </label>
+            <SingleSelect
+              style={inputStyle}
+              label="Class"
+              id="classId"
+              name="classId"
+              defaultValue={
+                concept.classId === 1
+                  ? { label: "Test", value: 1 }
+                  : getDefaultClassIdValue
+              }
+              onChange={classIdChangeHandler.bind(this)}
+              options={classOptions}
+            />
             <br />
-
-            <label htmlFor="isSet">
-              Is Set:
-              <input
-                type="checkbox"
-                id="isSet"
-                name="isSet"
-                onChange={isSetChangeHandler.bind(this)}
-                checked={getValueFor(concept.isSet)}
-              />
-            </label>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  type="checkbox"
+                  id="isSet"
+                  name="isSet"
+                  onChange={isSetChangeHandler.bind(this)}
+                  checked={getValueFor(concept.isSet)}
+                />
+              }
+              label={<span style={checkboxLabelStyle}>Is set</span>}
+            />
             <br />
 
             {concept.isSet && (
               <div>
-                <label htmlFor="conceptSets">
+                {/* <label htmlFor="conceptSets">
                   Set Members:
                   <div style={{ width: "500px", display: "inline-block" }}>
                     <Select
@@ -1097,161 +1108,151 @@ class ConceptForm extends React.Component {
                       options={conceptOptions}
                     />
                   </div>
-                </label>
+                </label> */}
+                <MultipleSelect
+                  style={inputStyle}
+                  label="Set Members"
+                  id="conceptSets"
+                  name="conceptSets"
+                  defaultValue={defaultConceptSetsValue}
+                  onChange={conceptSetsChangeHandler.bind(this)}
+                  options={conceptOptions}
+                />
                 <br />
               </div>
             )}
 
-            <label htmlFor="dataType">
-              Datatype:
-              <div style={{ width: "300px", display: "inline-block" }}>
-                <Select
-                  id="dataType"
-                  name="dataType"
-                  defaultValue={
-                    dataType === 1
-                      ? { label: "Numeric", value: 1 }
-                      : getDefaultDataTypeValue
-                  }
-                  onChange={dataTypeChangeHandler.bind(this)}
-                  options={dataTypeOptions}
-                />
-              </div>
-            </label>
+            <SingleSelect
+              label="Datatype"
+              style={inputStyle}
+              id="dataType"
+              name="dataType"
+              defaultValue={
+                dataType === 1
+                  ? { label: "Numeric", value: 1 }
+                  : getDefaultDataTypeValue
+              }
+              onChange={dataTypeChangeHandler.bind(this)}
+              options={dataTypeOptions}
+            />
             <br />
 
             {dataType === 1 && (
               <div>
                 <p>Numeric</p>
-                <label htmlFor="hiAbsolute">
-                  Absolute High
-                  <input
-                    type="text"
-                    id="hiAbsolute"
-                    name="hiAbsolute"
-                    value={getValueFor(
-                      conceptNumeric === null ? "" : conceptNumeric.hiAbsolute
-                    )}
-                    onChange={(e) => numericChangeHandler(e, "hiAbsolute")}
-                  />
-                </label>
+                <TextField
+                  label="Absolute High"
+                  type="text"
+                  id="hiAbsolute"
+                  name="hiAbsolute"
+                  value={getValueFor(
+                    conceptNumeric === null ? "" : conceptNumeric.hiAbsolute
+                  )}
+                  onChange={(e) => numericChangeHandler(e, "hiAbsolute")}
+                />
                 <br />
 
-                <label htmlFor="hiCritical">
-                  Critical High
-                  <input
-                    type="text"
-                    id="hiCritical"
-                    name="hiCritical"
-                    value={getValueFor(
-                      conceptNumeric === null ? "" : conceptNumeric.hiCritical
-                    )}
-                    onChange={(e) => numericChangeHandler(e, "hiCritical")}
-                  />
-                </label>
+                <TextField
+                  label="Critical High"
+                  type="text"
+                  id="hiCritical"
+                  name="hiCritical"
+                  value={getValueFor(
+                    conceptNumeric === null ? "" : conceptNumeric.hiCritical
+                  )}
+                  onChange={(e) => numericChangeHandler(e, "hiCritical")}
+                />
+                <br />
+                <TextField
+                  label="Normal High"
+                  type="text"
+                  id="hiNormal"
+                  name="hiNormal"
+                  value={getValueFor(
+                    conceptNumeric === null ? "" : conceptNumeric.hiNormal
+                  )}
+                  onChange={(e) => numericChangeHandler(e, "hiNormal")}
+                />
+                <br />
+                <TextField
+                  label="Absolute Low"
+                  type="text"
+                  id="lowAbsolute"
+                  name="lowAbsolute"
+                  value={getValueFor(
+                    conceptNumeric === null ? "" : conceptNumeric.lowAbsolute
+                  )}
+                  onChange={(e) => numericChangeHandler(e, "lowAbsolute")}
+                />
                 <br />
 
-                <label htmlFor="hiNormal">
-                  Normal High
-                  <input
-                    type="text"
-                    id="hiNormal"
-                    name="hiNormal"
-                    value={getValueFor(
-                      conceptNumeric === null ? "" : conceptNumeric.hiNormal
-                    )}
-                    onChange={(e) => numericChangeHandler(e, "hiNormal")}
-                  />
-                </label>
+                <TextField
+                  label="Critical Low"
+                  type="text"
+                  id="lowCritical"
+                  name="lowCritical"
+                  value={getValueFor(
+                    conceptNumeric === null ? "" : conceptNumeric.lowCritical
+                  )}
+                  onChange={(e) => numericChangeHandler(e, "lowCritical")}
+                />
                 <br />
 
-                <label htmlFor="lowAbsolute">
-                  Absolute Low
-                  <input
-                    type="text"
-                    id="lowAbsolute"
-                    name="lowAbsolute"
-                    value={getValueFor(
-                      conceptNumeric === null ? "" : conceptNumeric.lowAbsolute
-                    )}
-                    onChange={(e) => numericChangeHandler(e, "lowAbsolute")}
-                  />
-                </label>
+                <TextField
+                  label="Normal Low"
+                  type="text"
+                  id="lowNormal"
+                  name="lowNormal"
+                  value={getValueFor(
+                    conceptNumeric === null ? "" : conceptNumeric.lowNormal
+                  )}
+                  onChange={(e) => numericChangeHandler(e, "lowNormal")}
+                />
                 <br />
 
-                <label htmlFor="lowCritical">
-                  Critical Low
-                  <input
-                    type="text"
-                    id="lowCritical"
-                    name="lowCritical"
-                    value={getValueFor(
-                      conceptNumeric === null ? "" : conceptNumeric.lowCritical
-                    )}
-                    onChange={(e) => numericChangeHandler(e, "lowCritical")}
-                  />
-                </label>
+                <TextField
+                  label="Units"
+                  type="text"
+                  id="units"
+                  name="units"
+                  value={getValueFor(
+                    conceptNumeric === null ? "" : conceptNumeric.units
+                  )}
+                  onChange={(e) => numericChangeHandler(e, "units")}
+                />
                 <br />
 
-                <label htmlFor="lowNormal">
-                  Normal Low
-                  <input
-                    type="text"
-                    id="lowNormal"
-                    name="lowNormal"
-                    value={getValueFor(
-                      conceptNumeric === null ? "" : conceptNumeric.lowNormal
-                    )}
-                    onChange={(e) => numericChangeHandler(e, "lowNormal")}
-                  />
-                </label>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      type="checkbox"
+                      id="precise"
+                      name="precise"
+                      checked={getValueFor(
+                        conceptNumeric === null ? "" : conceptNumeric.precise
+                      )}
+                      onChange={(e) =>
+                        numericChangeHandler(e, "precise", "checked")
+                      }
+                    />
+                  }
+                  label={<span style={checkboxLabelStyle}>Allow Decimal?</span>}
+                />
                 <br />
 
-                <label htmlFor="units">
-                  Units
-                  <input
-                    type="text"
-                    id="units"
-                    name="units"
-                    value={getValueFor(
-                      conceptNumeric === null ? "" : conceptNumeric.units
-                    )}
-                    onChange={(e) => numericChangeHandler(e, "units")}
-                  />
-                </label>
-                <br />
-
-                <label htmlFor="precise">
-                  Allow Decimal?
-                  <input
-                    type="checkbox"
-                    id="precise"
-                    name="precise"
-                    checked={getValueFor(
-                      conceptNumeric === null ? "" : conceptNumeric.precise
-                    )}
-                    onChange={(e) =>
-                      numericChangeHandler(e, "precise", "checked")
-                    }
-                  />
-                </label>
-                <br />
-
-                <label htmlFor="displayPrecision">
-                  Display Precision
-                  <input
-                    type="text"
-                    id="displayPrecision"
-                    name="displayPrecision"
-                    value={getValueFor(
-                      conceptNumeric === null
-                        ? ""
-                        : conceptNumeric.displayPrecision
-                    )}
-                    readOnly="true"
-                    disabled="true"
-                  />
-                </label>
+                <TextField
+                  label="Display Precision"
+                  type="text"
+                  id="displayPrecision"
+                  name="displayPrecision"
+                  value={getValueFor(
+                    conceptNumeric === null
+                      ? ""
+                      : conceptNumeric.displayPrecision
+                  )}
+                  readOnly="true"
+                  disabled="true"
+                />
                 <br />
               </div>
             )}
@@ -1308,6 +1309,14 @@ class ConceptForm extends React.Component {
                     />
                   </div>
                 </label>
+                <SingleSelect
+                  label="Handler"
+                  id="conceptComplex"
+                  name="conceptComplex"
+                  defaultValue={getDefaultConceptComplexValue}
+                  onChange={conceptComplexChangeHandler.bind(this)}
+                  options={CONCEPT_COMPLEX_HANDLERS}
+                />
               </div>
             )}
 
@@ -1321,19 +1330,23 @@ class ConceptForm extends React.Component {
             />
             <br />
 
-            <button type="button" onClick={saveConcept.bind(this)}>
-              Save Concept
-            </button>
-            <button type="button" onClick={saveConceptAndContinue.bind(this)}>
+            <Controls.SaveButton onClick={saveConcept.bind(this)} />
+            <Button
+              variant="outlined"
+              onClick={saveConceptAndContinue.bind(this)}
+            >
               Save and Continue
-            </button>
-            <button type="button" onClick={cancelConcept.bind(this)}>
-              Cancel
-            </button>
+            </Button>
+            <Controls.CancelButton
+              type="button"
+              onClick={cancelConcept.bind(this)}
+            />
+
             {conceptId !== "add" && (
-              <button type="button" onClick={deleteConcept.bind(this)}>
-                Delete
-              </button>
+              <Controls.DeleteButton
+                style={deleteButtonStyle}
+                onClick={deleteConcept.bind(this)}
+              />
             )}
           </form>
 
@@ -1341,21 +1354,20 @@ class ConceptForm extends React.Component {
             <div>
               <hr />
               <p>Retire Concept</p>
-              <label htmlFor="retireReason">
-                Reason:
-                <input
-                  type="text"
-                  id="retireReason"
-                  name="retireReason"
-                  onChange={retireReasonChangeHandler.bind(this)}
-                  value={getValueFor(concept.retireReason)}
-                />
-              </label>
+              <TextField
+                label="Reason"
+                type="text"
+                id="retireReason"
+                name="retireReason"
+                onChange={retireReasonChangeHandler.bind(this)}
+                value={getValueFor(concept.retireReason)}
+              />
               <br />
 
-              <button type="button" onClick={retireConcept.bind(this)}>
-                Retire
-              </button>
+              <Controls.RetireButton
+                type="button"
+                onClick={retireConcept.bind(this)}
+              />
             </div>
           )}
         </Paper>

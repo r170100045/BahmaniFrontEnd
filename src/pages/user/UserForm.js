@@ -1,17 +1,30 @@
 import {
+  Button,
   Checkbox,
+  FormControl,
   FormControlLabel,
+  FormLabel,
   Grid,
   Paper,
+  Radio,
+  RadioGroup,
   TextField,
 } from "@material-ui/core";
 import { Redirect, withRouter } from "react-router-dom";
+import {
+  checkboxGroupHeading,
+  checkboxLabelStyle,
+  deleteButtonStyle,
+  inputInfoStyle,
+  paperStyle,
+  subHeadingStyle,
+} from "../../constants/formStyling";
 import { getPersonById, getUserById } from "../../services/userService";
 
+import Controls from "../../components/controls/Controls";
 import { GET_VALUE } from "../../constants/otherConstants";
 import React from "react";
 import { getRoles } from "../../services/roleService";
-import { paperStyle } from "../../constants/formStyling";
 
 class UserForm extends React.Component {
   constructor(props) {
@@ -339,7 +352,6 @@ class UserForm extends React.Component {
     return (
       <React.Fragment>
         {error && <p>Fill the required fields</p>}
-        <p>User Management</p>
 
         {user.retired && (
           <span>This user account is disabled and the user cannot log in.</span>
@@ -349,57 +361,70 @@ class UserForm extends React.Component {
           <form>
             <fieldset>
               <legend>Demographic Info</legend>
-              <label htmlFor="givenName">Given*: </label>
-              <input
+              <TextField
+                label="Given"
                 type="text"
                 id="givenName"
                 name="givenName"
                 onChange={personInputChangeHandler}
                 value={GET_VALUE(user.person.givenName)}
+                required
               />
               <br />
-
-              <label htmlFor="middleName">Middle: </label>
-              <input
+              <TextField
+                label="Middle"
                 type="text"
                 id="middleName"
                 name="middleName"
                 onChange={personInputChangeHandler}
                 value={GET_VALUE(user.person.middleName)}
+                required
               />
               <br />
-
-              <label htmlFor="familyName">Family Name*: </label>
-              <input
+              <TextField
+                label="Family Name"
                 type="text"
                 id="familyName"
                 name="familyName"
                 onChange={personInputChangeHandler}
                 value={GET_VALUE(user.person.familyName)}
+                required
               />
               <br />
-
-              <span>
-                Gender*:{" "}
-                <input
-                  id="male"
-                  type="radio"
-                  name="gender"
-                  value="M"
-                  checked={user.person.gender === "M" ? true : false}
+              <br />
+              <FormControl>
+                <FormLabel id="demo-radio-buttons-group-label">
+                  Gender
+                </FormLabel>
+                <RadioGroup
+                  aria-labelledby="demo-radio-buttons-group-label"
+                  defaultValue="female"
+                  name="radio-buttons-group"
+                  row
                   onChange={personInputChangeHandler}
-                />
-                <label htmlFor="male">Male</label>
-                <input
-                  id="female"
-                  type="radio"
-                  name="gender"
-                  value="F"
-                  checked={user.person.gender === "F" ? true : false}
-                  onChange={personInputChangeHandler}
-                />
-                <label htmlFor="female">Female</label>
-              </span>
+                >
+                  <FormControlLabel
+                    control={<Radio />}
+                    label="Male"
+                    id="male"
+                    type="radio"
+                    name="gender"
+                    value="M"
+                    checked={user.person.gender === "M" ? true : false}
+                    onChange={personInputChangeHandler}
+                  />
+                  <FormControlLabel
+                    control={<Radio />}
+                    label="Female"
+                    id="female"
+                    type="radio"
+                    name="gender"
+                    value="F"
+                    checked={user.person.gender === "F" ? true : false}
+                    onChange={personInputChangeHandler}
+                  />
+                </RadioGroup>
+              </FormControl>
               <br />
             </fieldset>
 
@@ -426,7 +451,9 @@ class UserForm extends React.Component {
               <div>
                 <span>System Id: </span>{" "}
                 {userId === "add" ? (
-                  <span>System Id will be generated after saving</span>
+                  <span style={inputInfoStyle}>
+                    System Id will be generated after saving
+                  </span>
                 ) : (
                   <span>{user.systemId}</span>
                 )}
@@ -441,44 +468,51 @@ class UserForm extends React.Component {
                 onChange={userInputChangeHandler}
                 value={GET_VALUE(user.username)}
               />
-              <span>User can log in with either Username or System Id</span>
               <br />
-
-              <label htmlFor="changePassword">Change Password:</label>
-              <input
-                type="checkbox"
-                id="changePassword"
-                name="changePassword"
-                onChange={(e) => stateChangeHandler(e, "checked")}
-                checked={GET_VALUE(changePassword)}
+              <span style={inputInfoStyle}>
+                *User can log in with either Username or System Id
+              </span>
+              <br />
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    id="changePassword"
+                    name="changePassword"
+                    onChange={(e) => stateChangeHandler(e, "checked")}
+                    checked={GET_VALUE(changePassword)}
+                  />
+                }
+                label={<span style={checkboxLabelStyle}>Change Password</span>}
               />
               <br />
 
               {changePassword && (
                 <div>
-                  <label htmlFor="password">User's Password: </label>
-                  <input
+                  <TextField
+                    label="User's Password"
                     type="password"
                     id="password"
                     name="password"
                     onChange={stateChangeHandler}
                     value={GET_VALUE(password)}
                   />
-                  <span>
+                  <br />
+                  <span style={inputInfoStyle}>
                     Password should be 8 characters long and should have both
                     upper and lower case characters , at least one digit , at
                     least one non digit
                   </span>
                   <br />
-                  <label htmlFor="passwordRetype">Confirm Password: </label>
-                  <input
+                  <TextField
+                    label="Confirm Password"
                     type="password"
                     id="passwordRetype"
                     name="passwordRetype"
                     onChange={stateChangeHandler}
                     value={GET_VALUE(passwordRetype)}
                   />
-                  <span>
+                  <br />
+                  <span style={inputInfoStyle}>
                     Retype the password (for accuracy). It should match the
                     password entered above
                   </span>
@@ -486,24 +520,29 @@ class UserForm extends React.Component {
                 </div>
               )}
 
-              <label htmlFor="forcePasswordChange">
-                Force Password Change{" "}
-              </label>
-              <input
-                type="checkbox"
-                id="forcePasswordChange"
-                name="forcePasswordChange"
-                checked={user.forcePasswordChange}
-                onChange={(e) => userInputChangeHandler(e, "checked")}
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    type="checkbox"
+                    id="forcePasswordChange"
+                    name="forcePasswordChange"
+                    checked={user.forcePasswordChange}
+                    onChange={(e) => userInputChangeHandler(e, "checked")}
+                  />
+                }
+                label={
+                  <span style={checkboxLabelStyle}>Force Password Change</span>
+                }
               />
-              <span>
+              <br />
+              <span style={inputInfoStyle}>
                 Optionally require that this user change their password on next
                 login
               </span>
               <br />
 
               <div>
-                <span>Roles: </span>
+                <span style={checkboxGroupHeading}>Roles: </span>
                 <span>
                   {/* <ul>
                     {roles.map((el, index) => (
@@ -536,7 +575,9 @@ class UserForm extends React.Component {
                                 }
                               />
                             }
-                            label={el.role}
+                            label={
+                              <span style={checkboxLabelStyle}>{el.role}</span>
+                            }
                           />
                         </div>
                       </Grid>
@@ -545,66 +586,58 @@ class UserForm extends React.Component {
                 </span>
               </div>
 
-              <button type="button" onClick={toggleAdvancedOptions.bind(this)}>
+              <Button
+                variant="outlined"
+                type="button"
+                onClick={toggleAdvancedOptions.bind(this)}
+              >
                 {getAdvancedOptionsText}
-              </button>
+              </Button>
             </fieldset>
 
             {showAdvancedOptions && (
               <div>
                 <div>
-                  <span>
-                    <label htmlFor="secretQuestion">Secret Question: </label>
-                    <input
-                      type="text"
-                      id="secretQuestion"
-                      name="secretQuestion"
-                      onChange={userInputChangeHandler}
-                      value={GET_VALUE(user.secretQuestion)}
-                    />
-                  </span>
-                  <span>Optional</span>
+                  <TextField
+                    label="Secret Question"
+                    type="text"
+                    id="secretQuestion"
+                    name="secretQuestion"
+                    onChange={userInputChangeHandler}
+                    value={GET_VALUE(user.secretQuestion)}
+                  />
                 </div>
                 <div>
-                  <span>
-                    <label htmlFor="secretAnswer">Secret Answer: </label>
-                    <input
-                      type="text"
-                      id="secretAnswer"
-                      name="secretAnswer"
-                      onChange={userInputChangeHandler}
-                      value={GET_VALUE(user.secretAnswer)}
-                    />
-                  </span>
-                  <span>Optional</span>
+                  <TextField
+                    label="Secret Answer"
+                    type="text"
+                    id="secretAnswer"
+                    name="secretAnswer"
+                    onChange={userInputChangeHandler}
+                    value={GET_VALUE(user.secretAnswer)}
+                  />
                 </div>
                 <div>
                   <span>UUID: </span>
                   <span>{user.uuid}</span>
                 </div>
                 <div>
-                  <span>User Properties</span>
+                  <span style={checkboxGroupHeading}>User Properties</span>
                   <span>
-                    <div>
+                    {/* <div>
                       <span>Name </span>
                       <span>Value</span>
-                    </div>
+                    </div> */}
                     {user.userProperty.map((uProperty, index) => (
                       <div key={index}>
-                        <span>
-                          <label htmlFor={uProperty.property}>
-                            {uProperty.property}
-                          </label>
-                          <input
-                            type="text"
-                            id={uProperty.property}
-                            name={uProperty.property}
-                            onChange={(e) =>
-                              userPropertyChangeHandler(e, index)
-                            }
-                            value={GET_VALUE(uProperty.propertyValue)}
-                          />
-                        </span>
+                        <TextField
+                          label={uProperty.property}
+                          type="text"
+                          id={uProperty.property}
+                          name={uProperty.property}
+                          onChange={(e) => userPropertyChangeHandler(e, index)}
+                          value={GET_VALUE(uProperty.propertyValue)}
+                        />
                       </div>
                     ))}
                   </span>
@@ -618,205 +651,161 @@ class UserForm extends React.Component {
                 <div>
                   <span>System Id: </span>{" "}
                   {userId === "add" ? (
-                    <span>System Id will be generated after saving</span>
+                    <span style={inputInfoStyle}>
+                      System Id will be generated after saving
+                    </span>
                   ) : (
                     <span>{user.systemId}</span>
                   )}
                 </div>
                 <br />
-
-                <label htmlFor="username">Username: </label>
-                <input
+                <TextField
+                  label="Username"
                   type="text"
                   id="username"
                   name="username"
                   onChange={userInputChangeHandler}
                   value={GET_VALUE(user.username)}
                 />
-                <span>User can log in with either Username or System Id</span>
                 <br />
-                <label htmlFor="password">User's Password: </label>
-                <input
+                <span style={inputInfoStyle}>
+                  User can log in with either Username or System Id
+                </span>
+                <br />
+                <TextField
+                  label="User's Password"
                   type="password"
                   id="password"
                   name="password"
                   onChange={stateChangeHandler}
                   value={GET_VALUE(password)}
                 />
-                <span>
+                <br />
+                <span style={inputInfoStyle}>
                   Password should be 8 characters long and should have both
                   upper and lower case characters , at least one digit , at
                   least one non digit
                 </span>
                 <br />
-                <label htmlFor="passwordRetype">Confirm Password: </label>
-                <input
+                <TextField
+                  label="Confirm Password"
                   type="password"
                   id="passwordRetype"
                   name="passwordRetype"
                   onChange={stateChangeHandler}
                   value={GET_VALUE(passwordRetype)}
                 />
-                <span>
+                <br />
+                <span style={inputInfoStyle}>
                   Retype the password (for accuracy). It should match the
                   password entered above
                 </span>
                 <br />
-                <label htmlFor="forcePasswordChange">
-                  Force Password Change{" "}
-                </label>
-                <input
-                  type="checkbox"
-                  id="forcePasswordChange"
-                  name="forcePasswordChange"
-                  checked={user.forcePasswordChange}
-                  onChange={(e) => userInputChangeHandler(e, "checked")}
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      id="forcePasswordChange"
+                      name="forcePasswordChange"
+                      checked={user.forcePasswordChange}
+                      onChange={(e) => userInputChangeHandler(e, "checked")}
+                    />
+                  }
+                  label={
+                    <span style={checkboxLabelStyle}>
+                      Force Password Change
+                    </span>
+                  }
                 />
                 <br />
 
                 <div>
-                  <span>Roles: </span>
-                  <span>
-                    <ul>
-                      {roles.map((el, index) => (
+                  <span style={checkboxGroupHeading}>Roles: </span>
+                  <Grid container>
+                    {roles.map((el, index) => (
+                      <Grid item md={4} xs={12} sm={6}>
                         <div key={el.role}>
-                          <input
-                            type="checkbox"
-                            name={el.role}
-                            checked={el.checked}
-                            id={el.role}
-                            onChange={(e) => userRoleChangeHandler(e, index)}
-                          />{" "}
-                          <label htmlFor={el.role}>{el.role}</label>
+                          <FormControlLabel
+                            control={
+                              <Checkbox
+                                type="checkbox"
+                                name={el.role}
+                                checked={el.checked}
+                                id={el.role}
+                                onChange={(e) =>
+                                  userRoleChangeHandler(e, index)
+                                }
+                              />
+                            }
+                            label={
+                              <span style={checkboxLabelStyle}>{el.role}</span>
+                            }
+                          />
                         </div>
-                      ))}
-                    </ul>
-                  </span>
+                      </Grid>
+                    ))}
+                  </Grid>
                 </div>
 
-                <button
-                  type="button"
+                <Button
+                  variant="outlined"
                   onClick={toggleAdvancedOptions.bind(this)}
                 >
                   {getAdvancedOptionsText}
-                </button>
+                </Button>
               </fieldset>
-            )}
-
-            {showAdvancedOptions && (
-              <div>
-                <div>
-                  <span>
-                    <label htmlFor="secretQuestion">Secret Question: </label>
-                    <input
-                      type="text"
-                      id="secretQuestion"
-                      name="secretQuestion"
-                      onChange={userInputChangeHandler}
-                      value={GET_VALUE(user.secretQuestion)}
-                    />
-                  </span>
-                  <span>Optional</span>
-                </div>
-                <div>
-                  <span>
-                    <label htmlFor="secretAnswer">Secret Answer: </label>
-                    <input
-                      type="text"
-                      id="secretAnswer"
-                      name="secretAnswer"
-                      onChange={userInputChangeHandler}
-                      value={GET_VALUE(user.secretAnswer)}
-                    />
-                  </span>
-                  <span>Optional</span>
-                </div>
-                <div>
-                  <span>UUID: </span>
-                  <span>{user.uuid}</span>
-                </div>
-                <div>
-                  <span>User Properties</span>
-                  <span>
-                    <div>
-                      <span>Name </span>
-                      <span>Value</span>
-                    </div>
-                    {user.userProperty.map((uProperty, index) => (
-                      <div key={index}>
-                        <span>
-                          <label htmlFor={uProperty.property}>
-                            {uProperty.property}
-                          </label>
-                          <input
-                            type="text"
-                            id={uProperty.property}
-                            name={uProperty.property}
-                            onChange={(e) =>
-                              userPropertyChangeHandler(e, index)
-                            }
-                            value={GET_VALUE(uProperty.propertyValue)}
-                          />
-                        </span>
-                      </div>
-                    ))}
-                  </span>
-                </div>
-              </div>
             )}
 
             {userId !== "add" && (
               <fieldset>
                 <legend>Creation Info</legend>
                 <div>
-                  <span>Created By</span>
+                  <span>Created By: </span>
                   <span>{user.createdBy}</span>
                 </div>
                 <div>
-                  <span>Date Created </span>
+                  <span>Date Created: </span>
                   <span>{user.dateCreated}</span>
                 </div>
               </fieldset>
             )}
 
-            <button type="button" onClick={saveUser.bind(this)}>
-              Save
-            </button>
-            <button type="button" onClick={cancelButtonHandler.bind(this)}>
-              Cancel
-            </button>
-            {userId !== "add" && (
-              <button type="button" onClick={deleteUser.bind(this)}>
-                Delete
-              </button>
-            )}
+            <Controls.SaveButton onClick={saveUser.bind(this)} />
+            <Controls.CancelButton onClick={cancelButtonHandler.bind(this)} />
           </form>
         </Paper>
-
-        <hr />
+        {userId !== "add" && (
+          <Controls.DeleteButton
+            style={deleteButtonStyle}
+            onClick={deleteUser.bind(this)}
+          />
+        )}
 
         {userId !== "add" && !user.retired && (
-          <fieldset>
-            <p>Disable Account</p>
-            <label htmlFor="retireReason">Reason:*</label>
-            <input
-              type="text"
-              id="retireReason"
-              name="retireReason"
-              onChange={userInputChangeHandler}
-              value={GET_VALUE(user.retireReason)}
-            />
-            <br />
-            <button type="button" onClick={retireUser.bind(this)}>
-              Disable Account
-            </button>
-          </fieldset>
+          <Paper style={paperStyle}>
+            <fieldset>
+              <p style={subHeadingStyle}>Disable Account</p>
+              <TextField
+                label="Reason"
+                type="text"
+                id="retireReason"
+                name="retireReason"
+                onChange={userInputChangeHandler}
+                value={GET_VALUE(user.retireReason)}
+                required
+              />
+              <br />
+              <br />
+              <Button variant="outlined" onClick={retireUser.bind(this)}>
+                Disable Account
+              </Button>
+            </fieldset>
+          </Paper>
         )}
 
         {userId !== "add" && user.retired && (
-          <button type="button" onClick={unretireUser.bind(this)}>
+          <Button variant="outlined" onClick={unretireUser.bind(this)}>
             Enable Account
-          </button>
+          </Button>
         )}
       </React.Fragment>
     );

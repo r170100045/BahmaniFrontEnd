@@ -2,6 +2,9 @@ import { Paper, TextField } from "@material-ui/core";
 import { Redirect, withRouter } from "react-router-dom";
 import {
   buttonGroupStyle,
+  deleteButtonStyle,
+  globalError,
+  inputError,
   inputStyle,
   paperStyle,
   subHeadingStyle,
@@ -13,6 +16,7 @@ import {
   updatePatientRelationshipTypeById,
 } from "../../services/patientRelationshipTypeService";
 
+import Controls from "../../components/controls/Controls";
 import ErrorLoadingData from "../../utils/ErrorLoadingData";
 import { GET_VALUE } from "../../constants/otherConstants";
 import LoadingData from "../../utils/LoadingData";
@@ -286,7 +290,9 @@ class PatientRelationshipTypeForm extends React.Component {
     return (
       <React.Fragment>
         <Paper style={paperStyle}>
-          {error && <span>{errors.globalErrorMessage}</span>}
+          {error && (
+            <span style={globalError}>{errors.globalErrorMessage}</span>
+          )}
 
           <TextField
             style={inputStyle}
@@ -297,7 +303,9 @@ class PatientRelationshipTypeForm extends React.Component {
             value={GET_VALUE(relationshipType.aisToB)}
             onChange={(e) => relationshipTypeChangeHandler(e)}
           />
-          <span>{error && errors.aisToBHasError && errors.aisToB}</span>
+          <span style={inputError}>
+            {error && errors.aisToBHasError && errors.aisToB}
+          </span>
           <br />
 
           <TextField
@@ -309,7 +317,9 @@ class PatientRelationshipTypeForm extends React.Component {
             value={GET_VALUE(relationshipType.bisToA)}
             onChange={(e) => relationshipTypeChangeHandler(e)}
           />
-          <span>{error && errors.bisToAHasError && errors.bisToA}</span>
+          <span style={inputError}>
+            {error && errors.bisToAHasError && errors.bisToA}
+          </span>
           <br />
 
           <TextField
@@ -323,26 +333,20 @@ class PatientRelationshipTypeForm extends React.Component {
             value={GET_VALUE(relationshipType.description)}
             onChange={(e) => relationshipTypeChangeHandler(e)}
           />
-          <span>
+          <span style={inputError}>
             {error && errors.descriptionHasError && errors.description}
           </span>
           <br />
 
           <div style={buttonGroupStyle}>
-            <button type="button" onClick={() => saveRelationshipType()}>
-              Save Relationship Type
-            </button>
-            <button type="button" onClick={() => cancelRelationshipType()}>
-              Cancel
-            </button>
+            <Controls.SaveButton onClick={() => saveRelationshipType()} />
+            <Controls.CancelButton onClick={() => cancelRelationshipType()} />
           </div>
           <br />
         </Paper>
 
         {relationshipTypeId !== "add" && !relationshipType.retired && (
           <Paper style={paperStyle}>
-            <hr />
-
             <p style={subHeadingStyle}>Retire Relationship Type</p>
 
             <TextField
@@ -360,9 +364,10 @@ class PatientRelationshipTypeForm extends React.Component {
             <br />
 
             <div style={buttonGroupStyle}>
-              <button type="button" onClick={() => retireRelationshipType()}>
-                Retire Relationship Type
-              </button>
+              <Controls.RetireButton
+                retired={relationshipType.retired}
+                onClick={() => retireRelationshipType()}
+              />
             </div>
             <br />
           </Paper>
@@ -371,24 +376,20 @@ class PatientRelationshipTypeForm extends React.Component {
           <Paper style={paperStyle}>
             <p style={subHeadingStyle}>Unretire Relationship Type</p>
             <div style={buttonGroupStyle}>
-              <button type="button" onClick={() => unretireRelationshipType()}>
-                Unretire Relationship Type
-              </button>
+              <Controls.RetireButton
+                retired={relationshipType.retired}
+                onClick={() => unretireRelationshipType()}
+              />
             </div>
             <br />
           </Paper>
         )}
 
         {relationshipTypeId !== "add" && (
-          <Paper style={paperStyle}>
-            <p style={subHeadingStyle}>Delete Relationship Type Forever</p>
-            <div style={buttonGroupStyle}>
-              <button type="button" onClick={() => deleteRelationshipType()}>
-                Delete Relationship Type Forever
-              </button>
-            </div>
-            <br />
-          </Paper>
+          <Controls.DeleteButton
+            style={deleteButtonStyle}
+            onClick={() => deleteRelationshipType()}
+          />
         )}
       </React.Fragment>
     );

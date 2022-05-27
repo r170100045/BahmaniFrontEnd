@@ -9,6 +9,7 @@ import { Redirect, withRouter } from "react-router-dom";
 import {
   buttonGroupStyle,
   buttonStyle,
+  deleteButtonStyle,
   globalError,
   inputError,
   inputStyle,
@@ -236,7 +237,9 @@ class PrivilegeForm extends React.Component {
     return (
       <React.Fragment>
         <Paper style={paperStyle}>
-          {error && <span>{errors.globalErrorMessage}</span>}
+          {error && (
+            <span style={globalError}>{errors.globalErrorMessage}</span>
+          )}
 
           <TextField
             style={inputStyle}
@@ -247,6 +250,7 @@ class PrivilegeForm extends React.Component {
             disabled={privilegeId === "add" ? false : true}
             value={GET_VALUE(privilege.privilege)}
             onChange={(e) => privilegeChangeHandler(e)}
+            required
           />
           <span style={inputError}>
             {error && errors.privilegeHasError && errors.privilege}
@@ -272,12 +276,10 @@ class PrivilegeForm extends React.Component {
           <br />
         </Paper>
         {privilegeId !== "add" && (
-          <div style={paperStyle}>
-            <div>
-              <Controls.DeleteButton onClick={() => deletePrivilege()} />
-            </div>
-            <br />
-          </div>
+          <Controls.DeleteButton
+            style={deleteButtonStyle}
+            onClick={() => deletePrivilege()}
+          />
         )}
       </React.Fragment>
     );

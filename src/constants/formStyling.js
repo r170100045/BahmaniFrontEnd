@@ -8,11 +8,14 @@ export const paperStyle = {
   flexDirection: "column",
 };
 export const globalError = {
-  marginLeft: "30px",
   color: red[400],
+  backgroundColor: "bisque",
+  width: "fit-content",
 };
 export const inputError = {
   color: red[400],
+  backgroundColor: "bisque",
+  width: "fit-content",
 };
 export const conceptPaperStyle = {
   margin: "10px 30px",
@@ -34,4 +37,22 @@ export const buttonGroupStyle = {};
 export const buttonStyle = {
   marginBottom: 7,
 };
-export const subHeadingStyle = {};
+export const subHeadingStyle = { fontSize: "1.2rem" };
+export const checkboxLabelStyle = {
+  fontSize: "0.875rem",
+};
+
+export const inputInfoStyle = {
+  fontStyle: "italic",
+  color: "rgba(0, 0, 0, 0.54)",
+};
+export const checkboxGroupHeading = {
+  fontSize: "1.25rem",
+  height: "0.25rem",
+};
+export const deleteButtonStyle = {
+  marginLeft: "30px",
+};
+export const unretireStyleHeading = {
+  marginLeft: "30px",
+};

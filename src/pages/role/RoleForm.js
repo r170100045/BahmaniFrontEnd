@@ -9,7 +9,11 @@ import {
 import { Redirect, withRouter } from "react-router-dom";
 import {
   buttonGroupStyle,
+  checkboxLabelStyle,
   conceptPaperStyle,
+  deleteButtonStyle,
+  globalError,
+  inputError,
   inputStyle,
   paperStyle,
 } from "../../constants/formStyling";
@@ -414,7 +418,9 @@ class RoleForm extends React.Component {
     return (
       <React.Fragment>
         <Paper style={paperStyle}>
-          {error && <span>{errors.globalErrorMessage}</span>}
+          {error && (
+            <span style={globalError}>{errors.globalErrorMessage}</span>
+          )}
           <TextField
             style={inputStyle}
             label="Role"
@@ -425,7 +431,9 @@ class RoleForm extends React.Component {
             disabled={roleId === "add" ? false : true}
             onChange={(e) => roleChangeHandler(e)}
           />
-          <span>{error && errors.roleHasError && errors.role}</span>
+          <span style={inputError}>
+            {error && errors.roleHasError && errors.role}
+          </span>
           <br />
 
           <label htmlFor="description">
@@ -459,9 +467,11 @@ class RoleForm extends React.Component {
           )}
 
           <div>
-            <p>Inherited Roles:</p>
+            <p>
+              Inherited Roles: ({role.role} inherits privileges from these
+              roles)
+            </p>
             <div>
-              <p>{role.role} inherits privileges from these roles</p>
               <ul>
                 {inheritedRoles.map((el, index) => (
                   <div key={el.role}>
@@ -480,33 +490,33 @@ class RoleForm extends React.Component {
           </div>
 
           <div>
-            <p>Privileges:</p>
+            <p>
+              Privileges: (Greyed out checkboxes represent privileges inherited
+              from other roles, these cannot be removed individually.)
+            </p>
             <div>
-              <p>
-                Greyed out checkboxes represent privileges inherited from other
-                roles, these cannot be removed individually.
-              </p>
+              <p></p>
               <Grid container spacing={1}>
                 {allPrivileges.map((el, index) => (
-                  <Grid item md={4} xs={12} sm={6}>
-                    <div key={el.privilege}>
-                      <FormControlLabel
-                        control={
-                          <Checkbox
-                            label={el.privilege}
-                            type="checkbox"
-                            name={el.privilege}
-                            checked={el.checked}
-                            disabled={el.disabled}
-                            id={el.privilege}
-                            onChange={(e) =>
-                              roleRolePrivilegesChangeHandler(e, index)
-                            }
-                          />
-                        }
-                        label={el.privilege}
-                      />
-                    </div>
+                  <Grid key={el.privilege} item md={4} xs={12} sm={6}>
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          label={el.privilege}
+                          type="checkbox"
+                          name={el.privilege}
+                          checked={el.checked}
+                          disabled={el.disabled}
+                          id={el.privilege}
+                          onChange={(e) =>
+                            roleRolePrivilegesChangeHandler(e, index)
+                          }
+                        />
+                      }
+                      label={
+                        <span style={checkboxLabelStyle}>{el.privilege}</span>
+                      }
+                    />
                   </Grid>
                 ))}
               </Grid>
@@ -524,14 +534,16 @@ class RoleForm extends React.Component {
           <div style={buttonGroupStyle}>
             <Controls.SaveButton onClick={() => saveRole()} />
             <Controls.CancelButton onClick={() => cancelRole()} />
-
-            {roleId !== "add" && (
-              <Controls.DeleteButton onClick={() => deleteRole()} />
-            )}
           </div>
 
           <br />
         </Paper>
+        {roleId !== "add" && (
+          <Controls.DeleteButton
+            style={deleteButtonStyle}
+            onClick={() => deleteRole()}
+          />
+        )}
       </React.Fragment>
     );
   }
