@@ -98,7 +98,7 @@ class VisitTypeForm extends React.Component {
         function () {
           this.setState({ redirect: this.viewAll });
         }.bind(this),
-        5000000
+        500
       );
     });
   }
@@ -151,7 +151,7 @@ class VisitTypeForm extends React.Component {
   // component mount ends
 
   // save starts
-  saveVisitType(successMessage = "updated") {
+  saveVisitType(successMessage = "UPDATED") {
     const { visitTypeId, visitType } = this.state;
     this.validate(visitType).then(() => {
       const { error } = this.state;
@@ -166,7 +166,7 @@ class VisitTypeForm extends React.Component {
   insertVisitTypeWithData(visitType) {
     insertVisitType(visitType)
       .then(() => {
-        this.successAndRedirect("saved");
+        this.successAndRedirect("SAVED");
       })
       .catch((error) => {
         console.log(error);
@@ -191,7 +191,7 @@ class VisitTypeForm extends React.Component {
     const { visitType } = this.state;
     visitType.retired = true;
     this.setState({ visitType }, () => {
-      this.saveVisitType("retired");
+      this.saveVisitType("RETIRED");
     });
   }
 
@@ -200,7 +200,7 @@ class VisitTypeForm extends React.Component {
     visitType.retireReason = null;
     visitType.retired = false;
     this.setState({ visitType }, () => {
-      this.saveVisitType("un-retired");
+      this.saveVisitType("UN-RETIRED");
     });
   }
 
@@ -212,7 +212,7 @@ class VisitTypeForm extends React.Component {
     const { visitTypeId } = this.state;
     deleteVisitTypeById(visitTypeId)
       .then(() => {
-        this.successAndRedirect("deleted");
+        this.successAndRedirect("DELETED");
       })
       .catch((error) => {
         console.log(error);
@@ -338,13 +338,12 @@ class VisitTypeForm extends React.Component {
 
         {visitTypeId !== "add" && visitType.retired && (
           <Paper style={paperStyle}>
-            <hr />
-
             <p style={subHeadingStyle}>Unretire Visit Type</p>
             <div style={buttonGroupStyle}>
-              <Button type="button" onClick={() => unretireVisitType()}>
-                Unretire Visit Type
-              </Button>
+              <Controls.RetireButton
+                retired={visitType.retired}
+                onClick={() => unretireVisitType()}
+              />
             </div>
 
             <br />

@@ -9,6 +9,7 @@ import {
 import { Redirect, withRouter } from "react-router-dom";
 import {
   buttonGroupStyle,
+  checkboxGroupHeading,
   checkboxLabelStyle,
   conceptPaperStyle,
   deleteButtonStyle,
@@ -430,6 +431,7 @@ class RoleForm extends React.Component {
             value={GET_VALUE(role.role)}
             disabled={roleId === "add" ? false : true}
             onChange={(e) => roleChangeHandler(e)}
+            required
           />
           <span style={inputError}>
             {error && errors.roleHasError && errors.role}
@@ -467,7 +469,7 @@ class RoleForm extends React.Component {
           )}
 
           <div>
-            <p>
+            <p style={checkboxGroupHeading}>
               Inherited Roles: ({role.role} inherits privileges from these
               roles)
             </p>
@@ -490,19 +492,17 @@ class RoleForm extends React.Component {
           </div>
 
           <div>
-            <p>
+            <p style={checkboxGroupHeading}>
               Privileges: (Greyed out checkboxes represent privileges inherited
               from other roles, these cannot be removed individually.)
             </p>
             <div>
-              <p></p>
               <Grid container spacing={1}>
                 {allPrivileges.map((el, index) => (
                   <Grid key={el.privilege} item md={4} xs={12} sm={6}>
                     <FormControlLabel
                       control={
                         <Checkbox
-                          label={el.privilege}
                           type="checkbox"
                           name={el.privilege}
                           checked={el.checked}

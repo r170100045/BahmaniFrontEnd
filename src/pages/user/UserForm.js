@@ -617,6 +617,7 @@ class UserForm extends React.Component {
                     value={GET_VALUE(user.secretAnswer)}
                   />
                 </div>
+
                 <div>
                   <span>UUID: </span>
                   <span>{user.uuid}</span>

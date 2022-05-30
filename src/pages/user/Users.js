@@ -34,7 +34,7 @@ const Users = () => {
         <p>
           {rowData.userRoles.map((role, index) =>
             index === rowData.userRoles.length - 1 ? (
-              <span>{role}</span>
+              <span key={index}>{role}</span>
             ) : (
               <span key={index}>{role + " | "}</span>
             )

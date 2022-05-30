@@ -341,6 +341,7 @@ class DrugForm extends React.Component {
             name="name"
             onChange={(e) => drugChangeHandler(e)}
             value={GET_VALUE(drug.name)}
+            required
           />
           <span style={inputError}>
             {error && errors.nameHasError && errors.name}
@@ -348,7 +349,7 @@ class DrugForm extends React.Component {
           <br />
 
           <SingleSelect
-            label="Concept*"
+            label="Concept"
             style={inputStyle}
             id="conceptId"
             name="conceptId"
@@ -359,6 +360,7 @@ class DrugForm extends React.Component {
             }
             options={options}
             filterOption={FILTER_OPTIONS}
+            required
           />
           <span style={inputError}>
             {error && errors.conceptIdHasError && errors.conceptId}
@@ -414,7 +416,6 @@ class DrugForm extends React.Component {
             onChange={(e) => drugChangeHandler(e)}
             value={GET_VALUE(drug.minimumDailyDose)}
             step="any"
-            required
           />
           <br />
 

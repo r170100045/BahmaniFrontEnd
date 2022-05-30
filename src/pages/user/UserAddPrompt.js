@@ -2,9 +2,11 @@ import { Redirect, Link as RouterLink, withRouter } from "react-router-dom";
 import { paperStyle, subHeadingStyle } from "../../constants/formStyling";
 
 import { FILTER_OPTIONS } from "../../constants/otherConstants";
+import LoadingData from "../../utils/LoadingData";
 import { Paper } from "@material-ui/core";
 import React from "react";
 import Select from "react-select";
+import { SingleSelect } from "react-select-material-ui";
 import { getPersons } from "../../services/userService";
 
 class UserAddPrompt extends React.Component {
@@ -21,6 +23,8 @@ class UserAddPrompt extends React.Component {
 
     this.createNewUserFromPerson = this.createNewUserFromPerson.bind(this);
     this.createNewUser = this.createNewUser.bind(this);
+    this.personChangeHandler = this.personChangeHandler.bind(this);
+    this.cancelButtonHandler = this.cancelButtonHandler.bind(this);
   }
 
   componentDidMount() {
@@ -47,8 +51,8 @@ class UserAddPrompt extends React.Component {
       });
   }
 
-  personChangeHandler(selectedOption) {
-    this.setState({ personUUID: selectedOption.value }, () => {
+  personChangeHandler(selectedValue) {
+    this.setState({ personUUID: selectedValue }, () => {
       this.setState({ personNotSelected: false });
     });
   }
@@ -66,8 +70,12 @@ class UserAddPrompt extends React.Component {
   }
 
   render() {
-    const { personChangeHandler, createNewUserFromPerson, createNewUser } =
-      this;
+    const {
+      personChangeHandler,
+      createNewUserFromPerson,
+      createNewUser,
+      cancelButtonHandler,
+    } = this;
 
     const {
       redirect,
@@ -75,92 +83,58 @@ class UserAddPrompt extends React.Component {
       isLoading,
       personNotSelected,
       personUUID,
-      cancelButtonHandler,
     } = this.state;
 
     if (redirect) return <Redirect to={redirect} />;
 
-    if (isLoading) <p>Loading...</p>;
+    if (isLoading) return <LoadingData />;
 
     return (
       <React.Fragment>
         <Paper style={paperStyle}>
-          {/* <div> */}
           <div>
+            <div>
+              <p style={subHeadingStyle}>Add User</p>
+              <p>A User account must belong to a Person in the system</p>
+            </div>
+
             <div>
               <p>Create a new person</p>
               <button type="button" onClick={() => createNewUser()}>
-                <a href={`/user/edit/add/dummy`}>Next</a>
+                Next
               </button>
-              {/* <button type="button">
-                  <a href={`/user/edit/add/dummy`}>Next</a>
-                </button> */}
             </div>
+
             <div>
               <p>Use a person who already exists</p>
               <div>
-                <label htmlFor="personUUID">Which Person?: </label>
-                <div style={{ width: "300px", display: "inline-block" }}>
-                  <Select
-                    id="personUUID"
-                    name="personUUID"
-                    placeholder="Enter user name or uuid"
-                    onChange={personChangeHandler.bind(this)}
-                    options={personOptions}
-                    filterOption={FILTER_OPTIONS}
-                  />
-                </div>
+                <SingleSelect
+                  label=">Which Person?: "
+                  id="personUUID"
+                  name="personUUID"
+                  placeholder="Enter user name or uuid"
+                  onChange={(selectedValue) =>
+                    personChangeHandler(selectedValue)
+                  }
+                  options={personOptions}
+                  filterOption={FILTER_OPTIONS}
+                />
               </div>
-              <p style={subHeadingStyle}>Add User</p>
-              <p>A User account must belong to a Person in the system</p>
 
               <div>
-                <div>
-                  <p>Create a new person</p>
-                  <button
-                    type="button"
-                    disabled={personNotSelected}
-                    onClick={() => createNewUserFromPerson(personUUID)}
-                  >
-                    Next
-                  </button>
-                </div>
-                <div>
-                  <p>Use a person who already exists</p>
-                  <div>
-                    <label htmlFor="personUUID">Which Person?: </label>
-                    <div style={{ width: "300px", display: "inline-block" }}>
-                      <Select
-                        id="personUUID"
-                        name="personUUID"
-                        placeholder="Enter user name or uuid"
-                        onChange={personChangeHandler.bind(this)}
-                        options={personOptions}
-                        filterOption={FILTER_OPTIONS}
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <button type="button" disabled={personNotSelected}>
-                      <a
-                        href={`/user/edit/add/${personUUID}`}
-                        disabled={personNotSelected}
-                      >
-                        Next
-                      </a>
-                    </button>
-                  </div>
-                </div>
+                <button
+                  type="button"
+                  disabled={personNotSelected}
+                  onClick={() => createNewUserFromPerson(personUUID)}
+                >
+                  Next
+                </button>
               </div>
             </div>
+
             <div>
-              <button
-                type="button"
-                // onClick={cancelButtonHandler.bind(this)}
-              >
-                <a href={`/user/view/all/dummy`}>Cancel</a>
-                {/* Cancel */}
+              <button type="button" onClick={() => cancelButtonHandler()}>
+                Cancel
               </button>
             </div>
           </div>

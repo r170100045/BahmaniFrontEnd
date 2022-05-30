@@ -14,6 +14,13 @@ const PersonAttributeTypes = () => {
     {
       title: "Name",
       field: "name",
+      render: (rowData) => (
+        <p
+          style={{ textDecoration: rowData.retired ? "line-through" : "none" }}
+        >
+          {rowData.name}
+        </p>
+      ),
     },
     {
       title: "Format",

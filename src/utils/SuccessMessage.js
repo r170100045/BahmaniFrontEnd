@@ -22,9 +22,10 @@ class SuccessMessage extends React.Component {
             fontFamily: "Roboto",
             fontSize: 50,
             color: green[500],
+            padding: "60px 50px",
           }}
         >
-          <p> {this.props.action} successfully</p>
+          <span> {this.props.action} SUCCESSFULLY</span>
         </Paper>
       </div>
     );

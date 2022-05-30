@@ -8,13 +8,16 @@ export const paperStyle = {
   flexDirection: "column",
 };
 export const globalError = {
-  color: red[400],
-  backgroundColor: "bisque",
+  color: "red",
+  backgroundColor: "rgb(251 230 230)",
   width: "fit-content",
+  border: "1px solid red",
+  padding: "2px",
+  marginBottom: "10px",
 };
 export const inputError = {
   color: red[400],
-  backgroundColor: "bisque",
+  backgroundColor: "#f9ecec",
   width: "fit-content",
 };
 export const conceptPaperStyle = {
