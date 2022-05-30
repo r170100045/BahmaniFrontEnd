@@ -1,6 +1,8 @@
 import { Redirect, Link as RouterLink, withRouter } from "react-router-dom";
+import { paperStyle, subHeadingStyle } from "../../constants/formStyling";
 
 import { FILTER_OPTIONS } from "../../constants/otherConstants";
+import { Paper } from "@material-ui/core";
 import React from "react";
 import Select from "react-select";
 import { getPersons } from "../../services/userService";
@@ -82,39 +84,39 @@ class UserAddPrompt extends React.Component {
 
     return (
       <React.Fragment>
-        <p>User Management</p>
-        <div>
+        <Paper style={paperStyle}>
+          {/* <div> */}
           <div>
-            <p>Add User</p>
-            <p>A User account must belong to a Person in the system</p>
-
             <div>
-              <div>
-                <p>Create a new person</p>
-                <button type="button" onClick={() => createNewUser()}>
-                  <a href={`/user/edit/add/dummy`}>Next</a>
-                </button>
-                {/* <button type="button">
+              <p>Create a new person</p>
+              <button type="button" onClick={() => createNewUser()}>
+                <a href={`/user/edit/add/dummy`}>Next</a>
+              </button>
+              {/* <button type="button">
                   <a href={`/user/edit/add/dummy`}>Next</a>
                 </button> */}
-              </div>
+            </div>
+            <div>
+              <p>Use a person who already exists</p>
               <div>
-                <p>Use a person who already exists</p>
-                <div>
-                  <label htmlFor="personUUID">Which Person?: </label>
-                  <div style={{ width: "300px", display: "inline-block" }}>
-                    <Select
-                      id="personUUID"
-                      name="personUUID"
-                      placeholder="Enter user name or uuid"
-                      onChange={personChangeHandler.bind(this)}
-                      options={personOptions}
-                      filterOption={FILTER_OPTIONS}
-                    />
-                  </div>
+                <label htmlFor="personUUID">Which Person?: </label>
+                <div style={{ width: "300px", display: "inline-block" }}>
+                  <Select
+                    id="personUUID"
+                    name="personUUID"
+                    placeholder="Enter user name or uuid"
+                    onChange={personChangeHandler.bind(this)}
+                    options={personOptions}
+                    filterOption={FILTER_OPTIONS}
+                  />
                 </div>
+              </div>
+              <p style={subHeadingStyle}>Add User</p>
+              <p>A User account must belong to a Person in the system</p>
 
+              <div>
                 <div>
+                  <p>Create a new person</p>
                   <button
                     type="button"
                     disabled={personNotSelected}
@@ -123,20 +125,46 @@ class UserAddPrompt extends React.Component {
                     Next
                   </button>
                 </div>
+                <div>
+                  <p>Use a person who already exists</p>
+                  <div>
+                    <label htmlFor="personUUID">Which Person?: </label>
+                    <div style={{ width: "300px", display: "inline-block" }}>
+                      <Select
+                        id="personUUID"
+                        name="personUUID"
+                        placeholder="Enter user name or uuid"
+                        onChange={personChangeHandler.bind(this)}
+                        options={personOptions}
+                        filterOption={FILTER_OPTIONS}
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <button type="button" disabled={personNotSelected}>
+                      <a
+                        href={`/user/edit/add/${personUUID}`}
+                        disabled={personNotSelected}
+                      >
+                        Next
+                      </a>
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
+            <div>
+              <button
+                type="button"
+                // onClick={cancelButtonHandler.bind(this)}
+              >
+                <a href={`/user/view/all/dummy`}>Cancel</a>
+                {/* Cancel */}
+              </button>
+            </div>
           </div>
-          <div>
-            <button
-              type="button"
-              // onClick={cancelButtonHandler.bind(this)}
-            >
-              <RouterLink to={`/user/view/all/dummy`}>Cancel</RouterLink>
-              {/* <a href={`/user/view/all/dummy`}>Cancel</a> */}
-              {/* Cancel */}
-            </button>
-          </div>
-        </div>
+        </Paper>
       </React.Fragment>
     );
   }

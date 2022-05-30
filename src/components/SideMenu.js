@@ -24,7 +24,7 @@ const useStyles = makeStyles((theme) => ({
     fontSize: 16,
   },
   activeLink: {
-    backgroundColor: "#daaeae",
+    backgroundColor: "#daaeae80",
     textDecoration: "none",
     color: "#5f6163",
   },

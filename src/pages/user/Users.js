@@ -90,7 +90,7 @@ const Users = () => {
 
   return (
     <>
-      <div style={{ maxWidth: "90%", margin: "auto" }}>
+      <div style={{ maxWidth: "96%", margin: "auto" }}>
         <MaterialTable
           title="Users"
           data={users}

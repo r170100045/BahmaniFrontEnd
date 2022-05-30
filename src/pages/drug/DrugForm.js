@@ -1,15 +1,23 @@
+import {
+  Checkbox,
+  FormControlLabel,
+  Paper,
+  TextField,
+} from "@material-ui/core";
 import { FILTER_OPTIONS, GET_VALUE } from "../../constants/otherConstants";
-import { Paper, TextField } from "@material-ui/core";
 import { Redirect, withRouter } from "react-router-dom";
 import {
   buttonGroupStyle,
   buttonStyle,
+  checkboxLabelStyle,
+  deleteButtonStyle,
   globalError,
   inputError,
   inputStyle,
   labelStyle,
   paperStyle,
   subHeadingStyle,
+  unretireStyleHeading,
 } from "../../constants/formStyling";
 import {
   deleteDrugById,
@@ -357,16 +365,18 @@ class DrugForm extends React.Component {
           </span>
           <br />
 
-          <label htmlFor="combination" style={inputStyle}>
-            Combination:
-            <input
-              type="checkbox"
-              id="combination"
-              name="combination"
-              onChange={(e) => drugChangeHandler(e, "checked")}
-              checked={GET_VALUE(drug.combination)}
-            />
-          </label>
+          <FormControlLabel
+            control={
+              <Checkbox
+                type="checkbox"
+                id="combination"
+                name="combination"
+                onChange={(e) => drugChangeHandler(e, "checked")}
+                checked={GET_VALUE(drug.combination)}
+              />
+            }
+            label={<span style={checkboxLabelStyle}>Combination</span>}
+          />
           <br />
 
           <SingleSelect
@@ -395,49 +405,36 @@ class DrugForm extends React.Component {
           />
           <br />
 
-          <label htmlFor="minimumDailyDose" style={inputStyle}>
-            Minimum Daily Dose:
-            <input
-              type="number"
-              id="minimumDailyDose"
-              name="minimumDailyDose"
-              onChange={(e) => drugChangeHandler(e)}
-              value={GET_VALUE(drug.minimumDailyDose)}
-              step="any"
-            />
-          </label>
+          <TextField
+            style={inputStyle}
+            label="Minimum Daily Dose"
+            type="number"
+            id="minimumDailyDose"
+            name="minimumDailyDose"
+            onChange={(e) => drugChangeHandler(e)}
+            value={GET_VALUE(drug.minimumDailyDose)}
+            step="any"
+            required
+          />
           <br />
 
-          <label htmlFor="maximumDailyDose" style={inputStyle}>
-            Maximum Daily Dose:
-            <input
-              type="number"
-              id="maximumDailyDose"
-              name="maximumDailyDose"
-              onChange={(e) => drugChangeHandler(e)}
-              value={GET_VALUE(drug.maximumDailyDose)}
-              step="any"
-            />
-          </label>
+          <TextField
+            stylel={inputStyle}
+            label="Maximum Daily Dose"
+            type="number"
+            id="maximumDailyDose"
+            name="maximumDailyDose"
+            onChange={(e) => drugChangeHandler(e)}
+            value={GET_VALUE(drug.maximumDailyDose)}
+            step="any"
+          />
           <br />
+
           <div style={buttonGroupStyle}>
-            <button
-              type="button"
-              style={buttonStyle}
-              onClick={() => saveDrug()}
-            >
-              Save
-            </button>
-            <button
-              type="button"
-              style={buttonStyle}
-              onClick={() => cancelDrug()}
-            >
-              Cancel
-            </button>
+            <Controls.SaveButton onClick={() => saveDrug()} />
+            <Controls.CancelButton onClick={() => cancelDrug()} />
           </div>
         </Paper>
-        <hr />
 
         {drugId !== "add" && !drug.retired && (
           <Paper style={paperStyle}>
@@ -455,21 +452,19 @@ class DrugForm extends React.Component {
               {error && errors.retireReasonHasError && errors.retireReason}
             </span>
             <br />
+
             <div style={buttonGroupStyle}>
               <Controls.RetireButton
                 retired={drug.retired}
                 onClick={() => retireDrug()}
               />
             </div>
-
-            <hr />
+            <br />
           </Paper>
         )}
 
         {drugId !== "add" && drug.retired && (
           <Paper style={paperStyle}>
-            <hr />
-
             <p style={subHeadingStyle}>Unretire Drug</p>
             <div style={buttonGroupStyle}>
               <Controls.RetireButton
@@ -477,7 +472,6 @@ class DrugForm extends React.Component {
                 onClick={() => unretireDrug()}
               />
             </div>
-
             <br />
           </Paper>
         )}

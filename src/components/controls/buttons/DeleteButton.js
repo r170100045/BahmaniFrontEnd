@@ -1,4 +1,4 @@
-import { Button, makeStyles, withStyles } from "@material-ui/core";
+import { Button, Paper, makeStyles, withStyles } from "@material-ui/core";
 
 import DeleteIcon from "@material-ui/icons/Delete";
 import { red } from "@material-ui/core/colors";
@@ -8,7 +8,7 @@ const ColorButton = withStyles((theme) => ({
     color: red[700],
     backgroundColor: red[50],
     "&:hover": {
-      backgroundColor: red[150],
+      backgroundColor: "white",
     },
   },
 }))(Button);

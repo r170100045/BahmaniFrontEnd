@@ -12,7 +12,7 @@ export default function ConceptPage() {
       action={action}
       id={id}
       personId={personId}
-      title="Users"
+      title="User Management"
       viewAll={<Users />}
       addPrompt={<UserAddPrompt />}
       addOrEdit={<UserForm />}

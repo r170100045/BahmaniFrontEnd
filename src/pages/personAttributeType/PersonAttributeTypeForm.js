@@ -1,8 +1,20 @@
+import {
+  Checkbox,
+  FormControl,
+  FormControlLabel,
+  Input,
+  Paper,
+  TextField,
+} from "@material-ui/core";
 import { FORMAT_OPTIONS, GET_VALUE } from "../../constants/otherConstants";
-import { FormControl, Input, Paper, TextField } from "@material-ui/core";
 import { Redirect, withRouter } from "react-router-dom";
 import {
   buttonGroupStyle,
+  checkboxLabelStyle,
+  deleteButtonStyle,
+  globalError,
+  inputError,
+  inputInfoStyle,
   inputStyle,
   paperStyle,
   subHeadingStyle,
@@ -14,6 +26,7 @@ import {
   updatePersonAttributeTypeById,
 } from "../../services/personAttributeTypeService";
 
+import Controls from "../../components/controls/Controls";
 import ErrorLoadingData from "../../utils/ErrorLoadingData";
 import LoadingData from "../../utils/LoadingData";
 import React from "react";
@@ -329,7 +342,9 @@ class PersonAttributeTypeForm extends React.Component {
     return (
       <React.Fragment>
         <Paper style={paperStyle}>
-          {error && <span>{errors.globalErrorMessage}</span>}
+          {error && (
+            <span style={globalError}>{errors.globalErrorMessage}</span>
+          )}
 
           <TextField
             style={inputStyle}
@@ -340,7 +355,9 @@ class PersonAttributeTypeForm extends React.Component {
             value={GET_VALUE(personAttributeType.name)}
             onChange={personAttributeTypeChangeHandler}
           />
-          <span>{error && errors.nameHasError && errors.name}</span>
+          <span style={inputError}>
+            {error && errors.nameHasError && errors.name}
+          </span>
 
           <br />
 
@@ -358,8 +375,10 @@ class PersonAttributeTypeForm extends React.Component {
             }
             options={FORMAT_OPTIONS}
           />
-          <span>Name of a Java or OpenMRS class</span>
-          <span>{error && errors.formatHasError && errors.format}</span>
+          <span style={inputInfoStyle}>Name of a Java or OpenMRS class</span>
+          <span style={inputError}>
+            {error && errors.formatHasError && errors.format}
+          </span>
 
           <br />
 
@@ -372,21 +391,26 @@ class PersonAttributeTypeForm extends React.Component {
             value={GET_VALUE(personAttributeType.foreignKey)}
             onChange={(e) => personAttributeTypeChangeHandler(e)}
           />
-          <span>Integer id of the object specified by 'format'</span>
+          <span style={inputInfoStyle}>
+            Integer id of the object specified by 'format'
+          </span>
           <br />
+          <FormControlLabel
+            control={
+              <Checkbox
+                type="checkbox"
+                id="searchable"
+                name="searchable"
+                onChange={(e) => personAttributeTypeChangeHandler(e, "checked")}
+                checked={GET_VALUE(personAttributeType.searchable)}
+              />
+            }
+            label={<span style={checkboxLabelStyle}>Searchable</span>}
+          />
 
-          <label htmlFor="searchable" style={inputStyle}>
-            Searchable:
-            <input
-              style={inputStyle}
-              type="checkbox"
-              id="searchable"
-              name="searchable"
-              onChange={(e) => personAttributeTypeChangeHandler(e, "checked")}
-              checked={GET_VALUE(personAttributeType.searchable)}
-            />
-          </label>
-          <span>Whether this type can be searched on or not</span>
+          <span style={inputInfoStyle}>
+            Whether this type can be searched on or not
+          </span>
           <br />
 
           <TextField
@@ -416,26 +440,22 @@ class PersonAttributeTypeForm extends React.Component {
             }
             options={editPrivilegeOptions}
           />
-          <span>
+          <span style={inputInfoStyle}>
             The privilege needed by a user to edit this person attribute
           </span>
           <br />
 
           <div style={buttonGroupStyle}>
-            <button type="button" onClick={() => savePersonAttributeType()}>
-              Save
-            </button>
-            <button type="button" onClick={() => cancelPersonAttributeType()}>
-              Cancel
-            </button>
+            <Controls.SaveButton onClick={() => savePersonAttributeType()} />
+            <Controls.CancelButton
+              onClick={() => cancelPersonAttributeType()}
+            />
           </div>
 
           <br />
         </Paper>
         {personAttributeTypeId !== "add" && !personAttributeType.retired && (
           <Paper style={paperStyle}>
-            <hr />
-
             <p style={subHeadingStyle}>Retire Person Attribute Type</p>
 
             <TextField
@@ -452,9 +472,10 @@ class PersonAttributeTypeForm extends React.Component {
             </span>
             <br />
             <div style={buttonGroupStyle}>
-              <button type="button" onClick={() => retirePersonAttributeType()}>
-                Retire
-              </button>
+              <Controls.RetireButton
+                retired={personAttributeType.retired}
+                onClick={() => retirePersonAttributeType()}
+              />
             </div>
 
             <br />
@@ -467,12 +488,10 @@ class PersonAttributeTypeForm extends React.Component {
             <p style={subHeadingStyle}>Unretire Person Attribute Type</p>
 
             <div style={buttonGroupStyle}>
-              <button
-                type="button"
+              <Controls.RetireButton
+                retired={personAttributeType.retired}
                 onClick={() => unretirePersonAttributeType()}
-              >
-                Unretire
-              </button>
+              />
             </div>
 
             <br />
@@ -480,16 +499,10 @@ class PersonAttributeTypeForm extends React.Component {
         )}
 
         {personAttributeTypeId !== "add" && (
-          <Paper style={paperStyle}>
-            <hr />
-
-            <p style={subHeadingStyle}>Delete Person Attribute Type Forever</p>
-            <div style={buttonGroupStyle}>
-              <button type="button" onClick={() => deletePersonAttributeType()}>
-                Delete Forever
-              </button>
-            </div>
-          </Paper>
+          <Controls.DeleteButton
+            style={deleteButtonStyle}
+            onClick={() => deletePersonAttributeType()}
+          />
         )}
       </React.Fragment>
     );
