@@ -407,7 +407,7 @@ class PersonAttributeTypeForm extends React.Component {
             style={inputStyle}
             id="editPrivilege"
             name="editPrivilege"
-            defaultValue={personAttributeType.editPrivilege}
+            defaultValue={GET_VALUE(personAttributeType.editPrivilege)}
             onChange={(selectedValue) =>
               personAttributeTypeSelectTypeInputChangeHandler(
                 selectedValue,

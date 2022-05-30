@@ -521,8 +521,8 @@ class UserForm extends React.Component {
                   </ul> */}
                   <Grid container>
                     {roles.map((el, index) => (
-                      <Grid item md={4} xs={12} sm={6}>
-                        <div key={el.role}>
+                      <Grid key={el.role} item md={4} xs={12} sm={6}>
+                        <div>
                           <FormControlLabel
                             control={
                               <Checkbox

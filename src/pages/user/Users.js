@@ -36,7 +36,7 @@ const Users = () => {
             index === rowData.userRoles.length - 1 ? (
               <span>{role}</span>
             ) : (
-              <span>{role + " | "}</span>
+              <span key={index}>{role + " | "}</span>
             )
           )}
         </p>

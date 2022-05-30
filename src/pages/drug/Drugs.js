@@ -58,7 +58,7 @@ const Drugs = () => {
     Toolbar: (props) => (
       <div>
         <MTableToolbar {...props} />
-        <div class="text-end" style={{ padding: "0px 10px" }}>
+        <div className="text-end" style={{ padding: "0px 10px" }}>
           <FormControlLabel
             value="start"
             control={

@@ -4,6 +4,8 @@ import { Redirect, withRouter } from "react-router-dom";
 import {
   buttonGroupStyle,
   buttonStyle,
+  globalError,
+  inputError,
   inputStyle,
   labelStyle,
   paperStyle,
@@ -16,9 +18,12 @@ import {
   updateDrugById,
 } from "../../services/drugService";
 
+import Controls from "../../components/controls/Controls";
+import ErrorLoadingData from "../../utils/ErrorLoadingData";
+import LoadingData from "../../utils/LoadingData";
 import React from "react";
-import Select from "react-select";
 import { SingleSelect } from "react-select-material-ui";
+import SuccessMessage from "../../utils/SuccessMessage";
 import { getConceptNames } from "../../services/conceptService";
 
 class DrugForm extends React.Component {
@@ -39,320 +44,454 @@ class DrugForm extends React.Component {
 
     this.state = {
       drug: initialDrugState,
-      redirect: null,
       drugId: this.props.match.params.id,
       options: [],
+      redirect: null,
       isLoading: true,
+      showSuccessMessage: false,
+      successMessage: null,
       error: false,
+      errors: {
+        globalErrorMessage: "Please fix all errors and try again.",
+        httpRequest: null,
+        httpRequestHasError: false,
+        name: "name can not be empty",
+        nameHasError: false,
+        conceptId: "concept can not be empty",
+        conceptIdHasError: false,
+        retireReason: "reason to retire can not be empty",
+        retireReasonHasError: false,
+      },
     };
 
-    this.drugInputChangeHandler = this.drugInputChangeHandler.bind(this);
+    this.viewAll = "/drug/view/all";
+
+    this.saveDrug = this.saveDrug.bind(this);
+    this.retireDrug = this.retireDrug.bind(this);
+    this.unretireDrug = this.unretireDrug.bind(this);
+    this.cancelDrug = this.cancelDrug.bind(this);
+    this.deleteDrug = this.deleteDrug.bind(this);
+    this.drugChangeHandler = this.drugChangeHandler.bind(this);
+    this.drugSelectTypeInputChangeHandler =
+      this.drugSelectTypeInputChangeHandler.bind(this);
   }
 
+  // error validation starts
+  setHttpError(apiName, eMessage) {
+    const { errors } = this.state;
+    errors.httpRequestHasError = true;
+    errors.httpRequest = "error: " + apiName + " api call failed : " + eMessage;
+    this.setState({ errors }, () => {
+      setTimeout(
+        function () {
+          this.setState({ redirect: this.viewAll });
+        }.bind(this),
+        4000
+      );
+    });
+  }
+
+  nonEmpty(object) {
+    return object && object.trim().length > 0;
+  }
+
+  nonEmptyInteger(object) {
+    return object && object !== "";
+  }
+
+  resetErrorsToFalse() {
+    return new Promise((resolve) => {
+      const { errors } = this.state;
+      errors.nameHasError = false;
+      errors.conceptIdHasError = false;
+      errors.retireReasonHasError = false;
+      this.setState({ errors, error: false }, () => resolve());
+    });
+  }
+
+  successAndRedirect(successMessage) {
+    this.setState({ showSuccessMessage: true, successMessage }, () => {
+      setTimeout(
+        function () {
+          this.setState({ redirect: this.viewAll });
+        }.bind(this),
+        500
+      );
+    });
+  }
+
+  validate(drug) {
+    return new Promise((resolve) => {
+      this.resetErrorsToFalse().then(() => {
+        const { errors } = this.state;
+        let error = false;
+
+        if (!this.nonEmpty(drug.name)) {
+          error = true;
+          errors.nameHasError = true;
+        }
+
+        if (!this.nonEmptyInteger(drug.conceptId)) {
+          error = true;
+          errors.conceptIdHasError = true;
+        }
+
+        if (drug.retired) {
+          if (!this.nonEmpty(drug.retireReason)) {
+            error = true;
+            errors.retireReasonHasError = true;
+            drug.retired = false;
+          }
+        }
+
+        this.setState({ error, errors, drug }, () => {
+          resolve();
+        });
+      });
+    });
+  }
+  // error validation ends
+
+  // component mount starts
   componentDidMount() {
     const { drugId } = this.state;
 
-    getConceptNames()
-      .then((response) => {
-        const options = [];
-        Object.keys(response.data).forEach((key) => {
-          options.push({
-            value: response.data[key].conceptId,
-            label: response.data[key].name,
-          });
-        });
-
-        this.setState({ options }, () => {
-          if (drugId !== "add") {
-            getDrugById(drugId)
-              .then((response) => {
-                this.setState({ drug: response.data, isLoading: false });
-              })
-              .catch((error) => {
-                console.log(error);
-              });
-          } else {
-            this.setState({ isLoading: false });
-          }
-        });
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    this.setOptions()
+      .then(() => this.setFetchedDrug(drugId))
+      .then(() => this.setState({ isLoading: false }));
   }
 
-  unretireDrug() {
-    const { drug, drugId } = this.state;
-    drug.retired = false;
-    this.setState({ drug }, () => {
-      updateDrugById(drugId, drug)
-        .then(() => {
-          this.setState({ redirect: "/drug/view/all" });
+  setOptions() {
+    return new Promise((resolve) => {
+      getConceptNames()
+        .then((response) => {
+          const options = [];
+          Object.keys(response.data).forEach((key) => {
+            options.push({
+              value: response.data[key].conceptId,
+              label: response.data[key].name,
+            });
+          });
+          this.setState({ options }, () => resolve());
         })
         .catch((error) => {
           console.log(error);
+          this.setHttpError("getConceptNames", error.message);
         });
     });
   }
 
-  drugInputChangeHandler = (event, type = "value") => {
+  setFetchedDrug(drugId) {
+    return new Promise((resolve) => {
+      if (drugId !== "add") {
+        getDrugById(drugId)
+          .then((response) => {
+            this.setState({ drug: response.data }, () => resolve());
+          })
+          .catch((error) => {
+            console.log(error);
+            this.setHttpError("getDrugById", error.message);
+          });
+      } else {
+        resolve();
+      }
+    });
+  }
+  // component mount ends
+
+  // save starts
+  saveDrug(successMessage = "updated") {
+    const { drugId, drug } = this.state;
+    this.validate(drug).then(() => {
+      const { error } = this.state;
+      if (!error) {
+        if (drugId === "add") this.insertDrugWithData(drug);
+        else this.updateDrugWithData(drugId, drug, successMessage);
+      }
+    });
+  }
+
+  insertDrugWithData(drug) {
+    insertDrug(drug)
+      .then(() => {
+        this.successAndRedirect("saved");
+      })
+      .catch((error) => {
+        console.log(error);
+        this.setHttpError("insertDrug", error.message);
+      });
+  }
+
+  updateDrugWithData(drugId, drug, successMessage) {
+    updateDrugById(drugId, drug)
+      .then(() => {
+        this.successAndRedirect(successMessage);
+      })
+      .catch((error) => {
+        console.log(error);
+        this.setHttpError("updateDrugById", error.message);
+      });
+  }
+  // save ends
+
+  retireDrug() {
+    const { drug } = this.state;
+    drug.retired = true;
+    this.setState({ drug }, () => {
+      this.saveDrug("retired");
+    });
+  }
+
+  unretireDrug() {
+    const { drug } = this.state;
+    drug.retireReason = null;
+    drug.retired = false;
+    this.setState({ drug }, () => {
+      this.saveDrug("un-retired");
+    });
+  }
+
+  cancelDrug() {
+    this.setState({ redirect: this.viewAll });
+  }
+
+  deleteDrug() {
+    const { drugId } = this.state;
+    deleteDrugById(drugId)
+      .then(() => {
+        this.successAndRedirect("deleted");
+      })
+      .catch((error) => {
+        console.log(error);
+        this.setHttpError("deleteDrugById", error.message);
+      });
+  }
+
+  // input change handlers
+  drugChangeHandler = (event, type = "value") => {
     const { name } = event.target;
     const { drug } = this.state;
     drug[name] = event.target[type];
     this.setState({ drug });
   };
 
-  conceptIdChangeHandler(selectedOption) {
+  drugSelectTypeInputChangeHandler(selectedValue, field) {
     const { drug } = this.state;
-    drug.conceptId = selectedOption.value;
+    drug[field] = selectedValue;
     this.setState({ drug });
-  }
-
-  dosageFormChangeHandler(selectedOption) {
-    const { drug } = this.state;
-    drug.dosageForm = selectedOption.value;
-    this.setState({ drug });
-  }
-
-  submitDrugFormHandler() {
-    const { drug, drugId } = this.state;
-    if (drug.name === "" || drug.conceptId === "")
-      this.setState({ error: true });
-    else {
-      if (drugId === "add") {
-        insertDrug(drug)
-          .then(() => {
-            this.setState({ redirect: "/drug/view/all" });
-          })
-          .catch((error) => {
-            console.log(error);
-          });
-      } else {
-        updateDrugById(drugId, drug)
-          .then(() => {
-            this.setState({ redirect: "/drug/view/all" });
-          })
-          .catch((error) => {
-            console.log(error);
-          });
-      }
-    }
-  }
-
-  cancelButtonHandler() {
-    this.setState({ redirect: "/drug/view/all" });
-  }
-
-  retireDrug() {
-    let { drug, drugId } = this.state;
-    drug.retired = true;
-    this.setState({ drug }, () => {
-      updateDrugById(drugId, drug)
-        .then(() => {})
-        .catch((error) => {
-          console.log(error);
-        });
-
-      this.setState({ redirect: "/drug/view/all" });
-    });
-  }
-
-  deleteDrug() {
-    let { drugId } = this.state;
-    deleteDrugById(drugId)
-      .then(() => {
-        this.setState({ redirect: "/drug/view/all" });
-      })
-      .catch((error) => {
-        console.log(error);
-      });
   }
 
   render() {
     const {
-      conceptIdChangeHandler,
-      dosageFormChangeHandler,
-      unretireDrug,
-      submitDrugFormHandler,
-      cancelButtonHandler,
+      saveDrug,
       retireDrug,
+      unretireDrug,
+      cancelDrug,
       deleteDrug,
-      drugInputChangeHandler,
+      drugChangeHandler,
+      drugSelectTypeInputChangeHandler,
     } = this;
 
-    const { drug, redirect, drugId, options, isLoading, error } = this.state;
-
-    const getDefaultConceptIdValue = options.filter(
-      (option) => option.value === drug.conceptId
-    );
-
-    const getDefaultDosageFormValue = options.filter(
-      (option) => option.value === drug.dosageForm
-    );
+    const {
+      drug,
+      drugId,
+      options,
+      redirect,
+      isLoading,
+      error,
+      errors,
+      showSuccessMessage,
+      successMessage,
+    } = this.state;
 
     if (redirect) return <Redirect to={redirect} />;
 
-    if (!isLoading || drugId === "add") {
+    if (showSuccessMessage) return <SuccessMessage action={successMessage} />;
+
+    if (isLoading)
       return (
-        <React.Fragment>
-          {error && <p>Fill the required fields</p>}
-          {drug.retired && (
-            <p>
-              This drug is retired by ... ... - {drug.retireReason}{" "}
-              <button type="button" onClick={unretireDrug.bind(this)}>
-                Unretire this drug
-              </button>
-            </p>
+        <div>
+          {!errors.httpRequestHasError && <LoadingData />}
+          {errors.httpRequestHasError && (
+            <ErrorLoadingData message={errors.httpRequest} />
           )}
-          <hr />
+        </div>
+      );
 
-          <Paper style={paperStyle}>
-            <TextField
-              label="Name"
-              style={inputStyle}
-              type="text"
-              id="name"
-              name="name"
-              onChange={drugInputChangeHandler}
-              value={GET_VALUE(drug.name)}
+    return (
+      <React.Fragment>
+        <Paper style={paperStyle}>
+          {error && (
+            <span style={globalError}>{errors.globalErrorMessage}</span>
+          )}
+
+          <TextField
+            label="Name"
+            style={inputStyle}
+            type="text"
+            id="name"
+            name="name"
+            onChange={(e) => drugChangeHandler(e)}
+            value={GET_VALUE(drug.name)}
+          />
+          <span style={inputError}>
+            {error && errors.nameHasError && errors.name}
+          </span>
+          <br />
+
+          <SingleSelect
+            label="Concept*"
+            style={inputStyle}
+            id="conceptId"
+            name="conceptId"
+            placeholder="Enter concept name or id"
+            defaultValue={GET_VALUE(drug.conceptId)}
+            onChange={(selectedValue) =>
+              drugSelectTypeInputChangeHandler(selectedValue, "conceptId")
+            }
+            options={options}
+            filterOption={FILTER_OPTIONS}
+          />
+          <span style={inputError}>
+            {error && errors.conceptIdHasError && errors.conceptId}
+          </span>
+          <br />
+
+          <label htmlFor="combination" style={inputStyle}>
+            Combination:
+            <input
+              type="checkbox"
+              id="combination"
+              name="combination"
+              onChange={(e) => drugChangeHandler(e, "checked")}
+              checked={GET_VALUE(drug.combination)}
             />
-            <br />
+          </label>
+          <br />
 
-            <SingleSelect
-              label="Concept*"
-              style={inputStyle}
-              id="conceptId"
-              name="conceptId"
-              placeholder="Enter concept name or id"
-              defaultValue={GET_VALUE(drug.conceptId)}
-              onChange={conceptIdChangeHandler.bind(this)}
-              options={options}
-              filterOption={FILTER_OPTIONS}
+          <SingleSelect
+            label="Dosage Form"
+            style={inputStyle}
+            id="dosageForm"
+            name="dosageForm"
+            placeholder="Enter concept name or id"
+            defaultValue={GET_VALUE(drug.dosageForm)}
+            onChange={(selectedValue) =>
+              drugSelectTypeInputChangeHandler(selectedValue, "dosageForm")
+            }
+            options={options}
+            filterOption={FILTER_OPTIONS}
+          />
+          <br />
+
+          <TextField
+            style={inputStyle}
+            label="Strength"
+            type="text"
+            id="strength"
+            name="strength"
+            onChange={(e) => drugChangeHandler(e)}
+            value={GET_VALUE(drug.strength)}
+          />
+          <br />
+
+          <label htmlFor="minimumDailyDose" style={inputStyle}>
+            Minimum Daily Dose:
+            <input
+              type="number"
+              id="minimumDailyDose"
+              name="minimumDailyDose"
+              onChange={(e) => drugChangeHandler(e)}
+              value={GET_VALUE(drug.minimumDailyDose)}
+              step="any"
             />
+          </label>
+          <br />
 
-            <br />
-            <label htmlFor="combination" style={inputStyle}>
-              Combination:
-              <input
-                type="checkbox"
-                id="combination"
-                name="combination"
-                onChange={(e) => drugInputChangeHandler(e, "checked")}
-                checked={GET_VALUE(drug.combination)}
-              />
-            </label>
-            <br />
-
-            <label htmlFor="dosageForm" style={inputStyle}>
-              Dosage Form:
-              <div style={{ width: "300px", display: "inline-block" }}>
-                <Select
-                  id="dosageForm"
-                  name="dosageForm"
-                  placeholder="Enter concept name or id"
-                  defaultValue={getDefaultDosageFormValue}
-                  onChange={dosageFormChangeHandler.bind(this)}
-                  options={options}
-                  filterOption={FILTER_OPTIONS}
-                />
-              </div>
-            </label>
-
-            <br />
-
-            <TextField
-              style={inputStyle}
-              label="Strength"
-              type="text"
-              id="strength"
-              name="strength"
-              onChange={drugInputChangeHandler}
-              value={GET_VALUE(drug.strength)}
+          <label htmlFor="maximumDailyDose" style={inputStyle}>
+            Maximum Daily Dose:
+            <input
+              type="number"
+              id="maximumDailyDose"
+              name="maximumDailyDose"
+              onChange={(e) => drugChangeHandler(e)}
+              value={GET_VALUE(drug.maximumDailyDose)}
+              step="any"
             />
-            <br />
-            <button type="button" onClick={retireDrug.bind(this)}>
-              Retire this Drug
+          </label>
+          <br />
+          <div style={buttonGroupStyle}>
+            <button
+              type="button"
+              style={buttonStyle}
+              onClick={() => saveDrug()}
+            >
+              Save
             </button>
+            <button
+              type="button"
+              style={buttonStyle}
+              onClick={() => cancelDrug()}
+            >
+              Cancel
+            </button>
+          </div>
+        </Paper>
+        <hr />
 
-            <label htmlFor="minimumDailyDose" style={inputStyle}>
-              Minimum Daily Dose:
-              <input
-                type="number"
-                id="minimumDailyDose"
-                name="minimumDailyDose"
-                onChange={drugInputChangeHandler}
-                value={GET_VALUE(drug.minimumDailyDose)}
-                step="any"
-              />
-            </label>
-            <br />
-
-            <label htmlFor="maximumDailyDose" style={inputStyle}>
-              Maximum Daily Dose:
-              <input
-                type="number"
-                id="maximumDailyDose"
-                name="maximumDailyDose"
-                onChange={drugInputChangeHandler}
-                value={GET_VALUE(drug.maximumDailyDose)}
-                step="any"
-              />
-            </label>
+        {drugId !== "add" && !drug.retired && (
+          <Paper style={paperStyle}>
+            <p style={subHeadingStyle}>Retire this Drug</p>
+            <TextField
+              style={inputStyle}
+              label="Reason"
+              type="text"
+              id="retireReason"
+              name="retireReason"
+              onChange={(e) => drugChangeHandler(e)}
+              value={GET_VALUE(drug.retireReason)}
+            />
+            <span>
+              {error && errors.retireReasonHasError && errors.retireReason}
+            </span>
             <br />
             <div style={buttonGroupStyle}>
-              <button
-                type="button"
-                style={buttonStyle}
-                onClick={submitDrugFormHandler.bind(this)}
-              >
-                Save Concept Drug
-              </button>
-              <button
-                type="button"
-                style={buttonStyle}
-                onClick={cancelButtonHandler.bind(this)}
-              >
-                Cancel
-              </button>
-            </div>
-          </Paper>
-          <hr />
-
-          {drugId !== "add" && (
-            <Paper style={paperStyle}>
-              <p style={subHeadingStyle}>Retire this Drug</p>
-              <TextField
-                style={inputStyle}
-                label="Reason"
-                type="text"
-                id="retireReason"
-                name="retireReason"
-                onChange={drugInputChangeHandler}
-                value={GET_VALUE(drug.retireReason)}
+              <Controls.RetireButton
+                retired={drug.retired}
+                onClick={() => retireDrug()}
               />
-              <br />
-              <div style={buttonGroupStyle}>
-                <button type="button" onClick={retireDrug.bind(this)}>
-                  Retire this Drug
-                </button>
-              </div>
+            </div>
 
-              <hr />
+            <hr />
+          </Paper>
+        )}
 
-              <p style={subHeadingStyle}>Permanently Delete Concept Drug</p>
-              <br />
-              <div style={buttonGroupStyle}>
-                <button type="button" onClick={deleteDrug.bind(this)}>
-                  Permanently Delete Concept Drug
-                </button>
-              </div>
-            </Paper>
-          )}
-        </React.Fragment>
-      );
-    }
+        {drugId !== "add" && drug.retired && (
+          <Paper style={paperStyle}>
+            <hr />
 
-    return <p>Loading...</p>;
+            <p style={subHeadingStyle}>Unretire Drug</p>
+            <div style={buttonGroupStyle}>
+              <Controls.RetireButton
+                retired={drug.retired}
+                onClick={() => unretireDrug()}
+              />
+            </div>
+
+            <br />
+          </Paper>
+        )}
+
+        {drugId !== "add" && (
+          <div style={paperStyle}>
+            <div style={buttonGroupStyle}>
+              <Controls.DeleteButton onClick={() => deleteDrug()} />
+            </div>
+            <br />
+          </div>
+        )}
+      </React.Fragment>
+    );
   }
 }
 

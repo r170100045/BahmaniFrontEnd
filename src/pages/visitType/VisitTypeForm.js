@@ -264,9 +264,11 @@ class VisitTypeForm extends React.Component {
 
     return (
       <React.Fragment>
-        {error && <span style={globalError}>{errors.globalErrorMessage}</span>}
-
         <Paper style={paperStyle}>
+          {error && (
+            <span style={globalError}>{errors.globalErrorMessage}</span>
+          )}
+
           <TextField
             style={inputStyle}
             label="Name"

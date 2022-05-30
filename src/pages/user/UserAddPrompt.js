@@ -16,6 +16,9 @@ class UserAddPrompt extends React.Component {
       personUUID: "dummy",
       personNotSelected: true,
     };
+
+    this.createNewUserFromPerson = this.createNewUserFromPerson.bind(this);
+    this.createNewUser = this.createNewUser.bind(this);
   }
 
   componentDidMount() {
@@ -52,8 +55,17 @@ class UserAddPrompt extends React.Component {
     this.setState({ redirect: "/user/view/all/dummy" });
   }
 
+  createNewUserFromPerson(personUUID) {
+    this.setState({ redirect: `/user/edit/add/${personUUID}` });
+  }
+
+  createNewUser() {
+    this.setState({ redirect: `/user/edit/add/dummy` });
+  }
+
   render() {
-    const { personChangeHandler } = this;
+    const { personChangeHandler, createNewUserFromPerson, createNewUser } =
+      this;
 
     const {
       redirect,
@@ -79,9 +91,12 @@ class UserAddPrompt extends React.Component {
             <div>
               <div>
                 <p>Create a new person</p>
-                <button type="button">
+                <button type="button" onClick={() => createNewUser()}>
                   <a href={`/user/edit/add/dummy`}>Next</a>
                 </button>
+                {/* <button type="button">
+                  <a href={`/user/edit/add/dummy`}>Next</a>
+                </button> */}
               </div>
               <div>
                 <p>Use a person who already exists</p>
@@ -100,20 +115,12 @@ class UserAddPrompt extends React.Component {
                 </div>
 
                 <div>
-                  <button type="button" disabled={personNotSelected}>
-                    <RouterLink
-                      to={`/user/edit/add/${personUUID}`}
-                      disabled={personNotSelected}
-                    >
-                      Next
-                    </RouterLink>
-
-                    {/* <a
-                      href={`/user/edit/add/${personUUID}`}
-                      disabled={personNotSelected}
-                    >
-                      Next
-                    </a> */}
+                  <button
+                    type="button"
+                    disabled={personNotSelected}
+                    onClick={() => createNewUserFromPerson(personUUID)}
+                  >
+                    Next
                   </button>
                 </div>
               </div>
