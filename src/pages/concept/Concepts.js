@@ -20,6 +20,13 @@ const Concepts = () => {
     {
       title: "Name",
       field: "conceptName",
+      render: (rowData) => (
+        <p
+          style={{ textDecoration: rowData.retired ? "line-through" : "none" }}
+        >
+          {rowData.conceptName}
+        </p>
+      ),
     },
     {
       title: "ID",

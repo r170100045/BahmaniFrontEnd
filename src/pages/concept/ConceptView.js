@@ -6,6 +6,9 @@ import {
   getConceptNameDetails,
 } from "../../services/conceptService";
 
+import { GET_VALUE } from "../../constants/otherConstants";
+import LoadingData from "../../utils/LoadingData";
+import { Redirect } from "react-router-dom";
 import { withRouter } from "react-router-dom";
 
 class ConceptView extends React.Component {
@@ -20,7 +23,7 @@ class ConceptView extends React.Component {
       ],
       classId: 1,
       isSet: false,
-      conceptSets: [{ conceptId: 4 }, { conceptId: 5 }],
+      conceptSets: [],
       conceptNumeric: {
         hiAbsolute: null,
         hiCritical: null,
@@ -50,28 +53,22 @@ class ConceptView extends React.Component {
       synonyms: initialConceptState.conceptNames.filter(
         (item) => item.conceptNameType !== ("FULLY_SPECIFIED" || "SHORT")
       ),
+      redirect: null,
       isLoading: true,
     };
+
+    this.redirectToEditPage = this.redirectToEditPage.bind(this);
   }
 
   componentDidMount() {
-    this.setClassOptions()
-      .then(() => this.setConceptOptions())
-      .then(() => this.setDataTypeOptions())
+    Promise.all([
+      this.setClassOptions(),
+      this.setConceptOptions(),
+      this.setDataTypeOptions(),
+    ])
       .then(() => this.setFetchedConcept())
-      .then(() => this.setDataType())
       .then(() => this.setSynonyms())
       .then(() => this.setState({ isLoading: false }));
-  }
-
-  setDataType() {
-    const { concept } = this.state;
-
-    return new Promise((resolve) => {
-      this.setState({ dataType: concept.dataTypeId.conceptDataTypeId }, () =>
-        resolve("success")
-      );
-    });
   }
 
   setDataTypeOptions() {
@@ -86,7 +83,7 @@ class ConceptView extends React.Component {
             });
           });
           this.setState({ dataTypeOptions }, () => {
-            resolve("success");
+            resolve();
           });
         })
         .catch((e) => reject(e));
@@ -106,7 +103,7 @@ class ConceptView extends React.Component {
             });
           });
           this.setState({ conceptOptions }, () => {
-            resolve("success");
+            resolve();
           });
         })
         .catch((e) => reject(e));
@@ -125,7 +122,7 @@ class ConceptView extends React.Component {
             });
           });
           this.setState({ classOptions }, () => {
-            resolve("success");
+            resolve();
           });
         })
         .catch((e) => reject(e));
@@ -133,12 +130,12 @@ class ConceptView extends React.Component {
   }
 
   setSynonyms() {
-    const { conceptNames } = this.state.concept;
     return new Promise((resolve) => {
+      const { conceptNames } = this.state.concept;
       const synonyms = conceptNames.filter(
         (item) => item.conceptNameType !== ("FULLY_SPECIFIED" || "SHORT")
       );
-      this.setState({ synonyms }, () => resolve("success"));
+      this.setState({ synonyms }, () => resolve());
     });
   }
 
@@ -148,20 +145,18 @@ class ConceptView extends React.Component {
     return new Promise((resolve, reject) => {
       getConceptById(conceptId)
         .then((response) => {
-          this.setState({ concept: response.data });
+          this.setState({ concept: response.data }, () => resolve());
         })
-        .then(() => resolve("success"))
         .catch((e) => reject(e));
     });
   }
 
-  getValueFor(field) {
-    return field === null ? "" : field;
+  redirectToEditPage(conceptId) {
+    this.setState({ redirect: `/concept/edit/${conceptId}` });
   }
 
   render() {
     const {
-      isLoading,
       concept,
       synonyms,
       classOptions,
@@ -169,8 +164,10 @@ class ConceptView extends React.Component {
       dataTypeOptions,
       dataType,
       conceptId,
+      redirect,
+      isLoading,
     } = this.state;
-    const { getValueFor } = this;
+    const { redirectToEditPage } = this;
     const { conceptNames, isSet } = concept;
 
     const getFullySpecifiedName = () => {
@@ -210,160 +207,162 @@ class ConceptView extends React.Component {
       (dataTypeOption) => dataTypeOption.value === dataType
     );
 
-    if (!isLoading) {
-      console.log("concept", concept);
-      return (
-        <Fragment>
-          <button type="button">
-            <a href={`/concept/edit/${conceptId}`}>Edit</a>
-          </button>
-          <div>
-            <span>ID:</span>
-            <span>{concept.conceptId}</span>
-          </div>
+    if (redirect) return <Redirect to={redirect} />;
 
-          <div>
-            <span>UUID:</span>
-            <span>{concept.uuid}</span>
-          </div>
+    if (isLoading) return <LoadingData />;
 
-          <div>
-            <span>Fuly Specified Name:</span>
-            <span>{getValueFor(fullySpecifiedName)}</span>
-          </div>
+    console.log("concept", concept);
+    return (
+      <Fragment>
+        <button type="button" onClick={() => redirectToEditPage(conceptId)}>
+          Edit
+        </button>
+        <div>
+          <span>ID:</span>
+          <span>{concept.conceptId}</span>
+        </div>
 
+        <div>
+          <span>UUID:</span>
+          <span>{concept.uuid}</span>
+        </div>
+
+        <div>
+          <span>Fuly Specified Name:</span>
+          <span>{GET_VALUE(fullySpecifiedName)}</span>
+        </div>
+
+        <div>
+          <span>Synonyms:</span>
+          <span>
+            <ul>
+              {synonyms.map((item, index) => (
+                <li key={index}>{item.name}</li>
+              ))}
+            </ul>
+          </span>
+        </div>
+
+        <div>
+          <span>Search Terms:</span>
+          <span> </span>
+        </div>
+
+        <div>
+          <span>Short Name:</span>
+          <span>{GET_VALUE(concept.shortName)} </span>
+        </div>
+
+        <div>
+          <span>Description:</span>
+          <span>{GET_VALUE(concept.description)} </span>
+        </div>
+
+        <div>
+          <span>Class:</span>
+          <span>{GET_VALUE(className)} </span>
+        </div>
+
+        {isSet && (
           <div>
-            <span>Synonyms:</span>
+            <span>Set Members:</span>
             <span>
               <ul>
-                {synonyms.map((item, index) => (
-                  <li key={index}>{item.name}</li>
+                {defaultConceptSetsValue.map((item) => (
+                  <li key={item.uuid}>
+                    <a href={`/concept/view/${item.uuid}`}>{item.label}</a>
+                  </li>
                 ))}
               </ul>
             </span>
           </div>
+        )}
 
+        <div>
+          <span>Data Type:</span>
+          <span>
+            {getDefaultDataTypeValue.map((item, index) => (
+              <span key={index}>{item.label}</span>
+            ))}
+          </span>
+        </div>
+
+        {dataType === 1 && concept.conceptNumeric !== null && (
           <div>
-            <span>Search Terms:</span>
-            <span> </span>
-          </div>
-
-          <div>
-            <span>Short Name:</span>
-            <span>{getValueFor(concept.shortName)} </span>
-          </div>
-
-          <div>
-            <span>Description:</span>
-            <span>{getValueFor(concept.description)} </span>
-          </div>
-
-          <div>
-            <span>Class:</span>
-            <span>{getValueFor(className)} </span>
-          </div>
-
-          {isSet && (
-            <div>
-              <span>Set Members:</span>
-              <span>
-                <ul>
-                  {defaultConceptSetsValue.map((item) => (
-                    <li key={item.uuid}>
-                      <a href={`/concept/view/${item.uuid}`}>{item.label}</a>
-                    </li>
-                  ))}
-                </ul>
-              </span>
-            </div>
-          )}
-
-          <div>
-            <span>Data Type:</span>
+            <span>Numeric</span>
             <span>
-              {getDefaultDataTypeValue.map((item, index) => (
-                <span key={index}>{item.label}</span>
-              ))}
+              <div>
+                <span>Absolute High</span>
+                <span>{GET_VALUE(concept.conceptNumeric.hiAbsolute)}</span>
+              </div>
+              <div>
+                <span>Crirical High</span>
+                <span>{GET_VALUE(concept.conceptNumeric.hiCritical)}</span>
+              </div>
+              <div>
+                <span>Normal High</span>
+                <span>{GET_VALUE(concept.conceptNumeric.hiNormal)}</span>
+              </div>
+              <div>
+                <span>Normal Low</span>
+                <span>{GET_VALUE(concept.conceptNumeric.lowNormal)}</span>
+              </div>
+              <div>
+                <span>Critical Low</span>
+                <span>{GET_VALUE(concept.conceptNumeric.lowCritical)}</span>
+              </div>
+              <div>
+                <span>Absolute Low</span>
+                <span>{GET_VALUE(concept.conceptNumeric.lowAbsolute)}</span>
+              </div>
+              <div>
+                <span>Units</span>
+                <span>{GET_VALUE(concept.conceptNumeric.units)}</span>
+              </div>
+              <div>
+                <span>Allow Decimal?</span>
+                <span>
+                  {concept.conceptNumeric.precise === true ? "Yes" : "No"}
+                </span>
+              </div>
+              <div>
+                <span>Display Precision</span>
+                <span>
+                  {GET_VALUE(concept.conceptNumeric.displayPrecision)}
+                </span>
+              </div>
             </span>
           </div>
+        )}
 
-          {dataType === 1 && (
-            <div>
-              <span>Numeric</span>
-              <span>
-                <div>
-                  <span>Absolute High</span>
-                  <span>{concept.conceptNumeric.hiAbsolute}</span>
-                </div>
-                <div>
-                  <span>Crirical High</span>
-                  <span>{concept.conceptNumeric.hiCritical}</span>
-                </div>
-                <div>
-                  <span>Normal High</span>
-                  <span>{concept.conceptNumeric.hiNormal}</span>
-                </div>
-                <div>
-                  <span>Normal Low</span>
-                  <span>{concept.conceptNumeric.lowNormal}</span>
-                </div>
-                <div>
-                  <span>Critical Low</span>
-                  <span>{concept.conceptNumeric.lowCritical}</span>
-                </div>
-                <div>
-                  <span>Absolute Low</span>
-                  <span>{concept.conceptNumeric.lowAbsolute}</span>
-                </div>
-                <div>
-                  <span>Units</span>
-                  <span>{concept.conceptNumeric.units}</span>
-                </div>
-                <div>
-                  <span>Allow Decimal?</span>
-                  <span>
-                    {concept.conceptNumeric.precise === true ? "Yes" : "No"}
-                  </span>
-                </div>
-                <div>
-                  <span>Display Precision</span>
-                  <span>{concept.conceptNumeric.displayPrecision}</span>
-                </div>
-              </span>
-            </div>
-          )}
-
-          {dataType === 2 && (
-            <div>
-              <span>
-                TO-DO Make concept answers custom object and loop to display and
-                link
-              </span>
-              <span></span>
-            </div>
-          )}
-
-          {dataType === 13 && (
-            <div>
-              <span>Handler</span>
-              <span>{concept.conceptComplex}</span>
-            </div>
-          )}
-
+        {dataType === 2 && (
           <div>
-            <span>Mappings:</span>
-            <span>TO-DO</span>
+            <span>
+              TO-DO Make concept answers custom object and loop to display and
+              link
+            </span>
+            <span></span>
           </div>
+        )}
 
+        {dataType === 13 && (
           <div>
-            <span>Version:</span>
-            <span>{concept.version}</span>
+            <span>Handler</span>
+            <span>{concept.conceptComplex}</span>
           </div>
-        </Fragment>
-      );
-    }
+        )}
 
-    return <p>Loading...</p>;
+        <div>
+          <span>Mappings:</span>
+          <span>TO-DO</span>
+        </div>
+
+        <div>
+          <span>Version:</span>
+          <span>{concept.version}</span>
+        </div>
+      </Fragment>
+    );
   }
 }
 
