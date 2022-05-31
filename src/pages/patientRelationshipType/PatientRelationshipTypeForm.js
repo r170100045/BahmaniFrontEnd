@@ -277,15 +277,10 @@ class PatientRelationshipTypeForm extends React.Component {
 
     if (showSuccessMessage) return <SuccessMessage action={successMessage} />;
 
-    if (isLoading)
-      return (
-        <div>
-          {!errors.httpRequestHasError && <LoadingData />}
-          {errors.httpRequestHasError && (
-            <ErrorLoadingData message={errors.httpRequest} />
-          )}
-        </div>
-      );
+    if (errors.httpRequestHasError)
+      return <ErrorLoadingData message={errors.httpRequest} />;
+
+    if (isLoading) return <LoadingData />;
 
     return (
       <React.Fragment>
@@ -295,6 +290,8 @@ class PatientRelationshipTypeForm extends React.Component {
           )}
 
           <TextField
+            error={errors.aisToBHasError}
+            helperText={errors.aisToBHasError && errors.aisToB}
             style={inputStyle}
             label="A is to B"
             type="text"
@@ -303,12 +300,10 @@ class PatientRelationshipTypeForm extends React.Component {
             value={GET_VALUE(relationshipType.aisToB)}
             onChange={(e) => relationshipTypeChangeHandler(e)}
           />
-          <span style={inputError}>
-            {error && errors.aisToBHasError && errors.aisToB}
-          </span>
-          <br />
 
           <TextField
+            error={errors.bisToAHasError}
+            helperText={errors.bisToAHasError && errors.bisToA}
             style={inputStyle}
             label="B is to A"
             type="text"
@@ -317,12 +312,10 @@ class PatientRelationshipTypeForm extends React.Component {
             value={GET_VALUE(relationshipType.bisToA)}
             onChange={(e) => relationshipTypeChangeHandler(e)}
           />
-          <span style={inputError}>
-            {error && errors.bisToAHasError && errors.bisToA}
-          </span>
-          <br />
 
           <TextField
+            error={errors.descriptionHasError}
+            helperText={errors.descriptionHasError && errors.description}
             style={inputStyle}
             multiline
             label="Description"
@@ -333,16 +326,11 @@ class PatientRelationshipTypeForm extends React.Component {
             value={GET_VALUE(relationshipType.description)}
             onChange={(e) => relationshipTypeChangeHandler(e)}
           />
-          <span style={inputError}>
-            {error && errors.descriptionHasError && errors.description}
-          </span>
-          <br />
 
           <div style={buttonGroupStyle}>
             <Controls.SaveButton onClick={() => saveRelationshipType()} />
             <Controls.CancelButton onClick={() => cancelRelationshipType()} />
           </div>
-          <br />
         </Paper>
 
         {relationshipTypeId !== "add" && !relationshipType.retired && (
@@ -350,6 +338,8 @@ class PatientRelationshipTypeForm extends React.Component {
             <p style={subHeadingStyle}>Retire Relationship Type</p>
 
             <TextField
+              error={errors.retireReasonHasError}
+              helperText={errors.retireReasonHasError && errors.retireReason}
               style={inputStyle}
               label="Reason"
               type="text"
@@ -358,10 +348,6 @@ class PatientRelationshipTypeForm extends React.Component {
               value={GET_VALUE(relationshipType.retireReason)}
               onChange={(e) => relationshipTypeChangeHandler(e)}
             />
-            <span>
-              {error && errors.retireReasonHasError && errors.retireReason}
-            </span>
-            <br />
 
             <div style={buttonGroupStyle}>
               <Controls.RetireButton
@@ -369,7 +355,6 @@ class PatientRelationshipTypeForm extends React.Component {
                 onClick={() => retireRelationshipType()}
               />
             </div>
-            <br />
           </Paper>
         )}
         {relationshipTypeId !== "add" && relationshipType.retired && (

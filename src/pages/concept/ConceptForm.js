@@ -8,16 +8,19 @@ import {
 import {
   CONCEPT_COMPLEX_HANDLERS,
   FILTER_OPTIONS,
+  GET_VALUE,
 } from "../../constants/otherConstants";
 import { MultipleSelect, SingleSelect } from "react-select-material-ui";
 import React, { Fragment } from "react";
 import { Redirect, withRouter } from "react-router-dom";
 import {
+  buttonGroupStyle,
   checkboxLabelStyle,
   conceptPaperStyle,
   deleteButtonStyle,
   inputStyle,
   paperStyle,
+  subHeadingStyle,
 } from "../../constants/formStyling";
 import {
   deleteConceptById,
@@ -33,20 +36,32 @@ import {
 } from "../../services/conceptService";
 
 import Controls from "../../components/controls/Controls";
+import ErrorLoadingData from "../../utils/ErrorLoadingData";
+import LoadingData from "../../utils/LoadingData";
 import Select from "react-select";
+import SuccessMessage from "../../utils/SuccessMessage";
 import { getDrugs } from "../../services/drugService";
 
 class ConceptForm extends React.Component {
   constructor(props) {
     super(props);
     const initialConceptState = {
+      conceptNames: [
+        {
+          name: "",
+          conceptNameType: "FULLY_SPECIFIED",
+        },
+        {
+          name: "",
+          conceptNameType: "",
+        },
+      ],
       shortName: "",
       description: "",
-      isSet: false,
-      version: null,
       classId: 1,
-      retired: false,
-      retireReason: "",
+      isSet: false,
+      conceptSets: [4, 5],
+      dataTypeId: 1,
       conceptNumeric: {
         hiAbsolute: null,
         hiCritical: null,
@@ -58,34 +73,9 @@ class ConceptForm extends React.Component {
         precise: false,
         displayPrecision: null,
       },
-      dataTypeId: {
-        conceptDataTypeId: 1,
-      },
-      conceptNames: [
-        {
-          name: "",
-          conceptNameType: "FULLY_SPECIFIED",
-        },
-        {
-          name: "",
-          conceptNameType: "",
-        },
-      ],
-      conceptAnswers: [
-        {
-          answerDrug: 20,
-        },
-        {
-          answerConcept: 55,
-        },
-        {
-          answerConcept: 40,
-        },
-        {
-          answerDrug: 2,
-        },
-      ],
-      conceptComplex: "",
+      conceptAnswersDrugs: [20, 2],
+      conceptAnswersConcepts: [55, 40],
+      conceptComplex: null,
       mappings: [
         {
           conceptReferenceTermId: null,
@@ -96,14 +86,14 @@ class ConceptForm extends React.Component {
         //   conceptMapTypeId: 33
         // }
       ],
-      conceptSets: [{ conceptId: 4 }, { conceptId: 5 }],
+      version: null,
+      retireReason: "",
+      retired: false,
     };
 
     this.state = {
       concept: initialConceptState,
-      redirect: null,
       conceptId: this.props.match.params.id,
-      dataType: 1,
       classOptions: [],
       conceptOptions: [],
       drugOptions: [],
@@ -116,12 +106,42 @@ class ConceptForm extends React.Component {
       synonyms: initialConceptState.conceptNames.filter(
         (item) => item.conceptNameType !== "FULLY_SPECIFIED"
       ),
+      redirect: null,
       isLoading: true,
+      showSuccessMessage: false,
+      successMessage: null,
+      error: false,
+      errors: {
+        globalErrorMessage: "Please fix all errors and try again.",
+        httpRequest: null,
+        httpRequestHasError: false,
+        name: "name can not be empty",
+        nameHasError: false,
+        retireReason: "reason to retire can not be empty",
+        retireReasonHasError: false,
+      },
     };
 
+    this.viewAll = "/concept/view/all";
+
+    // this.saveConceptAndContinue = this.saveConceptAndContinue.bind(this);
+    this.saveConcept = this.saveConcept.bind(this);
+    this.retireConcept = this.retireConcept.bind(this);
+    this.unretireConcept = this.unretireConcept.bind(this);
+    this.cancelConcept = this.cancelConcept.bind(this);
+    this.deleteConcept = this.deleteConcept.bind(this);
+    this.redirectToViewPage = this.redirectToViewPage.bind(this);
+    this.conceptChangeHandler = this.conceptChangeHandler.bind(this);
+    this.fullySpecifiedNameChangeHandler =
+      this.fullySpecifiedNameChangeHandler.bind(this);
+    this.conceptSelectTypeInputChangehandler =
+      this.conceptSelectTypeInputChangehandler.bind(this);
+    this.synonymNameChangeHandler = this.synonymNameChangeHandler.bind(this);
+    this.addSynonymButtonHandler = this.addSynonymButtonHandler.bind(this);
     this.removeSynonymButtonHandler =
       this.removeSynonymButtonHandler.bind(this);
-    this.synonymNameChangeHandler = this.synonymNameChangeHandler.bind(this);
+    this.numericChangeHandler = this.numericChangeHandler.bind(this);
+    this.addMappingButtonHandler = this.addMappingButtonHandler.bind(this);
     this.removeMappingButtonHandler =
       this.removeMappingButtonHandler.bind(this);
     this.conceptMapTypeIdChangeHandler =
@@ -133,6 +153,79 @@ class ConceptForm extends React.Component {
     this.mapCodeChangeHandler = this.mapCodeChangeHandler.bind(this);
   }
 
+  // error validation starts
+  setHttpError(apiName, eMessage) {
+    const { errors } = this.state;
+    errors.httpRequestHasError = true;
+    errors.httpRequest = "error: " + apiName + " api call failed : " + eMessage;
+    this.setState({ errors }, () => {
+      setTimeout(
+        function () {
+          this.setState({ redirect: this.viewAll });
+        }.bind(this),
+        4000
+      );
+    });
+  }
+
+  nonEmpty(object) {
+    return object && object.trim().length > 0;
+  }
+
+  resetErrorsToFalse() {
+    return new Promise((resolve) => {
+      const { errors } = this.state;
+      errors.nameHasError = false;
+      errors.retireReasonHasError = false;
+      this.setState({ errors, error: false }, () => resolve());
+    });
+  }
+
+  successAndRedirect(successMessage) {
+    this.setState({ showSuccessMessage: true, successMessage }, () => {
+      setTimeout(
+        function () {
+          this.setState({ redirect: this.viewAll });
+        }.bind(this),
+        500
+      );
+    });
+  }
+
+  validate(concept) {
+    return new Promise((resolve) => {
+      this.resetErrorsToFalse().then(() => {
+        const { errors } = this.state;
+        let error = false;
+
+        const fullySpecifiedNameIndex = concept.conceptNames.findIndex(
+          (item) => item.conceptNameType === "FULLY_SPECIFIED"
+        );
+        const fullySpecifiedName =
+          concept.conceptNames[fullySpecifiedNameIndex].name;
+
+        if (!this.nonEmpty(fullySpecifiedName)) {
+          error = true;
+          errors.nameHasError = true;
+        }
+
+        if (concept.retired) {
+          if (!this.nonEmpty(concept.retireReason)) {
+            error = true;
+            errors.retireReasonHasError = true;
+            concept.retired = false;
+          }
+        }
+
+        this.setState({ error, errors, concept }, () => {
+          resolve();
+        });
+      });
+    });
+  }
+  // error validation ends
+
+  // component mount starts
   componentDidMount() {
     Promise.all([
       this.setClassOptions(),
@@ -146,181 +239,8 @@ class ConceptForm extends React.Component {
       this.setMapCodeOptions(),
     ])
       .then(() => this.setFetchedConcept())
-      .then(() => Promise.all([this.setDataType(), this.setSynonyms()]))
+      .then(() => this.setSynonyms())
       .then(() => this.setState({ isLoading: false }));
-  }
-
-  mergeConceptnames() {
-    const { synonyms, concept } = this.state;
-    const fullySpecifiedName = concept.conceptNames.find(
-      (item) => item.conceptNameType === "FULLY_SPECIFIED"
-    );
-    const syns = synonyms.filter((item) => item.name.trim() !== "");
-
-    concept.conceptNames = [fullySpecifiedName, ...syns];
-    this.setState({ concept });
-  }
-
-  getValueFor(field) {
-    return field === null ? "" : field;
-  }
-
-  collectCodedInfo = (conceptAnswers) => {
-    const { concept } = this.state;
-    concept.conceptAnswers = conceptAnswers;
-    this.setState({ concept });
-  };
-
-  collectConceptNumericInfo = (conceptNumeric) => {
-    const { concept } = this.state;
-    concept.conceptNumeric = conceptNumeric;
-    this.setState({ concept });
-  };
-
-  isSetChangeHandler(event) {
-    const { concept } = this.state;
-    concept.isSet = event.target.checked;
-    this.setState({ concept });
-  }
-
-  unretire(event) {
-    event.preventDefault();
-    const { concept, conceptId } = this.state;
-    concept.retired = false;
-    this.setState({ concept: concept }, () => {
-      updateConceptById(conceptId, concept)
-        .then()
-        .catch((error) => console.log(error));
-    });
-  }
-
-  shortNameChangeHandler(event) {
-    const { concept } = this.state;
-    concept.shortName = event.target.value;
-    this.setState({ concept: concept });
-  }
-
-  descriptionChangeHandler(event) {
-    const { concept } = this.state;
-    concept.description = event.target.value;
-    this.setState({ concept: concept });
-  }
-
-  versionChangeHandler(event) {
-    const { concept } = this.state;
-    concept.version = event.target.value;
-    this.setState({ concept: concept });
-  }
-
-  saveConcept(event) {
-    event.preventDefault();
-    this.mergeConceptnames();
-
-    const { conceptId, concept } = this.state;
-    console.log("concept - save", concept);
-
-    // if (conceptId === "add") {
-    //   insertConcept(concept)
-    //     .then(() => {
-    //       this.setState({ redirect: "/concept/view/all" });
-    //     })
-    //     .catch((error) => console.log(error));
-    // } else {
-    //   updateConceptById(conceptId, concept)
-    //     .then(() => {
-    //       this.setState({ redirect: "/concept/view/all" });
-    //     })
-    //     .catch((error) => console.log(error));
-    // }
-  }
-
-  saveConceptAndContinue(event) {
-    event.preventDefault();
-    this.mergeConceptnames();
-
-    const { conceptId, concept } = this.state;
-    if (conceptId === "add") {
-      insertConcept(concept)
-        .then((response) => {
-          this.setState({ conceptId: response.data.name });
-        })
-        .catch((error) => console.log(error));
-    } else {
-      updateConceptById(conceptId, concept)
-        .then()
-        .catch((error) => console.log(error));
-    }
-  }
-
-  cancelConcept(event) {
-    event.preventDefault();
-    this.setState({ redirect: "/concept/view/all" });
-  }
-
-  deleteConcept(event) {
-    event.preventDefault();
-    const { conceptId } = this.state;
-    deleteConceptById(conceptId)
-      .then(() => {
-        this.setState({ redirect: "/concept/view/all" });
-      })
-      .catch((error) => console.log(error));
-  }
-
-  retireReasonChangeHandler(event) {
-    const { concept } = this.state;
-    concept.retireReason = event.target.value;
-    this.setState({ concept: concept });
-  }
-
-  retireConcept(event) {
-    event.preventDefault();
-    const { concept, conceptId } = this.state;
-    concept.retired = true;
-    this.setState({ concept: concept }, () => {
-      updateConceptById(conceptId, concept)
-        .then()
-        .catch((error) => console.log(error));
-    });
-  }
-
-  classIdChangeHandler(selectedOption) {
-    const { concept } = this.state;
-    concept.classId = selectedOption.value;
-    this.setState({ concept });
-  }
-
-  dataTypeChangeHandler(selectedOption) {
-    const { concept } = this.state;
-    concept.dataTypeId.conceptDataTypeId = selectedOption.value;
-
-    if (selectedOption.value === 1) {
-      concept.conceptNumeric = {
-        hiAbsolute: null,
-        hiCritical: null,
-        hiNormal: null,
-        lowAbsolute: null,
-        lowCritical: null,
-        lowNormal: null,
-        units: null,
-        precise: false,
-        displayPrecision: null,
-      };
-    } else if (selectedOption.value === 13) {
-      concept.conceptComplex = null;
-    } else if (selectedOption.value === 2) {
-      concept.conceptAnswers = [];
-    }
-
-    this.setState({ concept }, () => {
-      this.setDataType();
-    });
-  }
-
-  conceptComplexChangeHandler(selectedOption) {
-    const { concept } = this.state;
-    concept.conceptComplex = selectedOption.value;
-    this.setState({ concept });
   }
 
   setClassOptions() {
@@ -335,7 +255,7 @@ class ConceptForm extends React.Component {
             });
           });
           this.setState({ classOptions }, () => {
-            resolve("success");
+            resolve();
           });
         })
         .catch((e) => reject(e));
@@ -378,7 +298,7 @@ class ConceptForm extends React.Component {
             });
           });
           this.setState({ drugOptions }, () => {
-            resolve("success");
+            resolve();
           });
         })
         .catch((e) => reject(e));
@@ -397,7 +317,7 @@ class ConceptForm extends React.Component {
             });
           });
           this.setState({ dataTypeOptions }, () => {
-            resolve("success");
+            resolve();
           });
         })
         .catch((e) => reject(e));
@@ -416,7 +336,7 @@ class ConceptForm extends React.Component {
             });
           });
           this.setState({ mapRelationshipOptions }, () => {
-            resolve("success");
+            resolve();
           });
         })
         .catch((e) => reject(e));
@@ -439,7 +359,7 @@ class ConceptForm extends React.Component {
             });
           });
           this.setState({ mapSourceOptions }, () => {
-            resolve("success");
+            resolve();
           });
         })
         .catch((e) => reject(e));
@@ -451,7 +371,7 @@ class ConceptForm extends React.Component {
       getConceptReferenceTerms()
         .then((response) => {
           this.setState({ mapReferenceTermOptions: response.data }, () => {
-            resolve("success");
+            resolve();
           });
         })
         .catch((e) => reject(e));
@@ -465,7 +385,7 @@ class ConceptForm extends React.Component {
           this.setState(
             { filteredMapReferenceTermOptions: response.data },
             () => {
-              resolve("success");
+              resolve();
             }
           );
         })
@@ -486,18 +406,8 @@ class ConceptForm extends React.Component {
       });
 
       this.setState({ mapCodeOptions }, () => {
-        resolve("success");
+        resolve();
       });
-    });
-  }
-
-  setDataType() {
-    const { concept } = this.state;
-
-    return new Promise((resolve) => {
-      this.setState({ dataType: concept.dataTypeId.conceptDataTypeId }, () =>
-        resolve("success")
-      );
     });
   }
 
@@ -508,11 +418,11 @@ class ConceptForm extends React.Component {
         getConceptById(conceptId)
           .then((response) => {
             console.log(response.data);
-            this.setState({ concept: response.data }, () => resolve("success"));
+            this.setState({ concept: response.data }, () => resolve());
           })
           .catch((e) => reject(e));
       } else {
-        resolve("success");
+        resolve();
       }
     });
   }
@@ -529,35 +439,199 @@ class ConceptForm extends React.Component {
           conceptNameType: "INDEX_TERM",
         });
       }
-      this.setState({ synonyms }, () => resolve("success"));
+      this.setState({ synonyms }, () => resolve());
+    });
+  }
+  // component mount ends
+
+  // save starts
+  saveConcept(successMessage = "UPDATED") {
+    const { conceptId, concept } = this.state;
+    this.validate(concept)
+      .then(() => this.mergeConceptnames())
+      .then(() => {
+        const { error } = this.state;
+        if (!error) {
+          if (conceptId === "add") this.insertConceptWithData(concept);
+          else this.updateConceptWithData(conceptId, concept, successMessage);
+        }
+      });
+  }
+
+  insertConceptWithData(concept) {
+    insertConcept(concept)
+      .then(() => {
+        this.successAndRedirect("SAVED");
+      })
+      .catch((error) => {
+        console.log(error);
+        this.setHttpError("insertConcept", error.message);
+      });
+  }
+
+  updateConceptWithData(conceptId, concept, successMessage) {
+    updateConceptById(conceptId, concept)
+      .then(() => {
+        this.successAndRedirect(successMessage);
+      })
+      .catch((error) => {
+        console.log(error);
+        this.setHttpError("updateConceptById", error.message);
+      });
+  }
+
+  mergeConceptnames() {
+    return new Promise((resolve, reject) => {
+      const { synonyms, concept } = this.state;
+      const fullySpecifiedName = concept.conceptNames.find(
+        (item) => item.conceptNameType === "FULLY_SPECIFIED"
+      );
+      const syns = synonyms.filter((item) => item.name.trim() !== "");
+      concept.conceptNames = [fullySpecifiedName, ...syns];
+
+      this.setState({ concept }, () => resolve());
+    });
+  }
+  // save ends
+
+  retireConcept() {
+    const { concept } = this.state;
+    concept.retired = true;
+    this.setState({ concept }, () => {
+      this.saveConcept("RETIRED");
     });
   }
 
-  answerConceptChangeHandler(selectedOptions) {
-    const { conceptAnswers } = this.state.concept;
-    const answerDrugs = [];
-    conceptAnswers.forEach((concept) => {
-      if (concept.answerDrug) {
-        answerDrugs.push(concept);
-      }
+  unretireConcept() {
+    const { concept } = this.state;
+    concept.retireReason = null;
+    concept.retired = false;
+    this.setState({ concept }, () => {
+      this.saveConcept("UN-RETIRED");
     });
+  }
 
-    const answerConcepts = [];
-    if (selectedOptions !== null) {
-      selectedOptions.forEach((option) => {
-        const found = answerConcepts.some(
-          (answerConcept) => answerConcept.answerConcept === option.value
-        );
-        if (!found) answerConcepts.push({ answerConcept: option.value });
+  cancelConcept() {
+    this.setState({ redirect: this.viewAll });
+  }
+
+  deleteConcept() {
+    const { conceptId } = this.state;
+    deleteConceptById(conceptId)
+      .then(() => {
+        this.successAndRedirect("DELETED");
+      })
+      .catch((error) => {
+        console.log(error);
+        this.setHttpError("deleteConceptById", error.message);
       });
+  }
+
+  redirectToViewPage(conceptId) {
+    this.setState({ redirect: `/concept/view/${conceptId}` });
+  }
+
+  // input change handlers
+  conceptChangeHandler = (event, type = "value") => {
+    const { name } = event.target;
+    const { concept } = this.state;
+    concept[name] = event.target[type];
+    this.setState({ concept });
+  };
+
+  conceptSelectTypeInputChangehandler(selectedValues, name) {
+    // works for both SingleSelect and MultipleSelect
+    const { concept } = this.state;
+    concept[name] = selectedValues;
+
+    if (name === "dataTypeId") {
+      if (selectedValues === 1 && concept.conceptNumeric === null) {
+        concept.conceptNumeric = {
+          hiAbsolute: null,
+          hiCritical: null,
+          hiNormal: null,
+          lowAbsolute: null,
+          lowCritical: null,
+          lowNormal: null,
+          units: null,
+          precise: false,
+          displayPrecision: null,
+        };
+      } else if (selectedValues === 13 && concept.conceptComplex === null) {
+        concept.conceptComplex = "";
+      } else if (selectedValues === 2) {
+        if (concept.conceptAnswersConcepts === null)
+          concept.conceptAnswersConcepts = [];
+
+        if (concept.conceptAnswersDrugs === null)
+          concept.conceptAnswersDrugs = [];
+      }
     }
 
-    const newConceptAnswers = [...answerDrugs, ...answerConcepts];
-
-    const { concept } = this.state;
-    concept.conceptAnswers = newConceptAnswers;
     this.setState({ concept });
   }
+
+  fullySpecifiedNameChangeHandler(event) {
+    const { concept } = this.state;
+    const fullySpecifiedNameIndex = concept.conceptNames.findIndex(
+      (item) => item.conceptNameType === "FULLY_SPECIFIED"
+    );
+    concept.conceptNames[fullySpecifiedNameIndex].name = event.target.value;
+    this.setState({ concept });
+  }
+
+  addSynonymButtonHandler() {
+    const { synonyms } = this.state;
+    const syns = [
+      ...synonyms,
+      {
+        name: "",
+        conceptNameType: "INDEX_TERM",
+      },
+    ];
+    this.setState({ synonyms: syns });
+  }
+
+  synonymNameChangeHandler(event, index) {
+    const { synonyms } = this.state;
+    const syns = [...synonyms];
+    syns[index].name = event.target.value;
+    this.setState({ synonyms: syns });
+  }
+
+  removeSynonymButtonHandler(index) {
+    const { synonyms } = this.state;
+    const syns = [...synonyms];
+    syns.splice(index, 1);
+    this.setState({ synonyms: syns });
+  }
+
+  numericChangeHandler = (event, type = "value") => {
+    const { name } = event.target;
+    const { concept } = this.state;
+    concept.conceptNumeric[name] = event.target[type];
+    this.setState({ concept });
+  };
+
+  // input change handlers ends
+
+  // saveConceptAndContinue(event) {
+  //   event.preventDefault();
+  //   this.mergeConceptnames();
+
+  //   const { conceptId, concept } = this.state;
+  //   if (conceptId === "add") {
+  //     insertConcept(concept)
+  //       .then((response) => {
+  //         this.setState({ conceptId: response.data.name });
+  //       })
+  //       .catch((error) => console.log(error));
+  //   } else {
+  //     updateConceptById(conceptId, concept)
+  //       .then()
+  //       .catch((error) => console.log(error));
+  //   }
+  // }
 
   conceptSourceIdChangeHandler(selectedOption, index) {
     const { mapReferenceTermOptions } = this.state;
@@ -588,126 +662,6 @@ class ConceptForm extends React.Component {
     const { concept } = this.state;
     const maps = [...concept.mappings];
     maps[index].conceptMapTypeId = selectedOption.value;
-  }
-
-  answerDrugChangeHandler(selectedOptions) {
-    const { conceptAnswers } = this.state.concept;
-    const answerConcepts = [];
-    conceptAnswers.forEach((concept) => {
-      if (concept.answerConcept) {
-        answerConcepts.push(concept);
-      }
-    });
-
-    const answerDrugs = [];
-
-    if (selectedOptions !== null) {
-      selectedOptions.forEach((option) => {
-        const found = answerDrugs.some(
-          (answerDrug) => answerDrug.answerDrug === option.value
-        );
-        if (!found) answerDrugs.push({ answerDrug: option.value });
-      });
-    }
-
-    const newDrugAnswers = [...answerDrugs, ...answerConcepts];
-
-    const { concept } = this.state;
-    concept.conceptAnswers = newDrugAnswers;
-    this.setState({ concept });
-  }
-
-  getDefaultAnswerConceptValue() {
-    const { conceptAnswers } = this.state.concept;
-    const { conceptOptions } = this.state;
-
-    let defaultAnswerConceptValue = [];
-    conceptAnswers.forEach((concept) => {
-      if (concept.answerConcept) {
-        const eachValueOptions = conceptOptions.filter(
-          (conceptOption) => conceptOption.value === concept.answerConcept
-        );
-        defaultAnswerConceptValue = [
-          ...defaultAnswerConceptValue,
-          ...eachValueOptions,
-        ];
-      }
-    });
-    console.log("getDACV", defaultAnswerConceptValue);
-    return defaultAnswerConceptValue;
-  }
-
-  getDefaultAnswerDrugValue() {
-    const { conceptAnswers } = this.state.concept;
-    const { drugOptions } = this.state;
-
-    let defaultAnswerDrugValue = [];
-    conceptAnswers.forEach((concept) => {
-      if (concept.answerDrug) {
-        const eachValueOptions = drugOptions.filter(
-          (drugOption) => drugOption.value === concept.answerDrug
-        );
-        defaultAnswerDrugValue = [
-          ...defaultAnswerDrugValue,
-          ...eachValueOptions,
-        ];
-      }
-    });
-    return defaultAnswerDrugValue;
-  }
-
-  conceptSetsChangeHandler(selectedOptions) {
-    const conceptSets = [];
-    selectedOptions.forEach((option) => {
-      const found = conceptSets.some(
-        (conceptSet) => conceptSet.conceptId === option.value
-      );
-      if (!found) conceptSets.push({ conceptId: option.value });
-    });
-    const { concept } = this.state;
-    concept.conceptSets = conceptSets;
-    this.setState({ concept });
-  }
-
-  numericChangeHandler = (event, name, type = "value") => {
-    const { concept } = this.state;
-    concept.conceptNumeric[name] = event.target[type];
-    this.setState({ concept });
-  };
-
-  fullySpecifiedNameChangeHandler(event) {
-    const { concept } = this.state;
-    const fullySpecifiedNameIndex = concept.conceptNames.findIndex(
-      (item) => item.conceptNameType === "FULLY_SPECIFIED"
-    );
-    concept.conceptNames[fullySpecifiedNameIndex].name = event.target.value;
-    this.setState({ concept });
-  }
-
-  synonymNameChangeHandler(event, index) {
-    const { synonyms } = this.state;
-    const syns = [...synonyms];
-    syns[index].name = event.target.value;
-    this.setState({ synonyms: syns });
-  }
-
-  removeSynonymButtonHandler(index) {
-    const { synonyms } = this.state;
-    const syns = [...synonyms];
-    syns.splice(index, 1);
-    this.setState({ synonyms: syns });
-  }
-
-  addSynonymButtonHandler() {
-    const { synonyms } = this.state;
-    const syns = [
-      ...synonyms,
-      {
-        name: "",
-        conceptNameType: "INDEX_TERM",
-      },
-    ];
-    this.setState({ synonyms: syns });
   }
 
   addMappingButtonHandler() {
@@ -744,31 +698,21 @@ class ConceptForm extends React.Component {
 
   render() {
     const {
-      unretire,
-      shortNameChangeHandler,
-      descriptionChangeHandler,
-      saveConcept,
       saveConceptAndContinue,
+      saveConcept,
+      retireConcept,
+      unretireConcept,
       cancelConcept,
       deleteConcept,
-      retireReasonChangeHandler,
-      retireConcept,
-      classIdChangeHandler,
-      dataTypeChangeHandler,
-      versionChangeHandler,
-      conceptComplexChangeHandler,
-      isSetChangeHandler,
-      getValueFor,
-      conceptSetsChangeHandler,
-      // getDefaultAnswerConceptValue,
-      // getDefaultAnswerDrugValue,
-      answerConceptChangeHandler,
-      answerDrugChangeHandler,
+      redirectToViewPage,
+      conceptChangeHandler,
       fullySpecifiedNameChangeHandler,
+      conceptSelectTypeInputChangehandler,
       synonymNameChangeHandler,
       addSynonymButtonHandler,
       removeSynonymButtonHandler,
       numericChangeHandler,
+
       addMappingButtonHandler,
       removeMappingButtonHandler,
       conceptMapTypeIdChangeHandler,
@@ -779,21 +723,32 @@ class ConceptForm extends React.Component {
 
     const {
       concept,
-      redirect,
       conceptId,
       classOptions,
       conceptOptions,
       drugOptions,
       dataTypeOptions,
       mapSourceOptions,
-      isLoading,
       synonyms,
       mapRelationshipOptions,
-      dataType,
       mapCodeOptions,
+      redirect,
+      isLoading,
+      error,
+      errors,
+      showSuccessMessage,
+      successMessage,
     } = this.state;
 
-    const { conceptNumeric, conceptNames, mappings } = concept;
+    const {
+      conceptNumeric,
+      conceptNames,
+      conceptSets,
+      mappings,
+      dataTypeId,
+      conceptAnswersConcepts,
+      conceptAnswersDrugs,
+    } = concept;
 
     const getFullySpecifiedName = () => {
       const fullySpecifiedNameObject = conceptNames.find(
@@ -803,106 +758,25 @@ class ConceptForm extends React.Component {
     };
     const fullySpecifiedName = getFullySpecifiedName();
 
-    const getDefaultDataTypeValue = dataTypeOptions.filter(
-      (dataTypeOption) => dataTypeOption.value === dataType
-    );
+    if (redirect) return <Redirect to={redirect} />;
 
-    const getDefaultClassIdValue = classOptions.filter(
-      (classOption) => classOption.value === concept.classId
-    );
+    if (showSuccessMessage) return <SuccessMessage action={successMessage} />;
 
-    const getDefaultConceptComplexValue = CONCEPT_COMPLEX_HANDLERS.filter(
-      (conceptComplexHandler) =>
-        conceptComplexHandler.value === concept.conceptComplex
-    );
+    if (errors.httpRequestHasError)
+      return <ErrorLoadingData message={errors.httpRequest} />;
 
-    const getDefaultConceptSetsValue = () => {
-      const { conceptSets } = this.state.concept;
-      const { conceptOptions } = this.state;
+    if (isLoading) return <LoadingData />;
 
-      let defaultConceptSetsValue = [];
-      conceptSets.forEach((concept) => {
-        const eachValueOptions = conceptOptions.filter(
-          (conceptOption) => conceptOption.value === concept.conceptId
-        );
-        defaultConceptSetsValue = [
-          ...defaultConceptSetsValue,
-          ...eachValueOptions,
-        ];
-      });
-      return defaultConceptSetsValue;
-    };
-    const defaultConceptSetsValue = getDefaultConceptSetsValue();
+    return (
+      <Paper style={conceptPaperStyle}>
+        {conceptId !== "add" && (
+          <button type="button" onClick={() => redirectToViewPage(conceptId)}>
+            View
+          </button>
+        )}
 
-    const getDefaultAnswerConceptValue = () => {
-      const { conceptAnswers } = this.state.concept;
-      const { conceptOptions } = this.state;
-
-      let defaultAnswerConceptValue = [];
-      conceptAnswers.forEach((concept) => {
-        if (concept.answerConcept) {
-          const eachValueOptions = conceptOptions.filter(
-            (conceptOption) => conceptOption.value === concept.answerConcept
-          );
-          defaultAnswerConceptValue = [
-            ...defaultAnswerConceptValue,
-            ...eachValueOptions,
-          ];
-        }
-      });
-      return defaultAnswerConceptValue;
-    };
-    const defaultAnswerConceptValue = getDefaultAnswerConceptValue();
-
-    const getDefaultAnswerDrugValue = () => {
-      const { conceptAnswers } = this.state.concept;
-      const { drugOptions } = this.state;
-
-      let defaultAnswerDrugValue = [];
-      conceptAnswers.forEach((concept) => {
-        if (concept.answerDrug) {
-          const eachValueOptions = drugOptions.filter(
-            (drugOption) => drugOption.value === concept.answerDrug
-          );
-          defaultAnswerDrugValue = [
-            ...defaultAnswerDrugValue,
-            ...eachValueOptions,
-          ];
-        }
-      });
-      return defaultAnswerDrugValue;
-    };
-    const defaultAnswerDrugValue = getDefaultAnswerDrugValue();
-
-    if (redirect) {
-      return <Redirect to={redirect} />;
-    }
-
-    if (isLoading) {
-      return <p>Loading...</p>;
-    }
-
-    if (conceptId === "add") {
-      return (
-        <Paper style={conceptPaperStyle}>
-          {conceptId !== "add" && (
-            <button type="button">
-              <a href={`/concept/view/${conceptId}`}>View</a>
-            </button>
-          )}
-          {conceptId !== "add" && concept.retired && (
-            <div>
-              <p>
-                This concept is retired by (user) (retiredDate) - Retired from
-                user interface
-              </p>
-              <button type="button" onClick={unretire.bind(this)}>
-                Unretire
-              </button>
-            </div>
-          )}
-
-          <form>
+        <form>
+          <div>
             <label>Mappings:</label>
             <div>
               <button
@@ -970,24 +844,24 @@ class ConceptForm extends React.Component {
                 </div>
               </div>
             ))}
-            <br />
+          </div>
 
-            <TextField
-              label="Fully Specified Name"
-              type="text"
-              id="fullySpecifiedName"
-              name="fullySpecifiedName"
-              onChange={fullySpecifiedNameChangeHandler.bind(this)}
-              value={getValueFor(fullySpecifiedName)}
-            />
-            <br />
+          <br />
 
+          <TextField
+            label="Fully Specified Name"
+            type="text"
+            id="fullySpecifiedName"
+            name="fullySpecifiedName"
+            onChange={(e) => fullySpecifiedNameChangeHandler(e)}
+            value={GET_VALUE(fullySpecifiedName)}
+          />
+          <br />
+
+          <div>
             <label>Synonyms:</label>
             <div>
-              <button
-                type="button"
-                onClick={addSynonymButtonHandler.bind(this)}
-              >
+              <button type="button" onClick={() => addSynonymButtonHandler()}>
                 Add Synonym
               </button>
             </div>
@@ -1010,8 +884,10 @@ class ConceptForm extends React.Component {
                 </div>
               </div>
             ))}
-            <br />
+          </div>
+          <br />
 
+          <div>
             {/* <label>Synonyms:</label>
             {synonyms.map((item, index) => (
               <div key={index}>
@@ -1044,336 +920,326 @@ class ConceptForm extends React.Component {
                 </div>
               </div>
             ))} */}
+          </div>
+          <br />
 
-            <br />
+          <TextField
+            label="Short Name"
+            type="text"
+            id="shortName"
+            name="shortName"
+            onChange={(e) => conceptChangeHandler(e)}
+            value={GET_VALUE(concept.shortName)}
+          />
+          <br />
 
-            <TextField
-              label="Short Name"
-              type="text"
-              id="shortName"
-              name="shortName"
-              onChange={shortNameChangeHandler.bind(this)}
-              value={getValueFor(concept.shortName)}
-            />
-            <br />
+          <TextField
+            label="Description"
+            type="text"
+            id="description"
+            name="description"
+            onChange={(e) => conceptChangeHandler(e)}
+            value={GET_VALUE(concept.description)}
+          />
+          <br />
 
-            <TextField
-              label="Description"
-              type="text"
-              id="description"
-              name="description"
-              onChange={descriptionChangeHandler.bind(this)}
-              value={getValueFor(concept.description)}
-            />
-            <br />
-            <SingleSelect
-              style={inputStyle}
-              label="Class"
-              id="classId"
-              name="classId"
-              defaultValue={
-                concept.classId === 1
-                  ? { label: "Test", value: 1 }
-                  : getDefaultClassIdValue
-              }
-              onChange={classIdChangeHandler.bind(this)}
-              options={classOptions}
-            />
-            <br />
-            <FormControlLabel
-              control={
-                <Checkbox
-                  type="checkbox"
-                  id="isSet"
-                  name="isSet"
-                  onChange={isSetChangeHandler.bind(this)}
-                  checked={getValueFor(concept.isSet)}
-                />
-              }
-              label={<span style={checkboxLabelStyle}>Is set</span>}
-            />
-            <br />
+          <SingleSelect
+            style={inputStyle}
+            label="Class"
+            id="classId"
+            name="classId"
+            defaultValue={concept.classId}
+            onChange={(selectedValue) =>
+              conceptSelectTypeInputChangehandler(selectedValue, "classId")
+            }
+            options={classOptions}
+          />
+          <br />
 
-            {concept.isSet && (
-              <div>
-                {/* <label htmlFor="conceptSets">
-                  Set Members:
-                  <div style={{ width: "500px", display: "inline-block" }}>
-                    <Select
-                      isMulti
-                      id="conceptSets"
-                      name="conceptSets"
-                      defaultValue={defaultConceptSetsValue}
-                      onChange={conceptSetsChangeHandler.bind(this)}
-                      options={conceptOptions}
-                    />
-                  </div>
-                </label> */}
-                <MultipleSelect
-                  style={inputStyle}
-                  label="Set Members"
-                  id="conceptSets"
-                  name="conceptSets"
-                  defaultValue={defaultConceptSetsValue}
-                  onChange={conceptSetsChangeHandler.bind(this)}
-                  options={conceptOptions}
-                />
-                <br />
-              </div>
-            )}
-
-            <SingleSelect
-              label="Datatype"
-              style={inputStyle}
-              id="dataType"
-              name="dataType"
-              defaultValue={
-                dataType === 1
-                  ? { label: "Numeric", value: 1 }
-                  : getDefaultDataTypeValue
-              }
-              onChange={dataTypeChangeHandler.bind(this)}
-              options={dataTypeOptions}
-            />
-            <br />
-
-            {dataType === 1 && (
-              <div>
-                <p>Numeric</p>
-                <TextField
-                  label="Absolute High"
-                  type="text"
-                  id="hiAbsolute"
-                  name="hiAbsolute"
-                  value={getValueFor(
-                    conceptNumeric === null ? "" : conceptNumeric.hiAbsolute
-                  )}
-                  onChange={(e) => numericChangeHandler(e, "hiAbsolute")}
-                />
-                <br />
-
-                <TextField
-                  label="Critical High"
-                  type="text"
-                  id="hiCritical"
-                  name="hiCritical"
-                  value={getValueFor(
-                    conceptNumeric === null ? "" : conceptNumeric.hiCritical
-                  )}
-                  onChange={(e) => numericChangeHandler(e, "hiCritical")}
-                />
-                <br />
-                <TextField
-                  label="Normal High"
-                  type="text"
-                  id="hiNormal"
-                  name="hiNormal"
-                  value={getValueFor(
-                    conceptNumeric === null ? "" : conceptNumeric.hiNormal
-                  )}
-                  onChange={(e) => numericChangeHandler(e, "hiNormal")}
-                />
-                <br />
-                <TextField
-                  label="Absolute Low"
-                  type="text"
-                  id="lowAbsolute"
-                  name="lowAbsolute"
-                  value={getValueFor(
-                    conceptNumeric === null ? "" : conceptNumeric.lowAbsolute
-                  )}
-                  onChange={(e) => numericChangeHandler(e, "lowAbsolute")}
-                />
-                <br />
-
-                <TextField
-                  label="Critical Low"
-                  type="text"
-                  id="lowCritical"
-                  name="lowCritical"
-                  value={getValueFor(
-                    conceptNumeric === null ? "" : conceptNumeric.lowCritical
-                  )}
-                  onChange={(e) => numericChangeHandler(e, "lowCritical")}
-                />
-                <br />
-
-                <TextField
-                  label="Normal Low"
-                  type="text"
-                  id="lowNormal"
-                  name="lowNormal"
-                  value={getValueFor(
-                    conceptNumeric === null ? "" : conceptNumeric.lowNormal
-                  )}
-                  onChange={(e) => numericChangeHandler(e, "lowNormal")}
-                />
-                <br />
-
-                <TextField
-                  label="Units"
-                  type="text"
-                  id="units"
-                  name="units"
-                  value={getValueFor(
-                    conceptNumeric === null ? "" : conceptNumeric.units
-                  )}
-                  onChange={(e) => numericChangeHandler(e, "units")}
-                />
-                <br />
-
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      type="checkbox"
-                      id="precise"
-                      name="precise"
-                      checked={getValueFor(
-                        conceptNumeric === null ? "" : conceptNumeric.precise
-                      )}
-                      onChange={(e) =>
-                        numericChangeHandler(e, "precise", "checked")
-                      }
-                    />
-                  }
-                  label={<span style={checkboxLabelStyle}>Allow Decimal?</span>}
-                />
-                <br />
-
-                <TextField
-                  label="Display Precision"
-                  type="text"
-                  id="displayPrecision"
-                  name="displayPrecision"
-                  value={getValueFor(
-                    conceptNumeric === null
-                      ? ""
-                      : conceptNumeric.displayPrecision
-                  )}
-                  readOnly="true"
-                  disabled="true"
-                />
-                <br />
-              </div>
-            )}
-
-            {dataType === 2 && (
-              <div>
-                <p>Answers</p>
-
-                <label htmlFor="answerConcept">Select Concepts: </label>
-                <div style={{ width: "80%", display: "inline-block" }}>
-                  <Select
-                    isMulti
-                    id="answerConcept"
-                    name="answerConcept"
-                    placeholder="Enter concept name or id"
-                    // defaultValue={() => getDefaultAnswerConceptValue.bind(this)}
-                    defaultValue={defaultAnswerConceptValue}
-                    onChange={answerConceptChangeHandler.bind(this)}
-                    options={conceptOptions}
-                    filterOption={FILTER_OPTIONS}
-                  />
-                </div>
-                <br />
-
-                <label htmlFor="answerDrug">Select Concept Drugs: </label>
-                <div style={{ width: "80%", display: "inline-block" }}>
-                  <Select
-                    isMulti
-                    id="answerDrug"
-                    name="answerDrug"
-                    placeholder="Enter concept drug name or id"
-                    // defaultValue={() => getDefaultAnswerDrugValue.bind(this)}
-                    defaultValue={defaultAnswerDrugValue}
-                    onChange={answerDrugChangeHandler.bind(this)}
-                    options={drugOptions}
-                    filterOption={FILTER_OPTIONS}
-                  />
-                </div>
-                <br />
-              </div>
-            )}
-
-            {dataType === 13 && (
-              <div>
-                <label htmlFor="conceptComplexHandler">
-                  Handler:
-                  <div style={{ width: "300px", display: "inline-block" }}>
-                    <Select
-                      id="conceptComplex"
-                      name="conceptComplex"
-                      defaultValue={getDefaultConceptComplexValue}
-                      onChange={conceptComplexChangeHandler.bind(this)}
-                      options={CONCEPT_COMPLEX_HANDLERS}
-                    />
-                  </div>
-                </label>
-                <SingleSelect
-                  label="Handler"
-                  id="conceptComplex"
-                  name="conceptComplex"
-                  defaultValue={getDefaultConceptComplexValue}
-                  onChange={conceptComplexChangeHandler.bind(this)}
-                  options={CONCEPT_COMPLEX_HANDLERS}
-                />
-              </div>
-            )}
-
-            <TextField
-              label="Version"
-              type="text"
-              id="version"
-              name="version"
-              onChange={versionChangeHandler.bind(this)}
-              value={getValueFor(concept.version)}
-            />
-            <br />
-
-            <Controls.SaveButton onClick={saveConcept.bind(this)} />
-            <Button
-              variant="outlined"
-              onClick={saveConceptAndContinue.bind(this)}
-            >
-              Save and Continue
-            </Button>
-            <Controls.CancelButton
-              type="button"
-              onClick={cancelConcept.bind(this)}
-            />
-
-            {conceptId !== "add" && (
-              <Controls.DeleteButton
-                style={deleteButtonStyle}
-                onClick={deleteConcept.bind(this)}
+          <FormControlLabel
+            control={
+              <Checkbox
+                type="checkbox"
+                id="isSet"
+                name="isSet"
+                onChange={(e) => conceptChangeHandler(e, "checked")}
+                checked={GET_VALUE(concept.isSet)}
               />
-            )}
-          </form>
+            }
+            label={<span style={checkboxLabelStyle}>Is set</span>}
+          />
+          <br />
 
-          {conceptId !== "add" && !concept.retired && (
+          {concept.isSet && (
             <div>
-              <hr />
-              <p>Retire Concept</p>
-              <TextField
-                label="Reason"
-                type="text"
-                id="retireReason"
-                name="retireReason"
-                onChange={retireReasonChangeHandler.bind(this)}
-                value={getValueFor(concept.retireReason)}
-              />
-              <br />
-
-              <Controls.RetireButton
-                type="button"
-                onClick={retireConcept.bind(this)}
+              <MultipleSelect
+                style={inputStyle}
+                label="Set Members"
+                id="conceptSets"
+                name="conceptSets"
+                defaultValues={conceptSets}
+                onChange={(selectedValues) =>
+                  conceptSelectTypeInputChangehandler(
+                    selectedValues,
+                    "conceptSets"
+                  )
+                }
+                options={conceptOptions}
               />
             </div>
           )}
-        </Paper>
-      );
-    }
-    return <p>Loading...</p>;
+
+          <SingleSelect
+            label="Datatype"
+            style={inputStyle}
+            id="dataTypeId"
+            name="dataTypeId"
+            defaultValue={dataTypeId}
+            onChange={(selectedValue) =>
+              conceptSelectTypeInputChangehandler(selectedValue, "dataTypeId")
+            }
+            options={dataTypeOptions}
+          />
+          <br />
+
+          {dataTypeId === 1 && (
+            <div>
+              <p>Numeric</p>
+              <TextField
+                label="Absolute High"
+                type="text"
+                id="hiAbsolute"
+                name="hiAbsolute"
+                value={GET_VALUE(
+                  conceptNumeric === null ? "" : conceptNumeric.hiAbsolute
+                )}
+                onChange={(e) => numericChangeHandler(e)}
+              />
+              <br />
+
+              <TextField
+                label="Critical High"
+                type="text"
+                id="hiCritical"
+                name="hiCritical"
+                value={GET_VALUE(
+                  conceptNumeric === null ? "" : conceptNumeric.hiCritical
+                )}
+                onChange={(e) => numericChangeHandler(e)}
+              />
+              <br />
+              <TextField
+                label="Normal High"
+                type="text"
+                id="hiNormal"
+                name="hiNormal"
+                value={GET_VALUE(
+                  conceptNumeric === null ? "" : conceptNumeric.hiNormal
+                )}
+                onChange={(e) => numericChangeHandler(e)}
+              />
+              <br />
+              <TextField
+                label="Absolute Low"
+                type="text"
+                id="lowAbsolute"
+                name="lowAbsolute"
+                value={GET_VALUE(
+                  conceptNumeric === null ? "" : conceptNumeric.lowAbsolute
+                )}
+                onChange={(e) => numericChangeHandler(e)}
+              />
+              <br />
+
+              <TextField
+                label="Critical Low"
+                type="text"
+                id="lowCritical"
+                name="lowCritical"
+                value={GET_VALUE(
+                  conceptNumeric === null ? "" : conceptNumeric.lowCritical
+                )}
+                onChange={(e) => numericChangeHandler(e)}
+              />
+              <br />
+
+              <TextField
+                label="Normal Low"
+                type="text"
+                id="lowNormal"
+                name="lowNormal"
+                value={GET_VALUE(
+                  conceptNumeric === null ? "" : conceptNumeric.lowNormal
+                )}
+                onChange={(e) => numericChangeHandler(e)}
+              />
+              <br />
+
+              <TextField
+                label="Units"
+                type="text"
+                id="units"
+                name="units"
+                value={GET_VALUE(
+                  conceptNumeric === null ? "" : conceptNumeric.units
+                )}
+                onChange={(e) => numericChangeHandler(e)}
+              />
+              <br />
+
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    type="checkbox"
+                    id="precise"
+                    name="precise"
+                    checked={GET_VALUE(
+                      conceptNumeric === null ? "" : conceptNumeric.precise
+                    )}
+                    onChange={(e) => numericChangeHandler(e, "checked")}
+                  />
+                }
+                label={<span style={checkboxLabelStyle}>Allow Decimal?</span>}
+              />
+              <br />
+
+              <TextField
+                label="Display Precision"
+                type="text"
+                id="displayPrecision"
+                name="displayPrecision"
+                value={GET_VALUE(
+                  conceptNumeric === null ? "" : conceptNumeric.displayPrecision
+                )}
+                readOnly="true"
+                disabled="true"
+              />
+              <br />
+            </div>
+          )}
+
+          {dataTypeId === 2 && (
+            <div>
+              <p>Answers</p>
+
+              <MultipleSelect
+                label="Select Concepts"
+                id="conceptAnswersConcepts"
+                name="conceptAnswersConcepts"
+                placeholder="Enter concept name or id"
+                defaultValues={conceptAnswersConcepts}
+                onChange={(selectedValues) =>
+                  conceptSelectTypeInputChangehandler(
+                    selectedValues,
+                    "conceptAnswersConcepts"
+                  )
+                }
+                options={conceptOptions}
+                filterOption={FILTER_OPTIONS}
+              />
+              <br />
+
+              <MultipleSelect
+                label="Select Drugs"
+                id="conceptAnswersDrugs"
+                name="conceptAnswersDrugs"
+                placeholder="Enter concept drug name or id"
+                defaultValues={conceptAnswersDrugs}
+                onChange={(selectedValues) =>
+                  conceptSelectTypeInputChangehandler(
+                    selectedValues,
+                    "conceptAnswersDrugs"
+                  )
+                }
+                options={drugOptions}
+                filterOption={FILTER_OPTIONS}
+              />
+            </div>
+          )}
+
+          {dataTypeId === 13 && (
+            <div>
+              <SingleSelect
+                label="Handler"
+                id="conceptComplex"
+                name="conceptComplex"
+                defaultValue={GET_VALUE(concept.conceptComplex)}
+                onChange={(selectedValue) =>
+                  conceptSelectTypeInputChangehandler(
+                    selectedValue,
+                    "conceptComplex"
+                  )
+                }
+                options={CONCEPT_COMPLEX_HANDLERS}
+              />
+            </div>
+          )}
+
+          <TextField
+            label="Version"
+            type="text"
+            id="version"
+            name="version"
+            onChange={(e) => conceptChangeHandler(e)}
+            value={GET_VALUE(concept.version)}
+          />
+          <br />
+        </form>
+
+        <Controls.SaveButton onClick={() => saveConcept()} />
+        {/* <Button variant="outlined" onClick={saveConceptAndContinue.bind(this)}>
+          Save and Continue
+        </Button> */}
+        <Controls.CancelButton type="button" onClick={() => cancelConcept()} />
+
+        {conceptId !== "add" && !concept.retired && (
+          <Paper style={paperStyle}>
+            <TextField
+              style={inputStyle}
+              label="Reason to retire"
+              type="text"
+              id="retireReason"
+              name="retireReason"
+              multiline
+              value={GET_VALUE(concept.retireReason)}
+              onChange={(e) => conceptChangeHandler(e)}
+            />
+            <span>
+              {error && errors.retireReasonHasError && errors.retireReason}
+            </span>
+
+            <br />
+            <div style={buttonGroupStyle}>
+              <Controls.RetireButton
+                retired={concept.retired}
+                onClick={() => retireConcept()}
+              />
+            </div>
+
+            <br />
+          </Paper>
+        )}
+
+        {conceptId !== "add" && concept.retired && (
+          <Paper style={paperStyle}>
+            <p style={subHeadingStyle}>Unretire Concept</p>
+            <div style={buttonGroupStyle}>
+              <Controls.RetireButton
+                retired={concept.retired}
+                onClick={() => unretireConcept()}
+              />
+            </div>
+          </Paper>
+        )}
+
+        {conceptId !== "add" && (
+          <Controls.DeleteButton
+            style={deleteButtonStyle}
+            onClick={() => deleteConcept()}
+          />
+        )}
+      </Paper>
+    );
   }
 }
 

@@ -224,15 +224,10 @@ class PrivilegeForm extends React.Component {
 
     if (showSuccessMessage) return <SuccessMessage action={successMessage} />;
 
-    if (isLoading)
-      return (
-        <div>
-          {!errors.httpRequestHasError && <LoadingData />}
-          {errors.httpRequestHasError && (
-            <ErrorLoadingData message={errors.httpRequest} />
-          )}
-        </div>
-      );
+    if (errors.httpRequestHasError)
+      return <ErrorLoadingData message={errors.httpRequest} />;
+
+    if (isLoading) return <LoadingData />;
 
     return (
       <React.Fragment>
@@ -242,6 +237,8 @@ class PrivilegeForm extends React.Component {
           )}
 
           <TextField
+            error={errors.privilegeHasError}
+            helperText={errors.privilegeHasError && errors.privilege}
             style={inputStyle}
             label="Privilege Name"
             type="text"
@@ -252,10 +249,6 @@ class PrivilegeForm extends React.Component {
             onChange={(e) => privilegeChangeHandler(e)}
             required
           />
-          <span style={inputError}>
-            {error && errors.privilegeHasError && errors.privilege}
-          </span>
-          <br />
 
           <TextField
             style={inputStyle}
@@ -268,7 +261,7 @@ class PrivilegeForm extends React.Component {
             value={GET_VALUE(privilege.description)}
             onChange={(e) => privilegeChangeHandler(e)}
           />
-          <br />
+
           <div style={buttonGroupStyle}>
             <Controls.SaveButton onClick={() => savePrivilege()} />
             <Controls.CancelButton onClick={() => cancelPrivilege()} />

@@ -406,15 +406,10 @@ class RoleForm extends React.Component {
 
     if (showSuccessMessage) return <SuccessMessage action={successMessage} />;
 
-    if (isLoading)
-      return (
-        <div>
-          {!errors.httpRequestHasError && <LoadingData />}
-          {errors.httpRequestHasError && (
-            <ErrorLoadingData message={errors.httpRequest} />
-          )}
-        </div>
-      );
+    if (errors.httpRequestHasError)
+      return <ErrorLoadingData message={errors.httpRequest} />;
+
+    if (isLoading) return <LoadingData />;
 
     return (
       <React.Fragment>
@@ -423,6 +418,8 @@ class RoleForm extends React.Component {
             <span style={globalError}>{errors.globalErrorMessage}</span>
           )}
           <TextField
+            error={errors.roleHasError}
+            helperText={errors.roleHasError && errors.role}
             style={inputStyle}
             label="Role"
             type="text"
@@ -433,10 +430,6 @@ class RoleForm extends React.Component {
             onChange={(e) => roleChangeHandler(e)}
             required
           />
-          <span style={inputError}>
-            {error && errors.roleHasError && errors.role}
-          </span>
-          <br />
 
           <label htmlFor="description">
             <TextField
@@ -450,7 +443,6 @@ class RoleForm extends React.Component {
               onChange={(e) => roleChangeHandler(e)}
             />
           </label>
-          <br />
 
           {role.childRoles.length > 0 && (
             <div>
@@ -464,7 +456,6 @@ class RoleForm extends React.Component {
                   </li>
                 ))}
               </ul>
-              <br />
             </div>
           )}
 
@@ -523,14 +514,13 @@ class RoleForm extends React.Component {
             </div>
           </div>
 
-          <br />
           {roleId !== "add" && (
             <div>
               <span>UUID: </span>
               <span>{role.uuid}</span>
             </div>
           )}
-          <br />
+
           <div style={buttonGroupStyle}>
             <Controls.SaveButton onClick={() => saveRole()} />
             <Controls.CancelButton onClick={() => cancelRole()} />

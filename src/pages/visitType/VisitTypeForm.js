@@ -253,15 +253,10 @@ class VisitTypeForm extends React.Component {
 
     if (showSuccessMessage) return <SuccessMessage action={successMessage} />;
 
-    if (isLoading)
-      return (
-        <div>
-          {!errors.httpRequestHasError && <LoadingData />}
-          {errors.httpRequestHasError && (
-            <ErrorLoadingData message={errors.httpRequest} />
-          )}
-        </div>
-      );
+    if (errors.httpRequestHasError)
+      return <ErrorLoadingData message={errors.httpRequest} />;
+
+    if (isLoading) return <LoadingData />;
 
     return (
       <React.Fragment>
@@ -269,7 +264,10 @@ class VisitTypeForm extends React.Component {
           {error && (
             <span style={globalError}>{errors.globalErrorMessage}</span>
           )}
+
           <TextField
+            error={errors.nameHasError}
+            helperText={errors.nameHasError && errors.name}
             style={inputStyle}
             label="Name"
             type="text"
@@ -279,11 +277,7 @@ class VisitTypeForm extends React.Component {
             onChange={(e) => visitTypeChangeHandler(e)}
             required
           />
-          <span style={inputError}>
-            {error && errors.nameHasError && errors.name}
-          </span>
 
-          <br />
           <TextField
             style={inputStyle}
             label="Description"
@@ -296,7 +290,6 @@ class VisitTypeForm extends React.Component {
             onChange={(e) => visitTypeChangeHandler(e)}
           />
 
-          <br />
           <div style={buttonGroupStyle}>
             <Controls.SaveButton onClick={() => saveVisitType()} />
             <Controls.CancelButton
@@ -304,13 +297,13 @@ class VisitTypeForm extends React.Component {
               onClick={() => cancelVisitType()}
             />
           </div>
-
-          <br />
         </Paper>
 
         {visitTypeId !== "add" && !visitType.retired && (
           <Paper style={paperStyle}>
             <TextField
+              error={errors.retireReasonHasError}
+              helperText={errors.retireReasonHasError && errors.retireReason}
               style={inputStyle}
               label="Reason to retire"
               type="text"
@@ -320,19 +313,13 @@ class VisitTypeForm extends React.Component {
               value={GET_VALUE(visitType.retireReason)}
               onChange={(e) => visitTypeChangeHandler(e)}
             />
-            <span>
-              {error && errors.retireReasonHasError && errors.retireReason}
-            </span>
 
-            <br />
             <div style={buttonGroupStyle}>
               <Controls.RetireButton
                 retired={visitType.retired}
                 onClick={() => retireVisitType()}
               />
             </div>
-
-            <br />
           </Paper>
         )}
 
@@ -345,8 +332,6 @@ class VisitTypeForm extends React.Component {
                 onClick={() => unretireVisitType()}
               />
             </div>
-
-            <br />
           </Paper>
         )}
 

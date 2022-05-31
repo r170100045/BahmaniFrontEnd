@@ -329,15 +329,10 @@ class PersonAttributeTypeForm extends React.Component {
 
     if (showSuccessMessage) return <SuccessMessage action={successMessage} />;
 
-    if (isLoading)
-      return (
-        <div>
-          {!errors.httpRequestHasError && <LoadingData />}
-          {errors.httpRequestHasError && (
-            <ErrorLoadingData message={errors.httpRequest} />
-          )}
-        </div>
-      );
+    if (errors.httpRequestHasError)
+      return <ErrorLoadingData message={errors.httpRequest} />;
+
+    if (isLoading) return <LoadingData />;
 
     return (
       <React.Fragment>
@@ -347,6 +342,8 @@ class PersonAttributeTypeForm extends React.Component {
           )}
 
           <TextField
+            error={errors.nameHasError}
+            helperText={errors.nameHasError && errors.name}
             style={inputStyle}
             label="Name*"
             type="text"
@@ -355,13 +352,10 @@ class PersonAttributeTypeForm extends React.Component {
             value={GET_VALUE(personAttributeType.name)}
             onChange={personAttributeTypeChangeHandler}
           />
-          <span style={inputError}>
-            {error && errors.nameHasError && errors.name}
-          </span>
-
-          <br />
 
           <SingleSelect
+            error={errors.formatHasError}
+            helperText={errors.formatHasError && errors.format}
             label="Format*"
             style={inputStyle}
             id="format"
@@ -376,11 +370,6 @@ class PersonAttributeTypeForm extends React.Component {
             options={FORMAT_OPTIONS}
           />
           <span style={inputInfoStyle}>Name of a Java or OpenMRS class</span>
-          <span style={inputError}>
-            {error && errors.formatHasError && errors.format}
-          </span>
-
-          <br />
 
           <TextField
             style={inputStyle}
@@ -394,7 +383,7 @@ class PersonAttributeTypeForm extends React.Component {
           <span style={inputInfoStyle}>
             Integer id of the object specified by 'format'
           </span>
-          <br />
+
           <FormControlLabel
             control={
               <Checkbox
@@ -407,11 +396,9 @@ class PersonAttributeTypeForm extends React.Component {
             }
             label={<span style={checkboxLabelStyle}>Searchable</span>}
           />
-
           <span style={inputInfoStyle}>
             Whether this type can be searched on or not
           </span>
-          <br />
 
           <TextField
             label="Description"
@@ -424,7 +411,6 @@ class PersonAttributeTypeForm extends React.Component {
             value={GET_VALUE(personAttributeType.description)}
             onChange={(e) => personAttributeTypeChangeHandler(e)}
           />
-          <br />
 
           <SingleSelect
             label="Edit Privilege"
@@ -443,7 +429,6 @@ class PersonAttributeTypeForm extends React.Component {
           <span style={inputInfoStyle}>
             The privilege needed by a user to edit this person attribute
           </span>
-          <br />
 
           <div style={buttonGroupStyle}>
             <Controls.SaveButton onClick={() => savePersonAttributeType()} />
@@ -451,14 +436,15 @@ class PersonAttributeTypeForm extends React.Component {
               onClick={() => cancelPersonAttributeType()}
             />
           </div>
-
-          <br />
         </Paper>
+
         {personAttributeTypeId !== "add" && !personAttributeType.retired && (
           <Paper style={paperStyle}>
             <p style={subHeadingStyle}>Retire Person Attribute Type</p>
 
             <TextField
+              error={errors.retireReasonHasError}
+              helperText={errors.retireReasonHasError && errors.retireReason}
               style={inputStyle}
               label="Reason"
               type="text"
@@ -467,24 +453,17 @@ class PersonAttributeTypeForm extends React.Component {
               value={GET_VALUE(personAttributeType.retireReason)}
               onChange={(e) => personAttributeTypeChangeHandler(e)}
             />
-            <span>
-              {error && errors.retireReasonHasError && errors.retireReason}
-            </span>
-            <br />
+
             <div style={buttonGroupStyle}>
               <Controls.RetireButton
                 retired={personAttributeType.retired}
                 onClick={() => retirePersonAttributeType()}
               />
             </div>
-
-            <br />
           </Paper>
         )}
         {personAttributeTypeId !== "add" && personAttributeType.retired && (
           <Paper style={paperStyle}>
-            <hr />
-
             <p style={subHeadingStyle}>Unretire Person Attribute Type</p>
 
             <div style={buttonGroupStyle}>
@@ -493,8 +472,6 @@ class PersonAttributeTypeForm extends React.Component {
                 onClick={() => unretirePersonAttributeType()}
               />
             </div>
-
-            <br />
           </Paper>
         )}
 

@@ -3,6 +3,7 @@ import {
   Checkbox,
   FormControl,
   FormControlLabel,
+  FormHelperText,
   FormLabel,
   Grid,
   Paper,
@@ -15,6 +16,8 @@ import {
   checkboxGroupHeading,
   checkboxLabelStyle,
   deleteButtonStyle,
+  globalError,
+  inputError,
   inputInfoStyle,
   paperStyle,
   subHeadingStyle,
@@ -22,8 +25,11 @@ import {
 import { getPersonById, getUserById } from "../../services/userService";
 
 import Controls from "../../components/controls/Controls";
+import ErrorLoadingData from "../../utils/ErrorLoadingData";
 import { GET_VALUE } from "../../constants/otherConstants";
+import LoadingData from "../../utils/LoadingData";
 import React from "react";
+import SuccessMessage from "../../utils/SuccessMessage";
 import { getRoles } from "../../services/roleService";
 
 class UserForm extends React.Component {
@@ -68,64 +74,179 @@ class UserForm extends React.Component {
 
     this.state = {
       user: initialUserState,
-      redirect: null,
       userId: this.props.match.params.id,
       personId: this.props.match.params.personId,
-      isLoading: true,
-      error: false,
-      errors: [],
       changePassword: false,
       password: null,
       passwordRetype: null,
       roles: [],
       showAdvancedOptions: false,
+      redirect: null,
+      isLoading: true,
+      showSuccessMessage: false,
+      successMessage: null,
+      error: false,
+      errors: {
+        globalErrorMessage: "Please fix all errors and try again.",
+        httpRequest: null,
+        httpRequestHasError: false,
+        personGivenName: "given name can not be empty",
+        personGivenNameHasError: false,
+        personFamilyName: "family name can not be empty",
+        personFamilyNameHasError: false,
+        personGender: "gender can not be empty",
+        personGenderHasError: false,
+        username: "username cannot be empty",
+        usernameHasError: false,
+        statePassword: "password doesn't satisfy mentioned requirements",
+        statePasswordHasError: false,
+        statePasswordRetype: "this should match the password entered above",
+        statePasswordRetypeHasError: false,
+        retireReason: "reason to retire can not be empty",
+        retireReasonHasError: false,
+      },
     };
 
-    this.personInputChangeHandler = this.personInputChangeHandler.bind(this);
-    this.userInputChangeHandler = this.userInputChangeHandler.bind(this);
+    this.viewAll = "/user/view/all";
+
+    this.saveUser = this.saveUser.bind(this);
+    this.disableUser = this.disableUser.bind(this);
+    this.enableUser = this.enableUser.bind(this);
+    this.cancelUser = this.cancelUser.bind(this);
+    this.deleteUser = this.deleteUser.bind(this);
+    this.toggleAdvancedOptions = this.toggleAdvancedOptions.bind(this);
     this.stateChangeHandler = this.stateChangeHandler.bind(this);
     this.userRoleChangeHandler = this.userRoleChangeHandler.bind(this);
     this.userPropertyChangeHandler = this.userPropertyChangeHandler.bind(this);
+    this.userPersonChangeHandler = this.userPersonChangeHandler.bind(this);
+    this.userChangeHandler = this.userChangeHandler.bind(this);
     // this.providerAccountChangeHandler =
     //   this.providerAccountChangeHandler.bind(this);
   }
 
+  // error validation starts
+  setHttpError(apiName, eMessage) {
+    const { errors } = this.state;
+    errors.httpRequestHasError = true;
+    errors.httpRequest = "error: " + apiName + " api call failed : " + eMessage;
+    this.setState({ errors }, () => {
+      setTimeout(
+        function () {
+          this.setState({ redirect: this.viewAll });
+        }.bind(this),
+        4000
+      );
+    });
+  }
+
+  nonEmpty(object) {
+    return object && object.trim().length > 0;
+  }
+
+  isValidPassword(password) {
+    if (password) {
+      const minLength = password.length > 7;
+      const oneUpperCase = /[A-Z]/.test(password);
+      const oneLowerCase = /[a-z]/.test(password);
+      const oneDigit = password.search(/[0-9]/) >= 0;
+      const oneSpecialChar =
+        password.search(/[!@#$%^&*()_+\-={};':"\\|,.<>/?]/) >= 0;
+
+      const isValid =
+        minLength && oneUpperCase && oneLowerCase && oneDigit && oneSpecialChar;
+
+      if (isValid) return true;
+      return false;
+    }
+    return false;
+  }
+
+  resetErrorsToFalse() {
+    return new Promise((resolve) => {
+      const { errors } = this.state;
+      errors.personGivenNameHasError = false;
+      errors.personFamilyNameHasError = false;
+      errors.personGenderHasError = false;
+      errors.usernameHasError = false;
+      errors.statePasswordHasError = false;
+      errors.statePasswordRetypeHasError = false;
+      errors.retireReasonHasError = false;
+      this.setState({ errors, error: false }, () => resolve());
+    });
+  }
+
+  successAndRedirect(successMessage) {
+    this.setState({ showSuccessMessage: true, successMessage }, () => {
+      setTimeout(
+        function () {
+          this.setState({ redirect: this.viewAll });
+        }.bind(this),
+        500
+      );
+    });
+  }
+
+  validate(user) {
+    return new Promise((resolve) => {
+      this.resetErrorsToFalse().then(() => {
+        const { errors, changePassword, password, passwordRetype } = this.state;
+        let error = false;
+
+        if (!this.nonEmpty(user.person.givenName)) {
+          error = true;
+          errors.personGivenNameHasError = true;
+        }
+
+        if (!this.nonEmpty(user.person.familyName)) {
+          error = true;
+          errors.personFamilyNameHasError = true;
+        }
+
+        if (!this.nonEmpty(user.person.gender)) {
+          error = true;
+          errors.personGenderHasError = true;
+        }
+
+        if (!this.nonEmpty(user.username)) {
+          error = true;
+          errors.usernameHasError = true;
+        }
+
+        if (changePassword) {
+          if (this.isValidPassword(password)) {
+            if (password !== passwordRetype) {
+              error = true;
+              errors.statePasswordRetypeHasError = true;
+            }
+          } else {
+            error = true;
+            errors.statePasswordHasError = true;
+          }
+        }
+
+        if (user.retired) {
+          if (!this.nonEmpty(user.retireReason)) {
+            error = true;
+            errors.retireReasonHasError = true;
+            user.retired = false;
+          }
+        }
+
+        this.setState({ error, errors, user }, () => {
+          resolve();
+        });
+      });
+    });
+  }
+  // error validation ends
+
+  // component mount starts
   componentDidMount() {
     const { userId, personId } = this.state;
 
     Promise.all([this.setUser(userId, personId), this.setRoles()])
       .then(() => this.setUserRoles())
       .then(() => this.setState({ isLoading: false }));
-  }
-
-  setUserRoles() {
-    return new Promise((resolve) => {
-      const { roles, user } = this.state;
-      const tempRoles = [...roles];
-      user.userRoles.forEach((uRole) => {
-        const idx = tempRoles.findIndex((role) => role.role === uRole);
-        if (tempRoles[idx]) {
-          tempRoles[idx].checked = true;
-        }
-      });
-      this.setState({ roles: tempRoles }, () => resolve());
-    });
-  }
-
-  setRoles() {
-    getRoles()
-      .then((response) => {
-        const roles = [];
-        Object.keys(response.data).forEach((key) => {
-          roles.push({
-            role: response.data[key].role,
-            checked: false,
-          });
-        });
-        return roles;
-      })
-      .then((roles) => this.setState({ roles }))
-      .catch((e) => console.log(e));
   }
 
   setUser(userId, personId) {
@@ -171,80 +292,107 @@ class UserForm extends React.Component {
     });
   }
 
-  unretireUser() {
-    const { user, userId } = this.state;
-    user.retired = false;
-    this.setState(
-      { user }
-      //    () => {
-      //   putDrugById(userId, user)
-      //     .then(() => {
-      //       this.setState({ redirect: "/user/view/all" });
-      //     })
-      //     .catch((error) => {
-      //       console.log(error);
-      //     });
-      // }
-    );
+  setRoles() {
+    getRoles()
+      .then((response) => {
+        const roles = [];
+        Object.keys(response.data).forEach((key) => {
+          roles.push({
+            role: response.data[key].role,
+            checked: false,
+          });
+        });
+        return roles;
+      })
+      .then((roles) => this.setState({ roles }))
+      .catch((e) => console.log(e));
   }
 
-  saveUser() {
-    const { user, userId, password } = this.state;
-    user.password = password;
+  setUserRoles() {
+    return new Promise((resolve) => {
+      const { roles, user } = this.state;
+      const tempRoles = [...roles];
+      user.userRoles.forEach((uRole) => {
+        const idx = tempRoles.findIndex((role) => role.role === uRole);
+        if (tempRoles[idx]) {
+          tempRoles[idx].checked = true;
+        }
+      });
+      this.setState({ roles: tempRoles }, () => resolve());
+    });
+  }
+  // component mount ends
+
+  // save starts
+  saveUser(successMessage = "UPDATED") {
+    const { userId, user, changePassword, password } = this.state;
+
+    this.validate(user).then(() => {
+      const { error } = this.state;
+      if (!error) {
+        if (changePassword) user.password = password;
+        if (userId === "add") this.insertUserWithData(user);
+        else this.updateUserWithData(userId, user, successMessage);
+      }
+    });
+  }
+
+  insertUserWithData(user) {
     console.log("user", user);
-    // if (drug.name === "" || drug.conceptId === "" passwordValidation) {
-    //   this.setState({ error: true });
-    // }
-    // else {
-    //   if (drugId === "add") {
-    //     postDrug(drug)
-    //       .then(() => {
-    //         this.setState({ redirect: "/drug/all" });
-    //       })
-    //       .catch((error) => {
-    //         console.log(error);
-    //       });
-    //   } else {
-    //     putDrugById(drugId, drug)
-    //       .then(() => {
-    //         this.setState({ redirect: "/drug/all" });
-    //       })
-    //       .catch((error) => {
-    //         console.log(error);
-    //       });
-    //   }
-    // }
-  }
-
-  cancelButtonHandler() {
-    this.setState({ redirect: "/user/view/all/dummy" });
-  }
-
-  retireUser() {
-    let { user, userId } = this.state;
-    user.retired = true;
-    this.setState(
-      { user }
-      //   () => {
-      //   putDrugById(userId, user)
-      //     .then(() => {})
-      //     .catch((error) => {
-      //       console.log(error);
-      //     });
-
-      //   this.setState({ redirect: "/user/view/all" });
-      // }
-    );
-  }
-
-  deleteUser() {
-    let { userId } = this.state;
-    // deleteDrugById(userId)
+    // insertUser(user)
     //   .then(() => {
-    //     this.setState({ redirect: "/user/view/all" });
+    //     this.successAndRedirect("SAVED");
     //   })
     //   .catch((error) => {
     //     console.log(error);
+    //     this.setHttpError("insertUser", error.message);
+    //   });
+  }
+
+  updateUserWithData(userId, user, successMessage) {
+    console.log("user", user);
+    // updateUserById(userId, user)
+    //   .then(() => {
+    //     this.successAndRedirect(successMessage);
+    //   })
+    //   .catch((error) => {
+    //     console.log(error);
+    //     this.setHttpError("updateUserById", error.message);
+    //   });
+  }
+  // save ends
+
+  disableUser() {
+    const { user } = this.state;
+    user.retired = true;
+    this.setState({ user }, () => {
+      this.saveUser("DISABLED");
+    });
+  }
+
+  enableUser() {
+    const { user } = this.state;
+    user.retireReason = null;
+    user.retired = false;
+    this.setState({ user }, () => {
+      this.saveUser("ENABLED");
+    });
+  }
+
+  cancelUser() {
+    this.setState({ redirect: this.viewAll });
+  }
+
+  deleteUser() {
+    const { userId } = this.state;
+    console.log("userId", userId);
+    // deleteUserById(userId)
+    //   .then(() => {
+    //     this.successAndRedirect("DELETED");
+    //   })
+    //   .catch((error) => {
+    //     console.log(error);
+    //     this.setHttpError("deleteUserById", error.message);
     //   });
   }
 
@@ -291,17 +439,17 @@ class UserForm extends React.Component {
     this.setState({ user });
   }
 
-  userInputChangeHandler = (event, type = "value") => {
+  userChangeHandler = (event, type = "value") => {
     const { name } = event.target;
     const { user } = this.state;
     user[name] = event.target[type];
     this.setState({ user });
   };
 
-  personInputChangeHandler = (event) => {
-    const { name, value } = event.target;
-    const { user } = this.state;
-    user.person[name] = value;
+  userPersonChangeHandler = (event, type = "value") => {
+    const { name } = event.target;
+    const user = { ...this.state.user };
+    user.person[name] = event.target[type];
     this.setState({ user });
   };
 
@@ -313,31 +461,34 @@ class UserForm extends React.Component {
 
   render() {
     const {
-      cancelButtonHandler,
-      retireUser,
-      deleteUser,
       saveUser,
-      unretireUser,
+      disableUser,
+      enableUser,
+      cancelUser,
+      deleteUser,
       toggleAdvancedOptions,
+      stateChangeHandler,
       userRoleChangeHandler,
       userPropertyChangeHandler,
-      personInputChangeHandler,
-      userInputChangeHandler,
-      stateChangeHandler,
+      userPersonChangeHandler,
+      userChangeHandler,
       // providerAccountChangeHandler,
     } = this;
 
     const {
       user,
-      redirect,
       userId,
-      isLoading,
-      roles,
-      error,
       changePassword,
       password,
       passwordRetype,
+      roles,
       showAdvancedOptions,
+      redirect,
+      isLoading,
+      error,
+      errors,
+      showSuccessMessage,
+      successMessage,
     } = this.state;
 
     const getAdvancedOptionsText =
@@ -347,61 +498,69 @@ class UserForm extends React.Component {
 
     if (redirect) return <Redirect to={redirect} />;
 
-    if (isLoading) return <p>Loading...</p>;
+    if (showSuccessMessage) return <SuccessMessage action={successMessage} />;
+
+    if (errors.httpRequestHasError)
+      return <ErrorLoadingData message={errors.httpRequest} />;
+
+    if (isLoading) return <LoadingData />;
 
     return (
       <React.Fragment>
-        {error && <p>Fill the required fields</p>}
-
-        {user.retired && (
-          <span>This user account is disabled and the user cannot log in.</span>
-        )}
-
         <Paper style={paperStyle}>
+          {error && (
+            <span style={globalError}>{errors.globalErrorMessage}</span>
+          )}
           <form>
             <fieldset>
               <legend>Demographic Info</legend>
               <TextField
+                error={errors.personGivenNameHasError}
+                helperText={
+                  errors.personGivenNameHasError && errors.personGivenName
+                }
                 label="Given"
                 type="text"
                 id="givenName"
                 name="givenName"
-                onChange={personInputChangeHandler}
+                onChange={(e) => userPersonChangeHandler(e)}
                 value={GET_VALUE(user.person.givenName)}
                 required
               />
-              <br />
+
               <TextField
                 label="Middle"
                 type="text"
                 id="middleName"
                 name="middleName"
-                onChange={personInputChangeHandler}
+                onChange={(e) => userPersonChangeHandler(e)}
                 value={GET_VALUE(user.person.middleName)}
-                required
               />
-              <br />
+
               <TextField
+                error={errors.personFamilyNameHasError}
+                helperText={
+                  errors.personFamilyNameHasError && errors.personFamilyName
+                }
                 label="Family Name"
                 type="text"
                 id="familyName"
                 name="familyName"
-                onChange={personInputChangeHandler}
+                onChange={(e) => userPersonChangeHandler(e)}
                 value={GET_VALUE(user.person.familyName)}
                 required
               />
-              <br />
-              <br />
-              <FormControl>
+
+              <FormControl error={errors.personGenderHasError}>
                 <FormLabel id="demo-radio-buttons-group-label">
                   Gender
                 </FormLabel>
                 <RadioGroup
                   aria-labelledby="demo-radio-buttons-group-label"
-                  defaultValue="female"
-                  name="radio-buttons-group"
+                  name="gender"
                   row
-                  onChange={personInputChangeHandler}
+                  value={user.person.gender}
+                  onChange={(e) => userPersonChangeHandler(e)}
                 >
                   <FormControlLabel
                     control={<Radio />}
@@ -410,8 +569,6 @@ class UserForm extends React.Component {
                     type="radio"
                     name="gender"
                     value="M"
-                    checked={user.person.gender === "M" ? true : false}
-                    onChange={personInputChangeHandler}
                   />
                   <FormControlLabel
                     control={<Radio />}
@@ -420,15 +577,13 @@ class UserForm extends React.Component {
                     type="radio"
                     name="gender"
                     value="F"
-                    checked={user.person.gender === "F" ? true : false}
-                    onChange={personInputChangeHandler}
                   />
                 </RadioGroup>
+                <FormHelperText>
+                  {errors.personGenderHasError && errors.personGender}
+                </FormHelperText>
               </FormControl>
-              <br />
             </fieldset>
-
-            <hr />
 
             {/* <fieldset>
               <legend>Provider Account</legend>
@@ -458,21 +613,22 @@ class UserForm extends React.Component {
                   <span>{user.systemId}</span>
                 )}
               </div>
-              <br />
 
               <TextField
+                error={errors.usernameHasError}
+                helperText={errors.usernameHasError && errors.username}
                 label="Username"
                 type="text"
                 id="username"
                 name="username"
-                onChange={userInputChangeHandler}
+                onChange={(e) => userChangeHandler(e)}
                 value={GET_VALUE(user.username)}
               />
-              <br />
+
               <span style={inputInfoStyle}>
-                *User can log in with either Username or System Id
+                user can log in with either Username or System-Id
               </span>
-              <br />
+
               <FormControlLabel
                 control={
                   <Checkbox
@@ -484,34 +640,40 @@ class UserForm extends React.Component {
                 }
                 label={<span style={checkboxLabelStyle}>Change Password</span>}
               />
-              <br />
 
               {changePassword && (
                 <div>
                   <TextField
+                    error={errors.statePasswordHasError}
+                    helperText={
+                      errors.statePasswordHasError && errors.statePassword
+                    }
                     label="User's Password"
                     type="password"
                     id="password"
                     name="password"
-                    onChange={stateChangeHandler}
+                    onChange={(e) => stateChangeHandler(e)}
                     value={GET_VALUE(password)}
                   />
-                  <br />
                   <span style={inputInfoStyle}>
-                    Password should be 8 characters long and should have both
-                    upper and lower case characters , at least one digit , at
-                    least one non digit
+                    Password should be atleast 8 characters long and should have
+                    atleast one upper case letter, one lower case letter and at
+                    least one digit
                   </span>
-                  <br />
+
                   <TextField
+                    error={errors.statePasswordRetypeHasError}
+                    helperText={
+                      errors.statePasswordRetypeHasError &&
+                      errors.statePasswordRetype
+                    }
                     label="Confirm Password"
                     type="password"
                     id="passwordRetype"
                     name="passwordRetype"
-                    onChange={stateChangeHandler}
+                    onChange={(e) => stateChangeHandler(e)}
                     value={GET_VALUE(passwordRetype)}
                   />
-                  <br />
                   <span style={inputInfoStyle}>
                     Retype the password (for accuracy). It should match the
                     password entered above
@@ -527,19 +689,17 @@ class UserForm extends React.Component {
                     id="forcePasswordChange"
                     name="forcePasswordChange"
                     checked={user.forcePasswordChange}
-                    onChange={(e) => userInputChangeHandler(e, "checked")}
+                    onChange={(e) => userChangeHandler(e, "checked")}
                   />
                 }
                 label={
                   <span style={checkboxLabelStyle}>Force Password Change</span>
                 }
               />
-              <br />
               <span style={inputInfoStyle}>
                 Optionally require that this user change their password on next
                 login
               </span>
-              <br />
 
               <div>
                 <span style={checkboxGroupHeading}>Roles: </span>
@@ -589,7 +749,7 @@ class UserForm extends React.Component {
               <Button
                 variant="outlined"
                 type="button"
-                onClick={toggleAdvancedOptions.bind(this)}
+                onClick={() => toggleAdvancedOptions()}
               >
                 {getAdvancedOptionsText}
               </Button>
@@ -603,7 +763,7 @@ class UserForm extends React.Component {
                     type="text"
                     id="secretQuestion"
                     name="secretQuestion"
-                    onChange={userInputChangeHandler}
+                    onChange={(e) => userChangeHandler(e)}
                     value={GET_VALUE(user.secretQuestion)}
                   />
                 </div>
@@ -613,147 +773,43 @@ class UserForm extends React.Component {
                     type="text"
                     id="secretAnswer"
                     name="secretAnswer"
-                    onChange={userInputChangeHandler}
+                    onChange={(e) => userChangeHandler(e)}
                     value={GET_VALUE(user.secretAnswer)}
                   />
                 </div>
 
-                <div>
-                  <span>UUID: </span>
-                  <span>{user.uuid}</span>
-                </div>
-                <div>
-                  <span style={checkboxGroupHeading}>User Properties</span>
-                  <span>
-                    {/* <div>
+                {userId !== "add" && (
+                  <div>
+                    <div>
+                      <span>UUID: </span>
+                      <span>{user.uuid}</span>
+                    </div>
+                    <div>
+                      <span style={checkboxGroupHeading}>User Properties</span>
+                      <span>
+                        {/* <div>
                       <span>Name </span>
                       <span>Value</span>
                     </div> */}
-                    {user.userProperty.map((uProperty, index) => (
-                      <div key={index}>
-                        <TextField
-                          label={uProperty.property}
-                          type="text"
-                          id={uProperty.property}
-                          name={uProperty.property}
-                          onChange={(e) => userPropertyChangeHandler(e, index)}
-                          value={GET_VALUE(uProperty.propertyValue)}
-                        />
-                      </div>
-                    ))}
-                  </span>
-                </div>
+                        {user.userProperty.map((uProperty, index) => (
+                          <div key={index}>
+                            <TextField
+                              label={uProperty.property}
+                              type="text"
+                              id={uProperty.property}
+                              name={uProperty.property}
+                              onChange={(e) =>
+                                userPropertyChangeHandler(e, index)
+                              }
+                              value={GET_VALUE(uProperty.propertyValue)}
+                            />
+                          </div>
+                        ))}
+                      </span>
+                    </div>
+                  </div>
+                )}
               </div>
-            )}
-
-            {userId !== "add" && (
-              <fieldset>
-                <legend>Login Info</legend>
-                <div>
-                  <span>System Id: </span>{" "}
-                  {userId === "add" ? (
-                    <span style={inputInfoStyle}>
-                      System Id will be generated after saving
-                    </span>
-                  ) : (
-                    <span>{user.systemId}</span>
-                  )}
-                </div>
-                <br />
-                <TextField
-                  label="Username"
-                  type="text"
-                  id="username"
-                  name="username"
-                  onChange={userInputChangeHandler}
-                  value={GET_VALUE(user.username)}
-                />
-                <br />
-                <span style={inputInfoStyle}>
-                  User can log in with either Username or System Id
-                </span>
-                <br />
-                <TextField
-                  label="User's Password"
-                  type="password"
-                  id="password"
-                  name="password"
-                  onChange={stateChangeHandler}
-                  value={GET_VALUE(password)}
-                />
-                <br />
-                <span style={inputInfoStyle}>
-                  Password should be 8 characters long and should have both
-                  upper and lower case characters , at least one digit , at
-                  least one non digit
-                </span>
-                <br />
-                <TextField
-                  label="Confirm Password"
-                  type="password"
-                  id="passwordRetype"
-                  name="passwordRetype"
-                  onChange={stateChangeHandler}
-                  value={GET_VALUE(passwordRetype)}
-                />
-                <br />
-                <span style={inputInfoStyle}>
-                  Retype the password (for accuracy). It should match the
-                  password entered above
-                </span>
-                <br />
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      id="forcePasswordChange"
-                      name="forcePasswordChange"
-                      checked={user.forcePasswordChange}
-                      onChange={(e) => userInputChangeHandler(e, "checked")}
-                    />
-                  }
-                  label={
-                    <span style={checkboxLabelStyle}>
-                      Force Password Change
-                    </span>
-                  }
-                />
-                <br />
-
-                <div>
-                  <span style={checkboxGroupHeading}>Roles: </span>
-                  <Grid container>
-                    {roles.map((el, index) => (
-                      <Grid item md={4} xs={12} sm={6}>
-                        <div key={el.role}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                type="checkbox"
-                                name={el.role}
-                                checked={el.checked}
-                                id={el.role}
-                                onChange={(e) =>
-                                  userRoleChangeHandler(e, index)
-                                }
-                              />
-                            }
-                            label={
-                              <span style={checkboxLabelStyle}>{el.role}</span>
-                            }
-                          />
-                        </div>
-                      </Grid>
-                    ))}
-                  </Grid>
-                </div>
-
-                <Button
-                  variant="outlined"
-                  onClick={toggleAdvancedOptions.bind(this)}
-                >
-                  {getAdvancedOptionsText}
-                </Button>
-              </fieldset>
             )}
 
             {userId !== "add" && (
@@ -770,33 +826,28 @@ class UserForm extends React.Component {
               </fieldset>
             )}
 
-            <Controls.SaveButton onClick={saveUser.bind(this)} />
-            <Controls.CancelButton onClick={cancelButtonHandler.bind(this)} />
+            <Controls.SaveButton onClick={() => saveUser()} />
+            <Controls.CancelButton onClick={() => cancelUser()} />
           </form>
         </Paper>
-        {userId !== "add" && (
-          <Controls.DeleteButton
-            style={deleteButtonStyle}
-            onClick={deleteUser.bind(this)}
-          />
-        )}
 
         {userId !== "add" && !user.retired && (
           <Paper style={paperStyle}>
             <fieldset>
               <p style={subHeadingStyle}>Disable Account</p>
               <TextField
-                label="Reason"
+                error={errors.retireReasonHasError}
+                helperText={errors.retireReasonHasError && errors.retireReason}
+                label="Reason to disable"
                 type="text"
                 id="retireReason"
                 name="retireReason"
-                onChange={userInputChangeHandler}
+                onChange={(e) => userChangeHandler(e)}
                 value={GET_VALUE(user.retireReason)}
                 required
               />
-              <br />
-              <br />
-              <Button variant="outlined" onClick={retireUser.bind(this)}>
+
+              <Button variant="outlined" onClick={() => disableUser()}>
                 Disable Account
               </Button>
             </fieldset>
@@ -804,9 +855,16 @@ class UserForm extends React.Component {
         )}
 
         {userId !== "add" && user.retired && (
-          <Button variant="outlined" onClick={unretireUser.bind(this)}>
+          <Button variant="outlined" onClick={() => enableUser()}>
             Enable Account
           </Button>
+        )}
+
+        {userId !== "add" && (
+          <Controls.DeleteButton
+            style={deleteButtonStyle}
+            onClick={() => deleteUser()}
+          />
         )}
       </React.Fragment>
     );

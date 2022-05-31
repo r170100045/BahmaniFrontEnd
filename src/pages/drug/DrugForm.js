@@ -316,15 +316,10 @@ class DrugForm extends React.Component {
 
     if (showSuccessMessage) return <SuccessMessage action={successMessage} />;
 
-    if (isLoading)
-      return (
-        <div>
-          {!errors.httpRequestHasError && <LoadingData />}
-          {errors.httpRequestHasError && (
-            <ErrorLoadingData message={errors.httpRequest} />
-          )}
-        </div>
-      );
+    if (errors.httpRequestHasError)
+      return <ErrorLoadingData message={errors.httpRequest} />;
+
+    if (isLoading) return <LoadingData />;
 
     return (
       <React.Fragment>
@@ -334,6 +329,8 @@ class DrugForm extends React.Component {
           )}
 
           <TextField
+            error={errors.nameHasError}
+            helperText={errors.nameHasError && errors.name}
             label="Name"
             style={inputStyle}
             type="text"
@@ -343,12 +340,10 @@ class DrugForm extends React.Component {
             value={GET_VALUE(drug.name)}
             required
           />
-          <span style={inputError}>
-            {error && errors.nameHasError && errors.name}
-          </span>
-          <br />
 
           <SingleSelect
+            error={errors.conceptIdHasError}
+            helperText={errors.conceptIdHasError && errors.conceptId}
             label="Concept"
             style={inputStyle}
             id="conceptId"
@@ -362,10 +357,6 @@ class DrugForm extends React.Component {
             filterOption={FILTER_OPTIONS}
             required
           />
-          <span style={inputError}>
-            {error && errors.conceptIdHasError && errors.conceptId}
-          </span>
-          <br />
 
           <FormControlLabel
             control={
@@ -379,7 +370,6 @@ class DrugForm extends React.Component {
             }
             label={<span style={checkboxLabelStyle}>Combination</span>}
           />
-          <br />
 
           <SingleSelect
             label="Dosage Form"
@@ -394,7 +384,6 @@ class DrugForm extends React.Component {
             options={options}
             filterOption={FILTER_OPTIONS}
           />
-          <br />
 
           <TextField
             style={inputStyle}
@@ -405,7 +394,6 @@ class DrugForm extends React.Component {
             onChange={(e) => drugChangeHandler(e)}
             value={GET_VALUE(drug.strength)}
           />
-          <br />
 
           <TextField
             style={inputStyle}
@@ -417,7 +405,6 @@ class DrugForm extends React.Component {
             value={GET_VALUE(drug.minimumDailyDose)}
             step="any"
           />
-          <br />
 
           <TextField
             stylel={inputStyle}
@@ -429,7 +416,6 @@ class DrugForm extends React.Component {
             value={GET_VALUE(drug.maximumDailyDose)}
             step="any"
           />
-          <br />
 
           <div style={buttonGroupStyle}>
             <Controls.SaveButton onClick={() => saveDrug()} />
@@ -441,6 +427,8 @@ class DrugForm extends React.Component {
           <Paper style={paperStyle}>
             <p style={subHeadingStyle}>Retire this Drug</p>
             <TextField
+              error={errors.retireReasonHasError}
+              helperText={errors.retireReasonHasError && errors.retireReason}
               style={inputStyle}
               label="Reason"
               type="text"
@@ -449,10 +437,6 @@ class DrugForm extends React.Component {
               onChange={(e) => drugChangeHandler(e)}
               value={GET_VALUE(drug.retireReason)}
             />
-            <span>
-              {error && errors.retireReasonHasError && errors.retireReason}
-            </span>
-            <br />
 
             <div style={buttonGroupStyle}>
               <Controls.RetireButton
@@ -460,7 +444,6 @@ class DrugForm extends React.Component {
                 onClick={() => retireDrug()}
               />
             </div>
-            <br />
           </Paper>
         )}
 
@@ -473,7 +456,6 @@ class DrugForm extends React.Component {
                 onClick={() => unretireDrug()}
               />
             </div>
-            <br />
           </Paper>
         )}
 
@@ -482,7 +464,6 @@ class DrugForm extends React.Component {
             <div style={buttonGroupStyle}>
               <Controls.DeleteButton onClick={() => deleteDrug()} />
             </div>
-            <br />
           </div>
         )}
       </React.Fragment>
