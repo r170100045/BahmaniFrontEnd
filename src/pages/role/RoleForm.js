@@ -6,7 +6,7 @@ import {
   Paper,
   TextField,
 } from "@material-ui/core";
-import { Redirect, withRouter } from "react-router-dom";
+import { Redirect, Link as RouterLink, withRouter } from "react-router-dom";
 import {
   buttonGroupStyle,
   checkboxGroupHeading,
@@ -90,43 +90,41 @@ class RoleForm extends React.Component {
   }
 
   setAllRoles() {
-    getRoles()
-      .then((response) => {
-        const allRoles = [];
-        Object.keys(response.data).forEach((key) => {
-          allRoles.push(response.data[key].role);
+    return new Promise((resolve) => {
+      getRoles()
+        .then((response) => {
+          const allRoles = [];
+          Object.keys(response.data).forEach((key) => {
+            allRoles.push(response.data[key].role);
+          });
+          this.setState({ allRoles }, () => resolve());
+        })
+        .catch((error) => {
+          console.log(error);
+          this.setHttpError("getRoles", error.message);
         });
-        return allRoles;
-      })
-      .then((allRoles) => {
-        this.setState({ allRoles });
-      })
-      .catch((error) => {
-        console.log(error);
-        this.setHttpError("getRoles", error.message);
-      });
+    });
   }
 
   setAllPrivileges() {
-    getPrivileges()
-      .then((response) => {
-        const allPrivileges = [];
-        Object.keys(response.data).forEach((key) => {
-          allPrivileges.push({
-            privilege: response.data[key].privilege,
-            checked: false,
-            disabled: false,
+    return new Promise((resolve) => {
+      getPrivileges()
+        .then((response) => {
+          const allPrivileges = [];
+          Object.keys(response.data).forEach((key) => {
+            allPrivileges.push({
+              privilege: response.data[key].privilege,
+              checked: false,
+              disabled: false,
+            });
           });
+          this.setState({ allPrivileges }, () => resolve());
+        })
+        .catch((error) => {
+          console.log(error);
+          this.setHttpError("getPrivileges", error.message);
         });
-        return allPrivileges;
-      })
-      .then((allPrivileges) => {
-        this.setState({ allPrivileges });
-      })
-      .catch((error) => {
-        console.log(error);
-        this.setHttpError("getPrivileges", error.message);
-      });
+    });
   }
 
   setRole() {
@@ -150,40 +148,44 @@ class RoleForm extends React.Component {
   }
 
   setInheritedRoles() {
-    const { allRoles, role } = this.state;
-    const inheritedRoles = [];
+    return new Promise((resolve) => {
+      const { allRoles, role } = this.state;
+      const inheritedRoles = [];
 
-    allRoles.forEach((el) => {
-      if (el !== "Anonymous" && el !== "Authenticated") {
-        if (role.parentRoles.includes(el)) {
-          inheritedRoles.push({
-            role: el,
-            checked: true,
-          });
-        } else {
-          inheritedRoles.push({
-            role: el,
-            checked: false,
-          });
+      allRoles.forEach((el) => {
+        if (el !== "Anonymous" && el !== "Authenticated") {
+          if (role.parentRoles.includes(el)) {
+            inheritedRoles.push({
+              role: el,
+              checked: true,
+            });
+          } else {
+            inheritedRoles.push({
+              role: el,
+              checked: false,
+            });
+          }
         }
-      }
-    });
+      });
 
-    this.setState({ inheritedRoles });
+      this.setState({ inheritedRoles }, () => resolve());
+    });
   }
 
   setCurrentPrivileges() {
-    const { role, allPrivileges } = this.state;
-    const tempAllPrivileges = [...allPrivileges];
+    return new Promise((resolve) => {
+      const { role, allPrivileges } = this.state;
+      const tempAllPrivileges = [...allPrivileges];
 
-    role.rolePrivileges.forEach((rp) => {
-      const tapIndex = tempAllPrivileges.findIndex(
-        (tap) => tap.privilege === rp
-      );
-      tempAllPrivileges[tapIndex].checked = true;
+      role.rolePrivileges.forEach((rp) => {
+        const tapIndex = tempAllPrivileges.findIndex(
+          (tap) => tap.privilege === rp
+        );
+        tempAllPrivileges[tapIndex].checked = true;
+      });
+
+      this.setState({ allPrivileges: tempAllPrivileges }, () => resolve());
     });
-
-    this.setState({ allPrivileges: tempAllPrivileges });
   }
 
   disableDisplayPrivileges() {
@@ -450,12 +452,24 @@ class RoleForm extends React.Component {
               <ul>
                 {role.childRoles.map((childRole) => (
                   <li key={childRole.uuid}>
+                    <RouterLink to={`/role/edit/${childRole.uuid}`}>
+                      {childRole.childRoleName}
+                    </RouterLink>
                     <a href={`/role/edit/${childRole.uuid}`}>
                       {childRole.childRoleName}
                     </a>
                   </li>
                 ))}
               </ul>
+              {/* <ul>
+                {role.childRoles.map((childRole) => (
+                  <li key={childRole.uuid}>
+                    <a href={`/role/edit/${childRole.uuid}`}>
+                      {childRole.childRoleName}
+                    </a>
+                  </li>
+                ))}
+              </ul> */}
             </div>
           )}
 

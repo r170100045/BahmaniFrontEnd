@@ -345,18 +345,19 @@ class PersonAttributeTypeForm extends React.Component {
             error={errors.nameHasError}
             helperText={errors.nameHasError && errors.name}
             style={inputStyle}
-            label="Name*"
+            label="Name"
             type="text"
             id="name"
             name="name"
             value={GET_VALUE(personAttributeType.name)}
             onChange={personAttributeTypeChangeHandler}
+            required
           />
 
           <SingleSelect
             error={errors.formatHasError}
             helperText={errors.formatHasError && errors.format}
-            label="Format*"
+            label="Format"
             style={inputStyle}
             id="format"
             name="format"
@@ -368,6 +369,7 @@ class PersonAttributeTypeForm extends React.Component {
               )
             }
             options={FORMAT_OPTIONS}
+            required
           />
           <span style={inputInfoStyle}>Name of a Java or OpenMRS class</span>
 
@@ -446,12 +448,13 @@ class PersonAttributeTypeForm extends React.Component {
               error={errors.retireReasonHasError}
               helperText={errors.retireReasonHasError && errors.retireReason}
               style={inputStyle}
-              label="Reason"
+              label="Reason to retire"
               type="text"
               id="retireReason"
               name="retireReason"
               value={GET_VALUE(personAttributeType.retireReason)}
               onChange={(e) => personAttributeTypeChangeHandler(e)}
+              required
             />
 
             <div style={buttonGroupStyle}>

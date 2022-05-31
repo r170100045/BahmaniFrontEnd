@@ -102,7 +102,7 @@ class UserForm extends React.Component {
         statePasswordHasError: false,
         statePasswordRetype: "this should match the password entered above",
         statePasswordRetypeHasError: false,
-        retireReason: "reason to retire can not be empty",
+        retireReason: "reason to disable can not be empty",
         retireReasonHasError: false,
       },
     };
@@ -551,7 +551,7 @@ class UserForm extends React.Component {
                 required
               />
 
-              <FormControl error={errors.personGenderHasError}>
+              <FormControl error={errors.personGenderHasError} required>
                 <FormLabel id="demo-radio-buttons-group-label">
                   Gender
                 </FormLabel>
@@ -623,6 +623,7 @@ class UserForm extends React.Component {
                 name="username"
                 onChange={(e) => userChangeHandler(e)}
                 value={GET_VALUE(user.username)}
+                required
               />
 
               <span style={inputInfoStyle}>
@@ -654,6 +655,7 @@ class UserForm extends React.Component {
                     name="password"
                     onChange={(e) => stateChangeHandler(e)}
                     value={GET_VALUE(password)}
+                    required
                   />
                   <span style={inputInfoStyle}>
                     Password should be atleast 8 characters long and should have
@@ -673,6 +675,7 @@ class UserForm extends React.Component {
                     name="passwordRetype"
                     onChange={(e) => stateChangeHandler(e)}
                     value={GET_VALUE(passwordRetype)}
+                    required
                   />
                   <span style={inputInfoStyle}>
                     Retype the password (for accuracy). It should match the

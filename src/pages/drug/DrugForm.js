@@ -430,12 +430,13 @@ class DrugForm extends React.Component {
               error={errors.retireReasonHasError}
               helperText={errors.retireReasonHasError && errors.retireReason}
               style={inputStyle}
-              label="Reason"
+              label="Reason to retire"
               type="text"
               id="retireReason"
               name="retireReason"
               onChange={(e) => drugChangeHandler(e)}
               value={GET_VALUE(drug.retireReason)}
+              required
             />
 
             <div style={buttonGroupStyle}>

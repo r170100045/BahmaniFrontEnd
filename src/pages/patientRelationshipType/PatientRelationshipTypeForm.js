@@ -299,6 +299,7 @@ class PatientRelationshipTypeForm extends React.Component {
             name="aisToB"
             value={GET_VALUE(relationshipType.aisToB)}
             onChange={(e) => relationshipTypeChangeHandler(e)}
+            required
           />
 
           <TextField
@@ -311,6 +312,7 @@ class PatientRelationshipTypeForm extends React.Component {
             name="bisToA"
             value={GET_VALUE(relationshipType.bisToA)}
             onChange={(e) => relationshipTypeChangeHandler(e)}
+            required
           />
 
           <TextField
@@ -325,6 +327,7 @@ class PatientRelationshipTypeForm extends React.Component {
             cols="20"
             value={GET_VALUE(relationshipType.description)}
             onChange={(e) => relationshipTypeChangeHandler(e)}
+            required
           />
 
           <div style={buttonGroupStyle}>
@@ -347,6 +350,7 @@ class PatientRelationshipTypeForm extends React.Component {
               name="retireReason"
               value={GET_VALUE(relationshipType.retireReason)}
               onChange={(e) => relationshipTypeChangeHandler(e)}
+              required
             />
 
             <div style={buttonGroupStyle}>

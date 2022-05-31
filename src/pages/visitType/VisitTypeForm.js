@@ -312,6 +312,7 @@ class VisitTypeForm extends React.Component {
               multiline
               value={GET_VALUE(visitType.retireReason)}
               onChange={(e) => visitTypeChangeHandler(e)}
+              required
             />
 
             <div style={buttonGroupStyle}>
