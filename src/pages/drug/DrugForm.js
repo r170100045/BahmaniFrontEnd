@@ -1,6 +1,7 @@
 import {
   Checkbox,
   FormControlLabel,
+  Grid,
   Paper,
   TextField,
 } from "@material-ui/core";
@@ -407,7 +408,7 @@ class DrugForm extends React.Component {
           />
 
           <TextField
-            stylel={inputStyle}
+            style={inputStyle}
             label="Maximum Daily Dose"
             type="number"
             id="maximumDailyDose"
@@ -417,10 +418,10 @@ class DrugForm extends React.Component {
             step="any"
           />
 
-          <div style={buttonGroupStyle}>
+          <Grid container style={{ gridGap: 5 }}>
             <Controls.SaveButton onClick={() => saveDrug()} />
             <Controls.CancelButton onClick={() => cancelDrug()} />
-          </div>
+          </Grid>
         </Paper>
 
         {drugId !== "add" && !drug.retired && (

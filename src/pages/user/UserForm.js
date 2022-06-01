@@ -17,10 +17,14 @@ import {
   checkboxLabelStyle,
   deleteButtonStyle,
   globalError,
+  groupHeading,
   inputError,
   inputInfoStyle,
+  inputStyle,
   paperStyle,
+  propertyName,
   subHeadingStyle,
+  userBioData,
 } from "../../constants/formStyling";
 import { getPersonById, getUserById } from "../../services/userService";
 
@@ -513,76 +517,84 @@ class UserForm extends React.Component {
           )}
           <form>
             <fieldset>
-              <legend>Demographic Info</legend>
-              <TextField
-                error={errors.personGivenNameHasError}
-                helperText={
-                  errors.personGivenNameHasError && errors.personGivenName
-                }
-                label="Given"
-                type="text"
-                id="givenName"
-                name="givenName"
-                onChange={(e) => userPersonChangeHandler(e)}
-                value={GET_VALUE(user.person.givenName)}
-                required
-              />
-
-              <TextField
-                label="Middle"
-                type="text"
-                id="middleName"
-                name="middleName"
-                onChange={(e) => userPersonChangeHandler(e)}
-                value={GET_VALUE(user.person.middleName)}
-              />
-
-              <TextField
-                error={errors.personFamilyNameHasError}
-                helperText={
-                  errors.personFamilyNameHasError && errors.personFamilyName
-                }
-                label="Family Name"
-                type="text"
-                id="familyName"
-                name="familyName"
-                onChange={(e) => userPersonChangeHandler(e)}
-                value={GET_VALUE(user.person.familyName)}
-                required
-              />
-
-              <FormControl error={errors.personGenderHasError} required>
-                <FormLabel id="demo-radio-buttons-group-label">
-                  Gender
-                </FormLabel>
-                <RadioGroup
-                  aria-labelledby="demo-radio-buttons-group-label"
-                  name="gender"
-                  row
-                  value={user.person.gender}
+              <div style={groupHeading}>Demographic Info</div>
+              <div style={userBioData}>
+                <TextField
+                  style={inputStyle}
+                  error={errors.personGivenNameHasError}
+                  helperText={
+                    errors.personGivenNameHasError && errors.personGivenName
+                  }
+                  label="Given"
+                  type="text"
+                  id="givenName"
+                  name="givenName"
                   onChange={(e) => userPersonChangeHandler(e)}
+                  value={GET_VALUE(user.person.givenName)}
+                  required
+                />
+
+                <TextField
+                  style={inputStyle}
+                  label="Middle"
+                  type="text"
+                  id="middleName"
+                  name="middleName"
+                  onChange={(e) => userPersonChangeHandler(e)}
+                  value={GET_VALUE(user.person.middleName)}
+                />
+
+                <TextField
+                  style={inputStyle}
+                  error={errors.personFamilyNameHasError}
+                  helperText={
+                    errors.personFamilyNameHasError && errors.personFamilyName
+                  }
+                  label="Family Name"
+                  type="text"
+                  id="familyName"
+                  name="familyName"
+                  onChange={(e) => userPersonChangeHandler(e)}
+                  value={GET_VALUE(user.person.familyName)}
+                  required
+                />
+                <FormControl
+                  error={errors.personGenderHasError}
+                  required
+                  style={{ marginTop: "16px" }}
                 >
-                  <FormControlLabel
-                    control={<Radio />}
-                    label="Male"
-                    id="male"
-                    type="radio"
+                  <FormLabel id="demo-radio-buttons-group-label">
+                    Gender
+                  </FormLabel>
+                  <RadioGroup
+                    aria-labelledby="demo-radio-buttons-group-label"
                     name="gender"
-                    value="M"
-                  />
-                  <FormControlLabel
-                    control={<Radio />}
-                    label="Female"
-                    id="female"
-                    type="radio"
-                    name="gender"
-                    value="F"
-                  />
-                </RadioGroup>
-                <FormHelperText>
-                  {errors.personGenderHasError && errors.personGender}
-                </FormHelperText>
-              </FormControl>
+                    row
+                    value={user.person.gender}
+                    onChange={(e) => userPersonChangeHandler(e)}
+                  >
+                    <FormControlLabel
+                      control={<Radio />}
+                      label="Male"
+                      id="male"
+                      type="radio"
+                      name="gender"
+                      value="M"
+                    />
+                    <FormControlLabel
+                      control={<Radio />}
+                      label="Female"
+                      id="female"
+                      type="radio"
+                      name="gender"
+                      value="F"
+                    />
+                  </RadioGroup>
+                  <FormHelperText>
+                    {errors.personGenderHasError && errors.personGender}
+                  </FormHelperText>
+                </FormControl>
+              </div>
             </fieldset>
 
             {/* <fieldset>
@@ -602,88 +614,98 @@ class UserForm extends React.Component {
             <hr /> */}
 
             <fieldset>
-              <legend>Login Info</legend>
-              <div>
-                <span>System Id: </span>{" "}
-                {userId === "add" ? (
-                  <span style={inputInfoStyle}>
-                    System Id will be generated after saving
-                  </span>
-                ) : (
-                  <span>{user.systemId}</span>
+              <div style={groupHeading}>Login Info</div>
+              <div style={userBioData}>
+                <span>
+                  <span style={propertyName}>System Id: </span>{" "}
+                  {userId === "add" ? (
+                    <span style={inputInfoStyle}>
+                      System Id will be generated after saving
+                    </span>
+                  ) : (
+                    <span>{user.systemId}</span>
+                  )}
+                </span>
+
+                <TextField
+                  style={inputStyle}
+                  error={errors.usernameHasError}
+                  helperText={errors.usernameHasError && errors.username}
+                  label="Username"
+                  type="text"
+                  id="username"
+                  name="username"
+                  onChange={(e) => userChangeHandler(e)}
+                  value={GET_VALUE(user.username)}
+                  required
+                />
+                <span style={inputInfoStyle}>
+                  user can log in with either Username or System-Id
+                </span>
+                {userId !== "add" && (
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        id="changePassword"
+                        name="changePassword"
+                        onChange={(e) => stateChangeHandler(e, "checked")}
+                        checked={GET_VALUE(changePassword)}
+                      />
+                    }
+                    label={
+                      <span style={checkboxLabelStyle}>Change Password</span>
+                    }
+                  />
+                )}
+
+                {(changePassword || userId === "add") && (
+                  <div>
+                    <TextField
+                      style={inputStyle}
+                      error={errors.statePasswordHasError}
+                      helperText={
+                        errors.statePasswordHasError && errors.statePassword
+                      }
+                      label="User's Password"
+                      type="password"
+                      id="password"
+                      name="password"
+                      onChange={(e) => stateChangeHandler(e)}
+                      value={GET_VALUE(password)}
+                      required
+                    />
+                    <div>
+                      <span style={inputInfoStyle}>
+                        Password should be atleast 8 characters long and should
+                        have atleast one upper case letter, one lower case
+                        letter and at least one digit
+                      </span>
+                    </div>
+
+                    <TextField
+                      style={inputStyle}
+                      error={errors.statePasswordRetypeHasError}
+                      helperText={
+                        errors.statePasswordRetypeHasError &&
+                        errors.statePasswordRetype
+                      }
+                      label="Confirm Password"
+                      type="password"
+                      id="passwordRetype"
+                      name="passwordRetype"
+                      onChange={(e) => stateChangeHandler(e)}
+                      value={GET_VALUE(passwordRetype)}
+                      required
+                    />
+                    <div>
+                      <span style={inputInfoStyle}>
+                        Retype the password (for accuracy). It should match the
+                        password entered above
+                      </span>
+                    </div>
+                  </div>
                 )}
               </div>
-
-              <TextField
-                error={errors.usernameHasError}
-                helperText={errors.usernameHasError && errors.username}
-                label="Username"
-                type="text"
-                id="username"
-                name="username"
-                onChange={(e) => userChangeHandler(e)}
-                value={GET_VALUE(user.username)}
-                required
-              />
-
-              <span style={inputInfoStyle}>
-                user can log in with either Username or System-Id
-              </span>
-
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    id="changePassword"
-                    name="changePassword"
-                    onChange={(e) => stateChangeHandler(e, "checked")}
-                    checked={GET_VALUE(changePassword)}
-                  />
-                }
-                label={<span style={checkboxLabelStyle}>Change Password</span>}
-              />
-
-              {changePassword && (
-                <div>
-                  <TextField
-                    error={errors.statePasswordHasError}
-                    helperText={
-                      errors.statePasswordHasError && errors.statePassword
-                    }
-                    label="User's Password"
-                    type="password"
-                    id="password"
-                    name="password"
-                    onChange={(e) => stateChangeHandler(e)}
-                    value={GET_VALUE(password)}
-                    required
-                  />
-                  <span style={inputInfoStyle}>
-                    Password should be atleast 8 characters long and should have
-                    atleast one upper case letter, one lower case letter and at
-                    least one digit
-                  </span>
-
-                  <TextField
-                    error={errors.statePasswordRetypeHasError}
-                    helperText={
-                      errors.statePasswordRetypeHasError &&
-                      errors.statePasswordRetype
-                    }
-                    label="Confirm Password"
-                    type="password"
-                    id="passwordRetype"
-                    name="passwordRetype"
-                    onChange={(e) => stateChangeHandler(e)}
-                    value={GET_VALUE(passwordRetype)}
-                    required
-                  />
-                  <span style={inputInfoStyle}>
-                    Retype the password (for accuracy). It should match the
-                    password entered above
-                  </span>
-                  <br />
-                </div>
-              )}
 
               <FormControlLabel
                 control={
@@ -696,13 +718,16 @@ class UserForm extends React.Component {
                   />
                 }
                 label={
-                  <span style={checkboxLabelStyle}>Force Password Change</span>
+                  <span style={checkboxLabelStyle}>
+                    Force Password Change{" "}
+                    <span style={inputInfoStyle}>
+                      (Optionally require that this user change their password
+                      on next login)
+                    </span>
+                  </span>
                 }
               />
-              <span style={inputInfoStyle}>
-                Optionally require that this user change their password on next
-                login
-              </span>
+              <div></div>
 
               <div>
                 <span style={checkboxGroupHeading}>Roles: </span>
@@ -748,8 +773,8 @@ class UserForm extends React.Component {
                   </Grid>
                 </span>
               </div>
-
               <Button
+                style={{ marginBottom: 10 }}
                 variant="outlined"
                 type="button"
                 onClick={() => toggleAdvancedOptions()}
@@ -762,6 +787,7 @@ class UserForm extends React.Component {
               <div>
                 <div>
                   <TextField
+                    style={inputStyle}
                     label="Secret Question"
                     type="text"
                     id="secretQuestion"
@@ -772,6 +798,7 @@ class UserForm extends React.Component {
                 </div>
                 <div>
                   <TextField
+                    style={inputStyle}
                     label="Secret Answer"
                     type="text"
                     id="secretAnswer"
@@ -797,6 +824,7 @@ class UserForm extends React.Component {
                         {user.userProperty.map((uProperty, index) => (
                           <div key={index}>
                             <TextField
+                              style={inputStyle}
                               label={uProperty.property}
                               type="text"
                               id={uProperty.property}
@@ -829,8 +857,10 @@ class UserForm extends React.Component {
               </fieldset>
             )}
 
-            <Controls.SaveButton onClick={() => saveUser()} />
-            <Controls.CancelButton onClick={() => cancelUser()} />
+            <Grid container style={{ gridGap: 5 }}>
+              <Controls.SaveButton onClick={() => saveUser()} />
+              <Controls.CancelButton onClick={() => cancelUser()} />
+            </Grid>
           </form>
         </Paper>
 

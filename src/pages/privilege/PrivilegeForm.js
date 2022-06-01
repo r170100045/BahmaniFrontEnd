@@ -1,5 +1,6 @@
 import {
   Button,
+  Grid,
   Input,
   Paper,
   TextField,
@@ -89,14 +90,7 @@ class PrivilegeForm extends React.Component {
     const { errors } = this.state;
     errors.httpRequestHasError = true;
     errors.httpRequest = "error: " + apiName + " api call failed : " + eMessage;
-    this.setState({ errors }, () => {
-      setTimeout(
-        function () {
-          this.setState({ redirect: this.viewAll });
-        }.bind(this),
-        4000
-      );
-    });
+    this.setState({ errors });
   }
 
   nonEmpty(object) {
@@ -222,15 +216,14 @@ class PrivilegeForm extends React.Component {
 
     if (redirect) return <Redirect to={redirect} />;
 
-    if (showSuccessMessage) return <SuccessMessage action={successMessage} />;
-
-    if (errors.httpRequestHasError)
-      return <ErrorLoadingData message={errors.httpRequest} />;
-
     if (isLoading) return <LoadingData />;
 
     return (
       <React.Fragment>
+        {errors.httpRequestHasError && (
+          <ErrorLoadingData message={errors.httpRequest} />
+        )}
+        {showSuccessMessage && <SuccessMessage action={successMessage} />}
         <Paper style={paperStyle}>
           {error && (
             <span style={globalError}>{errors.globalErrorMessage}</span>
@@ -262,10 +255,10 @@ class PrivilegeForm extends React.Component {
             onChange={(e) => privilegeChangeHandler(e)}
           />
 
-          <div style={buttonGroupStyle}>
+          <Grid container style={{ gridGap: 5 }}>
             <Controls.SaveButton onClick={() => savePrivilege()} />
             <Controls.CancelButton onClick={() => cancelPrivilege()} />
-          </div>
+          </Grid>
           <br />
         </Paper>
         {privilegeId !== "add" && (

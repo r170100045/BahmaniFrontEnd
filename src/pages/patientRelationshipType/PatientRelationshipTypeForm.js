@@ -1,4 +1,4 @@
-import { Paper, TextField } from "@material-ui/core";
+import { Grid, Paper, TextField } from "@material-ui/core";
 import { Redirect, withRouter } from "react-router-dom";
 import {
   buttonGroupStyle,
@@ -330,10 +330,10 @@ class PatientRelationshipTypeForm extends React.Component {
             required
           />
 
-          <div style={buttonGroupStyle}>
+          <Grid container style={{ gridGap: 5 }}>
             <Controls.SaveButton onClick={() => saveRelationshipType()} />
             <Controls.CancelButton onClick={() => cancelRelationshipType()} />
-          </div>
+          </Grid>
         </Paper>
 
         {relationshipTypeId !== "add" && !relationshipType.retired && (

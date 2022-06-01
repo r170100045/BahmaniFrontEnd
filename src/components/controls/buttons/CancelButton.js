@@ -12,14 +12,7 @@ const ColorButton = withStyles((theme) => ({
   },
 }))(Button);
 
-const useStyles = makeStyles((theme) => ({
-  margin: {
-    margin: theme.spacing(1),
-  },
-}));
-
 export default function CancelButton(props) {
-  const classes = useStyles();
   const { onClick, entityName, ...other } = props;
 
   return (
@@ -28,7 +21,6 @@ export default function CancelButton(props) {
       color="primary"
       size="medium"
       startIcon={<CancelIcon />}
-      className={classes.margin}
       onClick={onClick}
       {...other}
     >

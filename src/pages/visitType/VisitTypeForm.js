@@ -1,4 +1,4 @@
-import { Button, Paper, TextField } from "@material-ui/core";
+import { Button, Grid, Paper, TextField } from "@material-ui/core";
 import { Redirect, withRouter } from "react-router-dom";
 import {
   buttonGroupStyle,
@@ -69,14 +69,7 @@ class VisitTypeForm extends React.Component {
     const { errors } = this.state;
     errors.httpRequestHasError = true;
     errors.httpRequest = "error: " + apiName + " api call failed : " + eMessage;
-    this.setState({ errors }, () => {
-      setTimeout(
-        function () {
-          this.setState({ redirect: this.viewAll });
-        }.bind(this),
-        4000
-      );
-    });
+    this.setState({ errors });
   }
 
   nonEmpty(object) {
@@ -175,7 +168,6 @@ class VisitTypeForm extends React.Component {
   }
 
   updateVisitTypeWithData(visitTypeId, visitType, successMessage) {
-    console.log("vt", visitType);
     updateVisitTypeById(visitTypeId, visitType)
       .then(() => {
         this.successAndRedirect(successMessage);
@@ -251,15 +243,15 @@ class VisitTypeForm extends React.Component {
 
     if (redirect) return <Redirect to={redirect} />;
 
-    if (showSuccessMessage) return <SuccessMessage action={successMessage} />;
-
-    if (errors.httpRequestHasError)
-      return <ErrorLoadingData message={errors.httpRequest} />;
-
     if (isLoading) return <LoadingData />;
 
     return (
       <React.Fragment>
+        {errors.httpRequestHasError && (
+          <ErrorLoadingData message={errors.httpRequest} />
+        )}
+        {showSuccessMessage && <SuccessMessage action={successMessage} />}
+
         <Paper style={paperStyle}>
           {error && (
             <span style={globalError}>{errors.globalErrorMessage}</span>
@@ -290,13 +282,10 @@ class VisitTypeForm extends React.Component {
             onChange={(e) => visitTypeChangeHandler(e)}
           />
 
-          <div style={buttonGroupStyle}>
+          <Grid container style={{ gridGap: 5 }}>
             <Controls.SaveButton onClick={() => saveVisitType()} />
-            <Controls.CancelButton
-              type="button"
-              onClick={() => cancelVisitType()}
-            />
-          </div>
+            <Controls.CancelButton onClick={() => cancelVisitType()} />
+          </Grid>
         </Paper>
 
         {visitTypeId !== "add" && !visitType.retired && (

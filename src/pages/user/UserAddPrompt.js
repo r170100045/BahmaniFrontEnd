@@ -1,9 +1,16 @@
+import { Button, Paper } from "@material-ui/core";
 import { Redirect, Link as RouterLink, withRouter } from "react-router-dom";
-import { paperStyle, subHeadingStyle } from "../../constants/formStyling";
+import {
+  createUser,
+  inputInfoStyle,
+  inputStyle,
+  paperStyle,
+  subHeadingStyle,
+} from "../../constants/formStyling";
 
+import Controls from "../../components/controls/Controls";
 import { FILTER_OPTIONS } from "../../constants/otherConstants";
 import LoadingData from "../../utils/LoadingData";
-import { Paper } from "@material-ui/core";
 import React from "react";
 import Select from "react-select";
 import { SingleSelect } from "react-select-material-ui";
@@ -94,48 +101,52 @@ class UserAddPrompt extends React.Component {
         <Paper style={paperStyle}>
           <div>
             <div>
-              <p style={subHeadingStyle}>Add User</p>
-              <p>A User account must belong to a Person in the system</p>
+              {/* <p style={subHeadingStyle}>Add User</p> */}
+              <p style={inputInfoStyle}>
+                A User account must belong to a Person in the system
+              </p>
             </div>
-
-            <div>
-              <p>Create a new person</p>
-              <button type="button" onClick={() => createNewUser()}>
-                Next
-              </button>
-            </div>
-
-            <div>
-              <p>Use a person who already exists</p>
-              <div>
-                <SingleSelect
-                  label=">Which Person?: "
-                  id="personUUID"
-                  name="personUUID"
-                  placeholder="Enter user name or uuid"
-                  onChange={(selectedValue) =>
-                    personChangeHandler(selectedValue)
-                  }
-                  options={personOptions}
-                  filterOption={FILTER_OPTIONS}
-                />
-              </div>
-
-              <div>
-                <button
-                  type="button"
-                  disabled={personNotSelected}
-                  onClick={() => createNewUserFromPerson(personUUID)}
-                >
+            <div style={{ display: "flex", marginTop: "40px" }}>
+              <div
+                style={{
+                  marginRight: "40px",
+                  paddingRight: "40px",
+                  borderRight: "2px solid black",
+                }}
+              >
+                <div style={createUser}>Create a new person</div>
+                <Button variant="outlined" onClick={() => createNewUser()}>
                   Next
-                </button>
+                </Button>
+              </div>
+              <div>
+                <span style={createUser}>Use a person who already exists</span>
+                <div>
+                  <SingleSelect
+                    id="personUUID"
+                    name="personUUID"
+                    placeholder="Enter user name or uuid"
+                    onChange={(selectedValue) =>
+                      personChangeHandler(selectedValue)
+                    }
+                    options={personOptions}
+                    filterOption={FILTER_OPTIONS}
+                  />
+
+                  <Button
+                    style={{ marginTop: "10px" }}
+                    variant="outlined"
+                    disabled={personNotSelected}
+                    onClick={() => createNewUserFromPerson(personUUID)}
+                  >
+                    Next
+                  </Button>
+                </div>
               </div>
             </div>
 
-            <div>
-              <button type="button" onClick={() => cancelButtonHandler()}>
-                Cancel
-              </button>
+            <div style={{ marginTop: "40px" }}>
+              <Controls.CancelButton onClick={() => cancelButtonHandler()} />
             </div>
           </div>
         </Paper>

@@ -2,6 +2,7 @@ import {
   Button,
   Checkbox,
   FormControlLabel,
+  Grid,
   Paper,
   TextField,
 } from "@material-ui/core";
@@ -768,7 +769,7 @@ class ConceptForm extends React.Component {
     if (isLoading) return <LoadingData />;
 
     return (
-      <Paper style={conceptPaperStyle}>
+      <Paper style={paperStyle}>
         {conceptId !== "add" && (
           <button type="button" onClick={() => redirectToViewPage(conceptId)}>
             View
@@ -779,12 +780,12 @@ class ConceptForm extends React.Component {
           <div>
             <label>Mappings:</label>
             <div>
-              <button
-                type="button"
+              <Button
+                variant="outlined"
                 onClick={addMappingButtonHandler.bind(this)}
               >
                 Add Mapping
-              </button>
+              </Button>
             </div>
             {mappings.map((item, index) => (
               <div key={index}>
@@ -828,19 +829,19 @@ class ConceptForm extends React.Component {
                       options={mapCodeOptions}
                     />
                   </div>
-                  <input
+                  <TextField
                     name="name"
                     type="name"
                     id="name"
                     value={item.name}
                     onChange={(e) => synonymNameChangeHandler(e, index)}
                   />
-                  <button
-                    type="button"
+                  <Button
+                    variant="outlined"
                     onClick={() => removeMappingButtonHandler(index)}
                   >
                     Remove
-                  </button>
+                  </Button>
                 </div>
               </div>
             ))}
@@ -861,26 +862,29 @@ class ConceptForm extends React.Component {
           <div>
             <label>Synonyms:</label>
             <div>
-              <button type="button" onClick={() => addSynonymButtonHandler()}>
+              <Button
+                variant="outlined"
+                onClick={() => addSynonymButtonHandler()}
+              >
                 Add Synonym
-              </button>
+              </Button>
             </div>
             {synonyms.map((item, index) => (
               <div key={index}>
                 <div>
-                  <input
+                  <TextField
                     name="name"
                     type="text"
                     id="name"
                     value={item.name}
                     onChange={(e) => synonymNameChangeHandler(e, index)}
                   />
-                  <button
-                    type="button"
+                  <Button
+                    variant="outlined"
                     onClick={() => removeSynonymButtonHandler(index)}
                   >
                     Remove
-                  </button>
+                  </Button>
                 </div>
               </div>
             ))}
@@ -1176,6 +1180,7 @@ class ConceptForm extends React.Component {
           )}
 
           <TextField
+            style={inputStyle}
             label="Version"
             type="text"
             id="version"
@@ -1185,12 +1190,16 @@ class ConceptForm extends React.Component {
           />
           <br />
         </form>
-
-        <Controls.SaveButton onClick={() => saveConcept()} />
-        {/* <Button variant="outlined" onClick={saveConceptAndContinue.bind(this)}>
+        <Grid container style={{ gridGap: 5 }}>
+          <Controls.SaveButton onClick={() => saveConcept()} />
+          {/* <Button variant="outlined" onClick={saveConceptAndContinue.bind(this)}>
           Save and Continue
         </Button> */}
-        <Controls.CancelButton type="button" onClick={() => cancelConcept()} />
+          <Controls.CancelButton
+            type="button"
+            onClick={() => cancelConcept()}
+          />
+        </Grid>
 
         {conceptId !== "add" && !concept.retired && (
           <Paper style={paperStyle}>

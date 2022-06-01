@@ -50,10 +50,33 @@ export const inputInfoStyle = {
 export const checkboxGroupHeading = {
   fontSize: "1.25rem",
   height: "0.25rem",
+  marginTop: "1rem",
+};
+export const childRoleHeading = {
+  fontSize: "1.25rem",
+  height: "0.25rem",
+  marginTop: "1rem",
+  marginBottom: "2rem",
 };
 export const deleteButtonStyle = {
   marginLeft: "30px",
 };
 export const unretireStyleHeading = {
   marginLeft: "30px",
+};
+export const userBioData = {
+  display: "flex",
+  flexDirection: "column",
+};
+export const propertyName = {
+  fontSize: "1rem",
+};
+export const createUser = {
+  marginBottom: "15px",
+  fontSize: "20px",
+};
+export const groupHeading = {
+  fontWeight: "bold",
+  fontSize: "1.25rem",
+  marginBottom: "0.25rem",
 };

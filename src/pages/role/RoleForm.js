@@ -11,12 +11,15 @@ import {
   buttonGroupStyle,
   checkboxGroupHeading,
   checkboxLabelStyle,
+  childRoleHeading,
   conceptPaperStyle,
   deleteButtonStyle,
   globalError,
   inputError,
+  inputInfoStyle,
   inputStyle,
   paperStyle,
+  propertyName,
 } from "../../constants/formStyling";
 import {
   deleteRoleById,
@@ -229,14 +232,7 @@ class RoleForm extends React.Component {
     const { errors } = this.state;
     errors.httpRequestHasError = true;
     errors.httpRequest = "error: " + apiName + " api call failed : " + eMessage;
-    this.setState({ errors }, () => {
-      setTimeout(
-        function () {
-          this.setState({ redirect: this.viewAll });
-        }.bind(this),
-        4000
-      );
-    });
+    this.setState({ errors });
   }
 
   nonEmpty(object) {
@@ -406,15 +402,14 @@ class RoleForm extends React.Component {
 
     if (redirect) return <Redirect to={redirect} />;
 
-    if (showSuccessMessage) return <SuccessMessage action={successMessage} />;
-
-    if (errors.httpRequestHasError)
-      return <ErrorLoadingData message={errors.httpRequest} />;
-
     if (isLoading) return <LoadingData />;
 
     return (
       <React.Fragment>
+        {errors.httpRequestHasError && (
+          <ErrorLoadingData message={errors.httpRequest} />
+        )}
+        {showSuccessMessage && <SuccessMessage action={successMessage} />}
         <Paper style={paperStyle}>
           {error && (
             <span style={globalError}>{errors.globalErrorMessage}</span>
@@ -448,19 +443,22 @@ class RoleForm extends React.Component {
 
           {role.childRoles.length > 0 && (
             <div>
-              <p>Roles that contain (inherit privileges from) {role.role}</p>
-              <ul>
+              <p style={childRoleHeading}>
+                Roles that contain (inherit privileges from) {role.role}
+              </p>
+              <div>
                 {role.childRoles.map((childRole) => (
-                  <li key={childRole.uuid}>
+                  <span key={childRole.uuid} style={{ marginRight: 8 }}>
                     <RouterLink to={`/role/edit/${childRole.uuid}`}>
                       {childRole.childRoleName}
                     </RouterLink>
                     <a href={`/role/edit/${childRole.uuid}`}>
                       {childRole.childRoleName}
                     </a>
-                  </li>
+                  </span>
                 ))}
-              </ul>
+              </div>
+
               {/* <ul>
                 {role.childRoles.map((childRole) => (
                   <li key={childRole.uuid}>
@@ -479,20 +477,24 @@ class RoleForm extends React.Component {
               roles)
             </p>
             <div>
-              <ul>
+              <Grid container spacing={1}>
                 {inheritedRoles.map((el, index) => (
-                  <div key={el.role}>
-                    <input
-                      type="checkbox"
-                      name={el.role}
-                      checked={el.checked}
-                      id={el.role}
-                      onChange={(e) => inheritedRoleChangeHandler(e, index)}
-                    />{" "}
-                    <label htmlFor={el.role}>{el.role}</label>
-                  </div>
+                  <Grid key={el.role} item md={4} xs={12} sm={6}>
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          type="checkbox"
+                          name={el.role}
+                          checked={el.checked}
+                          id={el.role}
+                          onChange={(e) => inheritedRoleChangeHandler(e, index)}
+                        />
+                      }
+                      label={<span style={checkboxLabelStyle}>{el.role}</span>}
+                    />
+                  </Grid>
                 ))}
-              </ul>
+              </Grid>
             </div>
           </div>
 
@@ -529,16 +531,20 @@ class RoleForm extends React.Component {
           </div>
 
           {roleId !== "add" && (
-            <div>
-              <span>UUID: </span>
-              <span>{role.uuid}</span>
+            <div style={{ marginBottom: 12 }}>
+              <span style={propertyName}>UUID: </span>
+              <span style={inputInfoStyle}>{role.uuid}</span>
             </div>
           )}
 
-          <div style={buttonGroupStyle}>
+          {/* <div style={buttonGroupStyle}>
             <Controls.SaveButton onClick={() => saveRole()} />
             <Controls.CancelButton onClick={() => cancelRole()} />
-          </div>
+          </div> */}
+          <Grid container style={{ gridGap: 5 }}>
+            <Controls.SaveButton onClick={() => saveRole()} />
+            <Controls.CancelButton onClick={() => cancelRole()} />
+          </Grid>
 
           <br />
         </Paper>

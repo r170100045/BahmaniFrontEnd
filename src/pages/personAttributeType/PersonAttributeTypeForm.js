@@ -2,6 +2,7 @@ import {
   Checkbox,
   FormControl,
   FormControlLabel,
+  Grid,
   Input,
   Paper,
   TextField,
@@ -432,12 +433,12 @@ class PersonAttributeTypeForm extends React.Component {
             The privilege needed by a user to edit this person attribute
           </span>
 
-          <div style={buttonGroupStyle}>
+          <Grid container style={{ gridGap: 5 }}>
             <Controls.SaveButton onClick={() => savePersonAttributeType()} />
             <Controls.CancelButton
               onClick={() => cancelPersonAttributeType()}
             />
-          </div>
+          </Grid>
         </Paper>
 
         {personAttributeTypeId !== "add" && !personAttributeType.retired && (

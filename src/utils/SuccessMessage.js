@@ -1,33 +1,23 @@
-import { Paper } from "@material-ui/core";
+import { Paper, Snackbar } from "@material-ui/core";
+
 import React from "react";
 import { green } from "@material-ui/core/colors";
 
 class SuccessMessage extends React.Component {
   render() {
     return (
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          height: "60vh",
-        }}
-      >
+      <Snackbar open anchorOrigin={{ vertical: "bottom", horizontal: "right" }}>
         <Paper
           style={{
-            backgroundColor: "#d7ecd7",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontFamily: "Roboto",
-            fontSize: 50,
-            color: green[500],
-            padding: "60px 50px",
+            padding: "15px",
+            fontSize: "15px",
+            backgroundColor: "#99dc99",
+            border: "1px solid green",
           }}
         >
-          <span> {this.props.action} SUCCESSFULLY</span>
+          {`${this.props.action} SUCCESSFULLY`}
         </Paper>
-      </div>
+      </Snackbar>
     );
   }
 }

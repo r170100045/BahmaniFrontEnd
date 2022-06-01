@@ -13,14 +13,7 @@ const ColorButton = withStyles((theme) => ({
   },
 }))(Button);
 
-const useStyles = makeStyles((theme) => ({
-  margin: {
-    margin: theme.spacing(1),
-  },
-}));
-
 export default function RetireButton(props) {
-  const classes = useStyles();
   const { onClick, retired, ...other } = props;
   const text = retired ? "Un - Retire" : "Retire";
   const icon = retired ? <AlarmOnIcon /> : <AlarmOffIcon />;
@@ -31,7 +24,6 @@ export default function RetireButton(props) {
       color="primary"
       size="medium"
       startIcon={icon}
-      className={classes.margin}
       onClick={onClick}
       {...other}
     >
