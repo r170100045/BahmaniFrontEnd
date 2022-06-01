@@ -12,14 +12,14 @@ const ColorButton = withStyles((theme) => ({
   },
 }))(Button);
 
-const useStyles = makeStyles((theme) => ({
-  margin: {
-    margin: theme.spacing(1),
-  },
-}));
+// const useStyles = makeStyles((theme) => ({
+//   margin: {
+//     margin: theme.spacing(0),
+//   },
+// }));
 
 export default function SaveButton(props) {
-  const classes = useStyles();
+  // const classes = useStyles();
   const { onClick, ...other } = props;
 
   return (
@@ -28,7 +28,7 @@ export default function SaveButton(props) {
       color="primary"
       size="medium"
       startIcon={<SaveIcon />}
-      className={classes.margin}
+      // className={classes.margin}
       onClick={onClick}
       {...other}
     >

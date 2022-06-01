@@ -9,9 +9,7 @@ export const paperStyle = {
 };
 export const globalError = {
   color: "red",
-  backgroundColor: "rgb(251 230 230)",
   width: "fit-content",
-  border: "1px solid red",
   padding: "2px",
   marginBottom: "10px",
 };
@@ -35,7 +33,7 @@ export const labelStyle = {
   justifyContent: "space-between",
   width: "40%",
 };
-export const inputStyle = { width: "30rem" };
+export const inputStyle = { width: "30rem", marginBottom: "10px" };
 export const buttonGroupStyle = {};
 export const buttonStyle = {
   marginBottom: 7,

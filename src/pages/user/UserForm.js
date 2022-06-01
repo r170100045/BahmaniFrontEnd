@@ -107,7 +107,7 @@ class UserForm extends React.Component {
       },
     };
 
-    this.viewAll = "/user/view/all";
+    this.viewAll = "/user/view/all/dummy";
 
     this.saveUser = this.saveUser.bind(this);
     this.disableUser = this.disableUser.bind(this);
