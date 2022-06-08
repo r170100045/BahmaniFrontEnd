@@ -78,6 +78,7 @@ const Drugs = () => {
         <MTableToolbar {...props} />
         <div className="text-end" style={{ padding: "0px 10px" }}>
           <FormControlLabel
+            style={{ marginRight: "10px" }}
             value="start"
             control={
               <Switch
@@ -97,7 +98,7 @@ const Drugs = () => {
 
   const actions = [
     {
-      icon: () => <EditIcon color="primary" />,
+      icon: () => <EditIcon color="primary" style={{ marginRight: 20 }} />,
       tooltip: "Edit",
       onClick: (event, rowData) => setRedirect(`/drug/edit/${rowData.uuid}`),
     },

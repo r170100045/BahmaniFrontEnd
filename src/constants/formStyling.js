@@ -33,7 +33,10 @@ export const labelStyle = {
   justifyContent: "space-between",
   width: "40%",
 };
-export const inputStyle = { width: "30rem", marginBottom: "10px" };
+export const inputStyle = {
+  width: "30rem",
+  marginTop: 15,
+};
 export const buttonGroupStyle = {};
 export const buttonStyle = {
   marginBottom: 7,
@@ -54,9 +57,8 @@ export const checkboxGroupHeading = {
 };
 export const childRoleHeading = {
   fontSize: "1.25rem",
-  height: "0.25rem",
   marginTop: "1rem",
-  marginBottom: "2rem",
+  marginBottom: "1rem",
 };
 export const deleteButtonStyle = {
   marginLeft: "30px",
@@ -67,6 +69,7 @@ export const unretireStyleHeading = {
 export const userBioData = {
   display: "flex",
   flexDirection: "column",
+  marginLeft: 20,
 };
 export const propertyName = {
   fontSize: "1rem",

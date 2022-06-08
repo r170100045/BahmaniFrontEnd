@@ -281,7 +281,6 @@ class VisitTypeForm extends React.Component {
             value={GET_VALUE(visitType.description)}
             onChange={(e) => visitTypeChangeHandler(e)}
           />
-
           <Grid container style={{ gridGap: 5 }}>
             <Controls.SaveButton onClick={() => saveVisitType()} />
             <Controls.CancelButton onClick={() => cancelVisitType()} />

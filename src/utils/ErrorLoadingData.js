@@ -35,10 +35,14 @@ class ErrorLoadingData extends React.Component {
             fontSize: "15px",
             backgroundColor: "rgb(228 154 157)",
             border: "1px solid red",
+            width: "300px",
+            height: 25,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
           }}
         >
-          <p>FrontEnd {`<-->`} Backend Communication Failure</p>
-          <p>{this.props.message}</p>
+          <span>Something went wrong!</span>
         </Paper>
       </Snackbar>
     );

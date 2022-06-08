@@ -13,6 +13,7 @@ import {
 } from "@material-ui/core";
 import { Redirect, withRouter } from "react-router-dom";
 import {
+  buttonGroupStyle,
   checkboxGroupHeading,
   checkboxLabelStyle,
   deleteButtonStyle,
@@ -33,6 +34,7 @@ import ErrorLoadingData from "../../utils/ErrorLoadingData";
 import { GET_VALUE } from "../../constants/otherConstants";
 import LoadingData from "../../utils/LoadingData";
 import React from "react";
+import RetireButton from "../../components/controls/buttons/RetireButton";
 import SuccessMessage from "../../utils/SuccessMessage";
 import { getRoles } from "../../services/roleService";
 
@@ -517,7 +519,7 @@ class UserForm extends React.Component {
             <span style={globalError}>{errors.globalErrorMessage}</span>
           )}
           <form>
-            <fieldset>
+            <div>
               <div style={groupHeading}>Demographic Info</div>
               <div style={userBioData}>
                 <TextField
@@ -596,7 +598,7 @@ class UserForm extends React.Component {
                   </FormHelperText>
                 </FormControl>
               </div>
-            </fieldset>
+            </div>
 
             {/* <fieldset>
               <legend>Provider Account</legend>
@@ -614,100 +616,97 @@ class UserForm extends React.Component {
             </fieldset>
             <hr /> */}
 
-            <fieldset>
-              <div style={groupHeading}>Login Info</div>
-              <div style={userBioData}>
-                <span>
-                  <span style={propertyName}>System Id: </span>{" "}
-                  {userId === "add" ? (
-                    <span style={inputInfoStyle}>
-                      System Id will be generated after saving
-                    </span>
-                  ) : (
-                    <span>{user.systemId}</span>
-                  )}
-                </span>
+            <div style={groupHeading}>Login Info</div>
+            <div style={userBioData}>
+              <span>
+                <span style={propertyName}>System Id: </span>{" "}
+                {userId === "add" ? (
+                  <span style={inputInfoStyle}>
+                    System Id will be generated after saving
+                  </span>
+                ) : (
+                  <span>{user.systemId}</span>
+                )}
+              </span>
 
-                <TextField
-                  style={inputStyle}
-                  error={errors.usernameHasError}
-                  helperText={errors.usernameHasError && errors.username}
-                  label="Username"
-                  type="text"
-                  id="username"
-                  name="username"
-                  onChange={(e) => userChangeHandler(e)}
-                  value={GET_VALUE(user.username)}
-                  required
+              <TextField
+                style={inputStyle}
+                error={errors.usernameHasError}
+                helperText={errors.usernameHasError && errors.username}
+                label="Username"
+                type="text"
+                id="username"
+                name="username"
+                onChange={(e) => userChangeHandler(e)}
+                value={GET_VALUE(user.username)}
+                required
+              />
+              <span style={inputInfoStyle}>
+                user can log in with either Username or System-Id
+              </span>
+              {userId !== "add" && (
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      id="changePassword"
+                      name="changePassword"
+                      onChange={(e) => stateChangeHandler(e, "checked")}
+                      checked={GET_VALUE(changePassword)}
+                    />
+                  }
+                  label={
+                    <span style={checkboxLabelStyle}>Change Password</span>
+                  }
                 />
-                <span style={inputInfoStyle}>
-                  user can log in with either Username or System-Id
-                </span>
-                {userId !== "add" && (
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        id="changePassword"
-                        name="changePassword"
-                        onChange={(e) => stateChangeHandler(e, "checked")}
-                        checked={GET_VALUE(changePassword)}
-                      />
+              )}
+
+              {(changePassword || userId === "add") && (
+                <div>
+                  <TextField
+                    style={inputStyle}
+                    error={errors.statePasswordHasError}
+                    helperText={
+                      errors.statePasswordHasError && errors.statePassword
                     }
-                    label={
-                      <span style={checkboxLabelStyle}>Change Password</span>
-                    }
+                    label="User's Password"
+                    type="password"
+                    id="password"
+                    name="password"
+                    onChange={(e) => stateChangeHandler(e)}
+                    value={GET_VALUE(password)}
+                    required
                   />
-                )}
-
-                {(changePassword || userId === "add") && (
                   <div>
-                    <TextField
-                      style={inputStyle}
-                      error={errors.statePasswordHasError}
-                      helperText={
-                        errors.statePasswordHasError && errors.statePassword
-                      }
-                      label="User's Password"
-                      type="password"
-                      id="password"
-                      name="password"
-                      onChange={(e) => stateChangeHandler(e)}
-                      value={GET_VALUE(password)}
-                      required
-                    />
-                    <div>
-                      <span style={inputInfoStyle}>
-                        Password should be atleast 8 characters long and should
-                        have atleast one upper case letter, one lower case
-                        letter and at least one digit
-                      </span>
-                    </div>
-
-                    <TextField
-                      style={inputStyle}
-                      error={errors.statePasswordRetypeHasError}
-                      helperText={
-                        errors.statePasswordRetypeHasError &&
-                        errors.statePasswordRetype
-                      }
-                      label="Confirm Password"
-                      type="password"
-                      id="passwordRetype"
-                      name="passwordRetype"
-                      onChange={(e) => stateChangeHandler(e)}
-                      value={GET_VALUE(passwordRetype)}
-                      required
-                    />
-                    <div>
-                      <span style={inputInfoStyle}>
-                        Retype the password (for accuracy). It should match the
-                        password entered above
-                      </span>
-                    </div>
+                    <span style={inputInfoStyle}>
+                      Password should be atleast 8 characters long and should
+                      have atleast one upper case letter, one lower case letter
+                      and at least one digit
+                    </span>
                   </div>
-                )}
-              </div>
 
+                  <TextField
+                    style={inputStyle}
+                    error={errors.statePasswordRetypeHasError}
+                    helperText={
+                      errors.statePasswordRetypeHasError &&
+                      errors.statePasswordRetype
+                    }
+                    label="Confirm Password"
+                    type="password"
+                    id="passwordRetype"
+                    name="passwordRetype"
+                    onChange={(e) => stateChangeHandler(e)}
+                    value={GET_VALUE(passwordRetype)}
+                    required
+                  />
+                  <div>
+                    <span style={inputInfoStyle}>
+                      Retype the password (for accuracy). It should match the
+                      password entered above
+                    </span>
+                  </div>
+                </div>
+              )}
               <FormControlLabel
                 control={
                   <Checkbox
@@ -728,64 +727,47 @@ class UserForm extends React.Component {
                   </span>
                 }
               />
-              <div></div>
-
-              <div>
-                <span style={checkboxGroupHeading}>Roles: </span>
-                <span>
-                  {/* <ul>
-                    {roles.map((el, index) => (
-                      <div key={el.role}>
-                        <input
-                          type="checkbox"
-                          name={el.role}
-                          checked={el.checked}
-                          id={el.role}
-                          onChange={(e) => userRoleChangeHandler(e, index)}
-                        />{" "}
-                        <label htmlFor={el.role}>{el.role}</label>
+            </div>
+            <div>
+              <span style={groupHeading}>Roles: </span>
+              <div style={{ marginLeft: 20 }}>
+                <Grid container>
+                  {roles.map((el, index) => (
+                    <Grid key={el.role} item md={4} xs={12} sm={6}>
+                      <div>
+                        <FormControlLabel
+                          control={
+                            <Checkbox
+                              label="entry"
+                              type="checkbox"
+                              name={el.role}
+                              checked={el.checked}
+                              id={el.role}
+                              onChange={(e) => userRoleChangeHandler(e, index)}
+                            />
+                          }
+                          label={
+                            <span style={checkboxLabelStyle}>{el.role}</span>
+                          }
+                        />
                       </div>
-                    ))}
-                  </ul> */}
-                  <Grid container>
-                    {roles.map((el, index) => (
-                      <Grid key={el.role} item md={4} xs={12} sm={6}>
-                        <div>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                label="entry"
-                                type="checkbox"
-                                name={el.role}
-                                checked={el.checked}
-                                id={el.role}
-                                onChange={(e) =>
-                                  userRoleChangeHandler(e, index)
-                                }
-                              />
-                            }
-                            label={
-                              <span style={checkboxLabelStyle}>{el.role}</span>
-                            }
-                          />
-                        </div>
-                      </Grid>
-                    ))}
-                  </Grid>
-                </span>
+                    </Grid>
+                  ))}
+                </Grid>
               </div>
-              <Button
-                style={{ marginBottom: 10 }}
-                variant="outlined"
-                type="button"
-                onClick={() => toggleAdvancedOptions()}
-              >
-                {getAdvancedOptionsText}
-              </Button>
-            </fieldset>
+            </div>
+            <Button
+              style={{ marginBottom: 10 }}
+              variant="outlined"
+              type="button"
+              onClick={() => toggleAdvancedOptions()}
+              size="small"
+            >
+              {getAdvancedOptionsText}
+            </Button>
 
             {showAdvancedOptions && (
-              <div>
+              <div style={{ marginLeft: 20 }}>
                 <div>
                   <TextField
                     style={inputStyle}
@@ -812,12 +794,12 @@ class UserForm extends React.Component {
                 {userId !== "add" && (
                   <div>
                     <div>
-                      <span>UUID: </span>
-                      <span>{user.uuid}</span>
+                      <span style={propertyName}>UUID: </span>
+                      <span style={inputInfoStyle}>{user.uuid}</span>
                     </div>
                     <div>
-                      <span style={checkboxGroupHeading}>User Properties</span>
-                      <span>
+                      <span style={groupHeading}>User Properties</span>
+                      <div style={{ marginLeft: 20 }}>
                         {/* <div>
                       <span>Name </span>
                       <span>Value</span>
@@ -837,7 +819,7 @@ class UserForm extends React.Component {
                             />
                           </div>
                         ))}
-                      </span>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -845,17 +827,19 @@ class UserForm extends React.Component {
             )}
 
             {userId !== "add" && (
-              <fieldset>
-                <legend>Creation Info</legend>
-                <div>
-                  <span>Created By: </span>
-                  <span>{user.createdBy}</span>
+              <div>
+                <div style={groupHeading}>Creation Info</div>
+                <div style={{ marginLeft: 20, marginBottom: 10 }}>
+                  <div>
+                    <span style={propertyName}>Created By: </span>
+                    <span style={inputInfoStyle}>{user.createdBy}</span>
+                  </div>
+                  <div>
+                    <span style={propertyName}>Date Created: </span>
+                    <span style={inputInfoStyle}>{user.dateCreated}</span>
+                  </div>
                 </div>
-                <div>
-                  <span>Date Created: </span>
-                  <span>{user.dateCreated}</span>
-                </div>
-              </fieldset>
+              </div>
             )}
 
             <Grid container style={{ gridGap: 5 }}>
@@ -867,24 +851,61 @@ class UserForm extends React.Component {
 
         {userId !== "add" && !user.retired && (
           <Paper style={paperStyle}>
-            <fieldset>
-              <p style={subHeadingStyle}>Disable Account</p>
-              <TextField
-                error={errors.retireReasonHasError}
-                helperText={errors.retireReasonHasError && errors.retireReason}
-                label="Reason to disable"
-                type="text"
-                id="retireReason"
-                name="retireReason"
-                onChange={(e) => userChangeHandler(e)}
-                value={GET_VALUE(user.retireReason)}
-                required
-              />
+            <TextField
+              error={errors.retireReasonHasError}
+              helperText={errors.retireReasonHasError && errors.retireReason}
+              style={inputStyle}
+              label="Reason to Disable"
+              type="text"
+              id="retireReason"
+              name="retireReason"
+              multiline
+              value={GET_VALUE(user.retireReason)}
+              onChange={(e) => userChangeHandler(e)}
+              required
+            />
 
-              <Button variant="outlined" onClick={() => disableUser()}>
-                Disable Account
-              </Button>
-            </fieldset>
+            <div style={buttonGroupStyle}>
+              <Controls.RetireButton
+                disabled={user.retired}
+                onClick={() => disableUser()}
+              />
+            </div>
+          </Paper>
+        )}
+
+        {userId !== "add" && user.retired && (
+          <Paper style={paperStyle}>
+            <p style={subHeadingStyle}>Enable User</p>
+            <div style={buttonGroupStyle}>
+              <Controls.RetireButton
+                retired={user.retired}
+                onClick={() => enableUser()}
+              />
+            </div>
+          </Paper>
+        )}
+
+        {/* {userId !== "add" && !user.retired && (
+          <Paper style={paperStyle}>
+            <div>
+              <p style={subHeadingStyle}>Disable Account</p>
+              <div>
+                <TextField
+                  error={errors.retireReasonHasError}
+                  helperText={
+                    errors.retireReasonHasError && errors.retireReason
+                  }
+                  label="Reason to disable"
+                  type="text"
+                  id="retireReason"
+                  name="retireReason"
+                  onChange={(e) => userChangeHandler(e)}
+                  value={GET_VALUE(user.retireReason)}
+                  required
+                />
+              </div>
+            </div>
           </Paper>
         )}
 
@@ -892,7 +913,7 @@ class UserForm extends React.Component {
           <Button variant="outlined" onClick={() => enableUser()}>
             Enable Account
           </Button>
-        )}
+        )} */}
 
         {userId !== "add" && (
           <Controls.DeleteButton

@@ -3,6 +3,8 @@ import {
   Checkbox,
   FormControlLabel,
   Grid,
+  IconButton,
+  InputAdornment,
   Paper,
   TextField,
 } from "@material-ui/core";
@@ -22,6 +24,7 @@ import {
   globalError,
   inputStyle,
   paperStyle,
+  propertyName,
   subHeadingStyle,
 } from "../../constants/formStyling";
 import {
@@ -39,6 +42,7 @@ import {
 } from "../../services/conceptService";
 
 import Controls from "../../components/controls/Controls";
+import DeleteIcon from "@material-ui/icons/Delete";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
@@ -940,13 +944,24 @@ class ConceptForm extends React.Component {
         {error && <span style={globalError}>{errors.globalErrorMessage}</span>}
 
         {conceptId !== "add" && (
-          <button type="button" onClick={() => redirectToViewPage(conceptId)}>
-            View
-          </button>
+          <div style={{ display: "flex", justifyContent: "end" }}>
+            <div style={buttonGroupStyle}>
+              <Button
+                style={{ backgroundColor: "#a7b3ee" }}
+                variant="outlined"
+                type="button"
+                size="small"
+                onClick={() => redirectToViewPage(conceptId)}
+              >
+                View
+              </Button>
+            </div>
+          </div>
         )}
 
         <form>
           <TextField
+            style={inputStyle}
             error={errors.nameHasError}
             helperText={errors.nameHasError && errors.name}
             label="Fully Specified Name"
@@ -956,314 +971,310 @@ class ConceptForm extends React.Component {
             onChange={(e) => fullySpecifiedNameChangeHandler(e)}
             value={GET_VALUE(fullySpecifiedName)}
           />
-          <br />
 
           <div>
-            <label>Synonyms:</label>
-            <div>
-              <Button
-                variant="outlined"
-                onClick={() => addSynonymButtonHandler()}
-              >
-                Add Synonym
-              </Button>
-            </div>
-            {synonyms.map((item, index) => (
-              <div key={index}>
-                <div>
-                  <TextField
-                    name="name"
-                    type="text"
-                    id="name"
-                    value={item.name}
-                    onChange={(e) => synonymNameChangeHandler(e, index)}
-                  />
-                  <Button
-                    variant="outlined"
-                    onClick={() => removeSynonymButtonHandler(index)}
-                  >
-                    Remove
-                  </Button>
+            <div style={{ fontSize: "1rem", marginTop: "15px" }}>Synonyms:</div>
+
+            <div style={{ marginLeft: "20px" }}>
+              {synonyms.map((item, index) => (
+                <div key={index}>
+                  <div>
+                    <TextField
+                      style={inputStyle}
+                      name="name"
+                      type="text"
+                      id="name"
+                      value={item.name}
+                      onChange={(e) => synonymNameChangeHandler(e, index)}
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <DeleteIcon
+                              style={{ cursor: "pointer", color: "red" }}
+                              onClick={() => removeSynonymButtonHandler(index)}
+                            />
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  </div>
                 </div>
+              ))}
+              <div>
+                <Button
+                  style={{ marginTop: "10px" }}
+                  variant="outlined"
+                  size="small"
+                  onClick={() => addSynonymButtonHandler()}
+                >
+                  Add Synonym
+                </Button>
               </div>
-            ))}
-          </div>
-          <br />
-
-          <div>
-            {/* <label>Synonyms:</label>
-            {synonyms.map((item, index) => (
-              <div key={index}>
-                <div>
-                  <input
-                    name="name"
-                    type="text"
-                    id="name"
-                    value={item.name}
-                    onChange={(e) => synonymNameChangeHandler(e, index)}
-                  />
-                  {synonyms.length > 1 && (
-                    <button
-                      type="button"
-                      onClick={() => removeSynonymButtonHandler(index)}
-                    >
-                      Remove
-                    </button>
-                  )}
-                </div>
-                <div>
-                  {synonyms.length - 1 === index && (
-                    <button
-                      type="button"
-                      onClick={addSynonymButtonHandler.bind(this)}
-                    >
-                      Add Synonym
-                    </button>
-                  )}
-                </div>
-              </div>
-            ))} */}
-          </div>
-          <br />
-
-          <TextField
-            label="Short Name"
-            type="text"
-            id="shortName"
-            name="shortName"
-            onChange={(e) => conceptChangeHandler(e)}
-            value={GET_VALUE(concept.shortName)}
-          />
-          <br />
-
-          <TextField
-            label="Description"
-            type="text"
-            id="description"
-            name="description"
-            onChange={(e) => conceptChangeHandler(e)}
-            value={GET_VALUE(concept.description)}
-          />
-          <br />
-
-          <SingleSelect
-            style={inputStyle}
-            label="Class"
-            id="classId"
-            name="classId"
-            defaultValue={concept.classId}
-            onChange={(selectedValue) =>
-              conceptSelectTypeInputChangehandler(selectedValue, "classId")
-            }
-            options={classOptions}
-          />
-          <br />
-
-          <FormControlLabel
-            control={
-              <Checkbox
-                type="checkbox"
-                id="isSet"
-                name="isSet"
-                onChange={(e) => conceptChangeHandler(e, "checked")}
-                checked={GET_VALUE(concept.isSet)}
-              />
-            }
-            label={<span style={checkboxLabelStyle}>Is set</span>}
-          />
-          <br />
-
-          {concept.isSet && (
-            <div>
-              <MultipleSelect
-                style={inputStyle}
-                label="Set Members"
-                id="conceptSets"
-                name="conceptSets"
-                defaultValues={conceptSets}
-                onChange={(selectedValues) =>
-                  conceptSelectTypeInputChangehandler(
-                    selectedValues,
-                    "conceptSets"
-                  )
-                }
-                options={conceptOptions}
-              />
             </div>
-          )}
+          </div>
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <TextField
+              style={inputStyle}
+              label="Short Name"
+              type="text"
+              id="shortName"
+              name="shortName"
+              onChange={(e) => conceptChangeHandler(e)}
+              value={GET_VALUE(concept.shortName)}
+            />
 
-          <SingleSelect
-            label="Datatype"
-            style={inputStyle}
-            id="dataTypeId"
-            name="dataTypeId"
-            defaultValue={dataTypeId}
-            onChange={(selectedValue) =>
-              conceptSelectTypeInputChangehandler(selectedValue, "dataTypeId")
-            }
-            options={dataTypeOptions}
-          />
-          <br />
+            <TextField
+              style={inputStyle}
+              label="Description"
+              type="text"
+              id="description"
+              name="description"
+              onChange={(e) => conceptChangeHandler(e)}
+              value={GET_VALUE(concept.description)}
+            />
+
+            <SingleSelect
+              style={inputStyle}
+              label="Class"
+              id="classId"
+              name="classId"
+              defaultValue={concept.classId}
+              onChange={(selectedValue) =>
+                conceptSelectTypeInputChangehandler(selectedValue, "classId")
+              }
+              options={classOptions}
+            />
+
+            <FormControlLabel
+              style={inputStyle}
+              control={
+                <Checkbox
+                  type="checkbox"
+                  id="isSet"
+                  name="isSet"
+                  onChange={(e) => conceptChangeHandler(e, "checked")}
+                  checked={GET_VALUE(concept.isSet)}
+                />
+              }
+              label={<span style={checkboxLabelStyle}>Is set</span>}
+            />
+
+            {concept.isSet && (
+              <div style={{ marginLeft: 20 }}>
+                <MultipleSelect
+                  style={inputStyle}
+                  label="Set Members"
+                  id="conceptSets"
+                  name="conceptSets"
+                  defaultValues={conceptSets}
+                  onChange={(selectedValues) =>
+                    conceptSelectTypeInputChangehandler(
+                      selectedValues,
+                      "conceptSets"
+                    )
+                  }
+                  options={conceptOptions}
+                />
+              </div>
+            )}
+
+            <SingleSelect
+              label="Datatype"
+              style={inputStyle}
+              id="dataTypeId"
+              name="dataTypeId"
+              defaultValue={dataTypeId}
+              onChange={(selectedValue) =>
+                conceptSelectTypeInputChangehandler(selectedValue, "dataTypeId")
+              }
+              options={dataTypeOptions}
+            />
+          </div>
 
           {dataTypeId === 1 && (
             <div>
-              <p>Numeric</p>
-              <TextField
-                label="Absolute High"
-                type="text"
-                id="hiAbsolute"
-                name="hiAbsolute"
-                value={GET_VALUE(
-                  conceptNumeric === null ? "" : conceptNumeric.hiAbsolute
-                )}
-                onChange={(e) => numericChangeHandler(e)}
-              />
-              <br />
-
-              <TextField
-                label="Critical High"
-                type="text"
-                id="hiCritical"
-                name="hiCritical"
-                value={GET_VALUE(
-                  conceptNumeric === null ? "" : conceptNumeric.hiCritical
-                )}
-                onChange={(e) => numericChangeHandler(e)}
-              />
-              <br />
-              <TextField
-                label="Normal High"
-                type="text"
-                id="hiNormal"
-                name="hiNormal"
-                value={GET_VALUE(
-                  conceptNumeric === null ? "" : conceptNumeric.hiNormal
-                )}
-                onChange={(e) => numericChangeHandler(e)}
-              />
-              <br />
-              <TextField
-                label="Absolute Low"
-                type="text"
-                id="lowAbsolute"
-                name="lowAbsolute"
-                value={GET_VALUE(
-                  conceptNumeric === null ? "" : conceptNumeric.lowAbsolute
-                )}
-                onChange={(e) => numericChangeHandler(e)}
-              />
-              <br />
-
-              <TextField
-                label="Critical Low"
-                type="text"
-                id="lowCritical"
-                name="lowCritical"
-                value={GET_VALUE(
-                  conceptNumeric === null ? "" : conceptNumeric.lowCritical
-                )}
-                onChange={(e) => numericChangeHandler(e)}
-              />
-              <br />
-
-              <TextField
-                label="Normal Low"
-                type="text"
-                id="lowNormal"
-                name="lowNormal"
-                value={GET_VALUE(
-                  conceptNumeric === null ? "" : conceptNumeric.lowNormal
-                )}
-                onChange={(e) => numericChangeHandler(e)}
-              />
-              <br />
-
-              <TextField
-                label="Units"
-                type="text"
-                id="units"
-                name="units"
-                value={GET_VALUE(
-                  conceptNumeric === null ? "" : conceptNumeric.units
-                )}
-                onChange={(e) => numericChangeHandler(e)}
-              />
-              <br />
-
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    type="checkbox"
-                    id="precise"
-                    name="precise"
-                    checked={GET_VALUE(
-                      conceptNumeric === null ? "" : conceptNumeric.precise
+              <div style={{ fontSize: "1rem", marginTop: "15px" }}>
+                Numeric Details
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  marginLeft: "20px",
+                }}
+              >
+                <div>
+                  <TextField
+                    style={inputStyle}
+                    label="Absolute High"
+                    type="text"
+                    id="hiAbsolute"
+                    name="hiAbsolute"
+                    value={GET_VALUE(
+                      conceptNumeric === null ? "" : conceptNumeric.hiAbsolute
                     )}
-                    onChange={(e) => numericChangeHandler(e, "checked")}
+                    onChange={(e) => numericChangeHandler(e)}
                   />
-                }
-                label={<span style={checkboxLabelStyle}>Allow Decimal?</span>}
-              />
-              <br />
+                </div>
 
-              <TextField
-                label="Display Precision"
-                type="text"
-                id="displayPrecision"
-                name="displayPrecision"
-                value={GET_VALUE(
-                  conceptNumeric === null ? "" : conceptNumeric.displayPrecision
-                )}
-                readOnly="true"
-                disabled="true"
-              />
-              <br />
+                <TextField
+                  style={inputStyle}
+                  label="Critical High"
+                  type="text"
+                  id="hiCritical"
+                  name="hiCritical"
+                  value={GET_VALUE(
+                    conceptNumeric === null ? "" : conceptNumeric.hiCritical
+                  )}
+                  onChange={(e) => numericChangeHandler(e)}
+                />
+                <TextField
+                  style={inputStyle}
+                  label="Normal High"
+                  type="text"
+                  id="hiNormal"
+                  name="hiNormal"
+                  value={GET_VALUE(
+                    conceptNumeric === null ? "" : conceptNumeric.hiNormal
+                  )}
+                  onChange={(e) => numericChangeHandler(e)}
+                />
+                <TextField
+                  style={inputStyle}
+                  label="Absolute Low"
+                  type="text"
+                  id="lowAbsolute"
+                  name="lowAbsolute"
+                  value={GET_VALUE(
+                    conceptNumeric === null ? "" : conceptNumeric.lowAbsolute
+                  )}
+                  onChange={(e) => numericChangeHandler(e)}
+                />
+
+                <TextField
+                  style={inputStyle}
+                  label="Critical Low"
+                  type="text"
+                  id="lowCritical"
+                  name="lowCritical"
+                  value={GET_VALUE(
+                    conceptNumeric === null ? "" : conceptNumeric.lowCritical
+                  )}
+                  onChange={(e) => numericChangeHandler(e)}
+                />
+
+                <TextField
+                  style={inputStyle}
+                  label="Normal Low"
+                  type="text"
+                  id="lowNormal"
+                  name="lowNormal"
+                  value={GET_VALUE(
+                    conceptNumeric === null ? "" : conceptNumeric.lowNormal
+                  )}
+                  onChange={(e) => numericChangeHandler(e)}
+                />
+
+                <TextField
+                  style={inputStyle}
+                  label="Units"
+                  type="text"
+                  id="units"
+                  name="units"
+                  value={GET_VALUE(
+                    conceptNumeric === null ? "" : conceptNumeric.units
+                  )}
+                  onChange={(e) => numericChangeHandler(e)}
+                />
+
+                <TextField
+                  style={inputStyle}
+                  label="Display Precision"
+                  type="text"
+                  id="displayPrecision"
+                  name="displayPrecision"
+                  value={GET_VALUE(
+                    conceptNumeric === null
+                      ? ""
+                      : conceptNumeric.displayPrecision
+                  )}
+                  readOnly="true"
+                  disabled="true"
+                />
+                <FormControlLabel
+                  style={inputStyle}
+                  control={
+                    <Checkbox
+                      type="checkbox"
+                      id="precise"
+                      name="precise"
+                      checked={GET_VALUE(
+                        conceptNumeric === null ? "" : conceptNumeric.precise
+                      )}
+                      onChange={(e) => numericChangeHandler(e, "checked")}
+                    />
+                  }
+                  label={<span style={checkboxLabelStyle}>Allow Decimal?</span>}
+                />
+              </div>
             </div>
           )}
 
           {dataTypeId === 2 && (
             <div>
-              <p>Answers</p>
+              <div style={{ fontSize: "1rem", marginTop: "15px" }}>
+                Coded: Answers
+              </div>
 
-              <MultipleSelect
-                label="Select Concepts"
-                id="conceptAnswerConcepts"
-                name="conceptAnswerConcepts"
-                placeholder="Enter concept name or id"
-                defaultValues={conceptAnswerConcepts}
-                onChange={(selectedValues) =>
-                  conceptSelectTypeInputChangehandler(
-                    selectedValues,
-                    "conceptAnswerConcepts"
-                  )
-                }
-                options={conceptOptions}
-                filterOption={FILTER_OPTIONS}
-              />
-              <br />
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  marginLeft: "20px",
+                }}
+              >
+                <MultipleSelect
+                  style={inputStyle}
+                  label="Select Concepts"
+                  id="conceptAnswerConcepts"
+                  name="conceptAnswerConcepts"
+                  placeholder="Enter concept name or id"
+                  defaultValues={conceptAnswerConcepts}
+                  onChange={(selectedValues) =>
+                    conceptSelectTypeInputChangehandler(
+                      selectedValues,
+                      "conceptAnswerConcepts"
+                    )
+                  }
+                  options={conceptOptions}
+                  filterOption={FILTER_OPTIONS}
+                />
 
-              <MultipleSelect
-                label="Select Drugs"
-                id="conceptAnswerDrugs"
-                name="conceptAnswerDrugs"
-                placeholder="Enter concept drug name or id"
-                defaultValues={conceptAnswerDrugs}
-                onChange={(selectedValues) =>
-                  conceptSelectTypeInputChangehandler(
-                    selectedValues,
-                    "conceptAnswerDrugs"
-                  )
-                }
-                options={drugOptions}
-                filterOption={FILTER_OPTIONS}
-              />
+                <MultipleSelect
+                  style={inputStyle}
+                  label="Select Drugs"
+                  id="conceptAnswerDrugs"
+                  name="conceptAnswerDrugs"
+                  placeholder="Enter concept drug name or id"
+                  defaultValues={conceptAnswerDrugs}
+                  onChange={(selectedValues) =>
+                    conceptSelectTypeInputChangehandler(
+                      selectedValues,
+                      "conceptAnswerDrugs"
+                    )
+                  }
+                  options={drugOptions}
+                  filterOption={FILTER_OPTIONS}
+                />
+              </div>
             </div>
           )}
 
           {dataTypeId === 13 && (
-            <div>
+            <div style={{ marginLeft: 20 }}>
               <SingleSelect
-                label="Handler"
+                style={inputStyle}
+                label="Complex Handler"
                 id="conceptComplex"
                 name="conceptComplex"
                 defaultValue={GET_VALUE(concept.conceptComplex)}
@@ -1279,142 +1290,185 @@ class ConceptForm extends React.Component {
           )}
 
           <div>
-            <label>Mappings:</label>
-          </div>
-          <Controls.AddButton onClick={() => addMappingButtonHandler()} />
-          <div>
-            <span>Relationship</span>
-            <span>Source</span>
-            <span>Code</span>
-            <span>Name</span>
-          </div>
+            <div style={{ fontSize: "1rem", marginTop: "15px" }}>Mappings:</div>
+            <div style={{ marginLeft: "20px" }}>
+              <div>
+                <span>Relationship</span>
+                <span>Source</span>
+                <span>Code</span>
+                <span>Name</span>
+              </div>
 
-          {mappings.map((item, index) => (
-            <div
-              key={
-                index +
-                item.conceptMapTypeId +
-                item.conceptReferenceConceptSourceId +
-                item.conceptReferenceCode +
-                item.conceptReferenceName +
-                item.conceptReferenceTermId
-              }
-            >
-              <SingleSelect
-                style={inputStyle}
-                id="conceptMapTypeId"
-                name="conceptMapTypeId"
-                defaultValue={GET_VALUE(item.conceptMapTypeId)}
-                onChange={(selectedValue) =>
-                  conceptMapTypeIdChangeHandler(selectedValue, index)
-                }
-                options={mapRelationshipOptions}
-              />
-              <SingleSelect
-                style={inputStyle}
-                id="conceptReferenceConceptSourceId"
-                name="conceptReferenceConceptSourceId"
-                defaultValue={GET_VALUE(item.conceptReferenceConceptSourceId)}
-                onChange={(selectedValue) =>
-                  conceptReferenceConceptSourceIdChangeHandler(
-                    selectedValue,
-                    index
-                  )
-                }
-                options={mapSourceOptions}
-              />
-              <SingleSelect
-                style={inputStyle}
-                id="conceptReferenceCode"
-                name="conceptReferenceCode"
-                defaultValue={GET_VALUE(item.conceptReferenceCode)}
-                onChange={(selectedValue, selectedOption) =>
-                  mapCodeChangeHandler(selectedValue, selectedOption, index)
-                }
-                options={mapCodeOptions[item.conceptReferenceConceptSourceId]}
-              />
-              <TextField
-                style={inputStyle}
-                id="conceptReferenceName"
-                name="conceptReferenceName"
-                value={GET_VALUE(item.conceptReferenceName)}
-                disabled
-              />
-              <Button
-                variant="outlined"
-                onClick={() => removeMappingButtonHandler(index)}
+              {mappings.map((item, index) => (
+                <div
+                  key={
+                    index +
+                    item.conceptMapTypeId +
+                    item.conceptReferenceConceptSourceId +
+                    item.conceptReferenceCode +
+                    item.conceptReferenceName +
+                    item.conceptReferenceTermId
+                  }
+                >
+                  <Grid
+                    container
+                    direction="row"
+                    justifyContent="space-between"
+                    alignItems="center"
+                    md={2}
+                  >
+                    <Grid item>
+                      <SingleSelect
+                        id="conceptMapTypeId"
+                        name="conceptMapTypeId"
+                        defaultValue={GET_VALUE(item.conceptMapTypeId)}
+                        onChange={(selectedValue) =>
+                          conceptMapTypeIdChangeHandler(selectedValue, index)
+                        }
+                        options={mapRelationshipOptions}
+                      />
+                    </Grid>
+                    <Grid item>
+                      <SingleSelect
+                        id="conceptReferenceConceptSourceId"
+                        name="conceptReferenceConceptSourceId"
+                        defaultValue={GET_VALUE(
+                          item.conceptReferenceConceptSourceId
+                        )}
+                        onChange={(selectedValue) =>
+                          conceptReferenceConceptSourceIdChangeHandler(
+                            selectedValue,
+                            index
+                          )
+                        }
+                        options={mapSourceOptions}
+                      />
+                    </Grid>
+                    <Grid item>
+                      <SingleSelect
+                        id="conceptReferenceCode"
+                        name="conceptReferenceCode"
+                        defaultValue={GET_VALUE(item.conceptReferenceCode)}
+                        onChange={(selectedValue, selectedOption) =>
+                          mapCodeChangeHandler(
+                            selectedValue,
+                            selectedOption,
+                            index
+                          )
+                        }
+                        options={
+                          mapCodeOptions[item.conceptReferenceConceptSourceId]
+                        }
+                      />
+                    </Grid>
+
+                    <Grid item>
+                      <TextField
+                        id="conceptReferenceName"
+                        name="conceptReferenceName"
+                        value={GET_VALUE(item.conceptReferenceName)}
+                        disabled
+                        InputProps={{
+                          endAdornment: (
+                            <InputAdornment position="end">
+                              <DeleteIcon
+                                style={{ cursor: "pointer", color: "red" }}
+                                onClick={() =>
+                                  removeMappingButtonHandler(index)
+                                }
+                              />
+                            </InputAdornment>
+                          ),
+                        }}
+                      />
+                    </Grid>
+                  </Grid>
+
+                  {/* <Button
+                    variant="outlined"
+                    onClick={() => removeMappingButtonHandler(index)}
+                  >
+                    Remove
+                  </Button> */}
+                </div>
+              ))}
+              <div>
+                <Grid container style={{ gridGap: 5 }}>
+                  <Button
+                    variant="outlined"
+                    color="primary"
+                    size="small"
+                    onClick={() => addMappingButtonHandler()}
+                  >
+                    Add New Mapping
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    color="primary"
+                    size="small"
+                    onClick={() => openReferenceTermFormHandler()}
+                  >
+                    Create New Reference Term
+                  </Button>
+                </Grid>
+              </div>
+
+              <Dialog
+                open={openReferenceTermForm}
+                onClose={() => closeReferenceTerm()}
+                aria-labelledby="form-dialog-title"
               >
-                Remove
-              </Button>
-            </div>
-          ))}
-          <div>
-            <Button
-              variant="outlined"
-              color="primary"
-              onClick={() => openReferenceTermFormHandler()}
-            >
-              Create New Reference Term
-            </Button>
-            <Dialog
-              open={openReferenceTermForm}
-              onClose={() => closeReferenceTerm()}
-              aria-labelledby="form-dialog-title"
-            >
-              <DialogTitle id="form-dialog-title">
-                Create New Reference Term
-              </DialogTitle>
-              <DialogContent>
-                <DialogContentText>Reference Term Details</DialogContentText>
-                {errorReferenceTerm && (
-                  <span style={globalError}>{errors.globalErrorMessage}</span>
-                )}
+                <DialogTitle id="form-dialog-title">
+                  Create New Reference Term
+                </DialogTitle>
+                <DialogContent>
+                  <DialogContentText>Reference Term Details</DialogContentText>
+                  {errorReferenceTerm && (
+                    <span style={globalError}>{errors.globalErrorMessage}</span>
+                  )}
 
-                <TextField
-                  error={errors.codeHasError}
-                  helperText={errors.codeHasError && errors.code}
-                  style={inputStyle}
-                  label="Code"
-                  id="code"
-                  name="code"
-                  value={GET_VALUE(referenceTerm.code)}
-                  onChange={(e) => referenceTermChangeHandler(e)}
-                  required
-                />
-                <SingleSelect
-                  error={errors.conceptSourceIdHasError}
-                  helperText={
-                    errors.conceptSourceIdHasError && errors.conceptSourceId
-                  }
-                  style={inputStyle}
-                  label="Source"
-                  id="conceptSourceId"
-                  name="conceptSourceId"
-                  defaultValue={GET_VALUE(referenceTerm.conceptSourceId)}
-                  onChange={(selectedValue) =>
-                    referenceTermSourceChangeHandler(selectedValue)
-                  }
-                  options={mapSourceOptionsForReferenceTerm}
-                  required
-                />
-                <TextField
-                  style={inputStyle}
-                  label="Name"
-                  id="name"
-                  name="name"
-                  value={GET_VALUE(referenceTerm.name)}
-                  onChange={(e) => referenceTermChangeHandler(e)}
-                />
-              </DialogContent>
-              <DialogActions>
-                <Button onClick={() => saveReferenceTerm()} color="primary">
-                  Save
-                </Button>
-                <Button onClick={() => closeReferenceTerm()} color="primary">
-                  Cancel
-                </Button>
-              </DialogActions>
-            </Dialog>
+                  <TextField
+                    error={errors.codeHasError}
+                    helperText={errors.codeHasError && errors.code}
+                    style={inputStyle}
+                    label="Code"
+                    id="code"
+                    name="code"
+                    value={GET_VALUE(referenceTerm.code)}
+                    onChange={(e) => referenceTermChangeHandler(e)}
+                    required
+                  />
+                  <SingleSelect
+                    error={errors.conceptSourceIdHasError}
+                    helperText={
+                      errors.conceptSourceIdHasError && errors.conceptSourceId
+                    }
+                    style={inputStyle}
+                    label="Source"
+                    id="conceptSourceId"
+                    name="conceptSourceId"
+                    defaultValue={GET_VALUE(referenceTerm.conceptSourceId)}
+                    onChange={(selectedValue) =>
+                      referenceTermSourceChangeHandler(selectedValue)
+                    }
+                    options={mapSourceOptionsForReferenceTerm}
+                    required
+                  />
+                  <TextField
+                    style={inputStyle}
+                    label="Name"
+                    id="name"
+                    name="name"
+                    value={GET_VALUE(referenceTerm.name)}
+                    onChange={(e) => referenceTermChangeHandler(e)}
+                  />
+                </DialogContent>
+                <DialogActions>
+                  <Controls.SaveButton onClick={() => saveReferenceTerm()} />
+                  <Controls.CancelButton onClick={() => closeReferenceTerm()} />
+                </DialogActions>
+              </Dialog>
+            </div>
           </div>
 
           <TextField
@@ -1426,7 +1480,6 @@ class ConceptForm extends React.Component {
             onChange={(e) => conceptChangeHandler(e)}
             value={GET_VALUE(concept.version)}
           />
-          <br />
         </form>
         <Grid container style={{ gridGap: 5 }}>
           <Controls.SaveButton onClick={() => saveConcept()} />
@@ -1439,7 +1492,7 @@ class ConceptForm extends React.Component {
           />
         </Grid>
 
-        {conceptId !== "add" && !concept.retired && (
+        {/* {conceptId !== "add" && !concept.retired && (
           <Paper style={paperStyle}>
             <TextField
               error={errors.retireReasonHasError}
@@ -1454,15 +1507,12 @@ class ConceptForm extends React.Component {
               onChange={(e) => conceptChangeHandler(e)}
             />
 
-            <br />
             <div style={buttonGroupStyle}>
               <Controls.RetireButton
                 retired={concept.retired}
                 onClick={() => retireConcept()}
               />
             </div>
-
-            <br />
           </Paper>
         )}
 
@@ -1483,7 +1533,7 @@ class ConceptForm extends React.Component {
             style={deleteButtonStyle}
             onClick={() => deleteConcept()}
           />
-        )}
+        )} */}
       </Paper>
     );
   }

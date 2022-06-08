@@ -259,7 +259,6 @@ class PrivilegeForm extends React.Component {
             <Controls.SaveButton onClick={() => savePrivilege()} />
             <Controls.CancelButton onClick={() => cancelPrivilege()} />
           </Grid>
-          <br />
         </Paper>
         {privilegeId !== "add" && (
           <Controls.DeleteButton

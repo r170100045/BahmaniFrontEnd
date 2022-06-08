@@ -433,7 +433,7 @@ class PersonAttributeTypeForm extends React.Component {
             The privilege needed by a user to edit this person attribute
           </span>
 
-          <Grid container style={{ gridGap: 5 }}>
+          <Grid container style={{ gridGap: 5, marginTop: 20 }}>
             <Controls.SaveButton onClick={() => savePersonAttributeType()} />
             <Controls.CancelButton
               onClick={() => cancelPersonAttributeType()}

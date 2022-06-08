@@ -85,6 +85,7 @@ const Concepts = () => {
         <MTableToolbar {...props} />
         <div class="text-end" style={{ padding: "0px 10px" }}>
           <FormControlLabel
+            style={{ marginRight: "10px" }}
             value="start"
             control={
               <Switch
@@ -105,13 +106,15 @@ const Concepts = () => {
   };
 
   const actions = [
+    // {
+    //   icon: () => <EditIcon color="primary" />,
+    //   tooltip: "Edit",
+    //   onClick: (event, rowData) => setRedirect(`/concept/edit/${rowData.uuid}`),
+    // },
     {
-      icon: () => <EditIcon color="primary" />,
-      tooltip: "Edit",
-      onClick: (event, rowData) => setRedirect(`/concept/edit/${rowData.uuid}`),
-    },
-    {
-      icon: () => <VisibilityIcon color="primary" />,
+      icon: () => (
+        <VisibilityIcon color="primary" style={{ marginRight: 20 }} />
+      ),
       tooltip: "View",
       onClick: (event, rowData) => setRedirect(`/concept/view/${rowData.uuid}`),
     },

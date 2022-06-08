@@ -102,7 +102,7 @@ const Roles = () => {
 
   const actions = [
     {
-      icon: () => <EditIcon color="primary" />,
+      icon: () => <EditIcon color="primary" style={{ marginRight: 20 }} />,
       tooltip: "Edit",
       onClick: (event, rowData) => setRedirect(`/role/edit/${rowData.uuid}`),
     },

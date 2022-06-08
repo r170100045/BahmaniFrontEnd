@@ -87,7 +87,7 @@ const PersonAttributeTypes = () => {
 
   const actions = [
     {
-      icon: () => <EditIcon color="primary" />,
+      icon: () => <EditIcon color="primary" style={{ marginRight: 20 }} />,
       tooltip: "Edit",
       onClick: (event, rowData) =>
         setRedirect(`/personAttributeType/edit/${rowData.uuid}`),

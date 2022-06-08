@@ -360,6 +360,7 @@ class DrugForm extends React.Component {
           />
 
           <FormControlLabel
+            style={inputStyle}
             control={
               <Checkbox
                 type="checkbox"

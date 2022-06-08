@@ -1,4 +1,5 @@
 import {
+  Button,
   Checkbox,
   FormControl,
   FormControlLabel,
@@ -84,12 +85,27 @@ class RoleForm extends React.Component {
 
   // component mount starts
   componentDidMount() {
+    this.fetchData();
+  }
+
+  fetchData() {
     Promise.all([this.setAllRoles(), this.setAllPrivileges()])
       .then(() => this.setRole())
       .then(() => this.setInheritedRoles())
       .then(() => this.setCurrentPrivileges())
       .then(() => this.disableDisplayPrivileges())
       .then(() => this.setState({ isLoading: false }));
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.match.params.id !== this.props.match.params.id) {
+      this.setState(
+        { roleId: this.props.match.params.id, isLoading: true },
+        () => {
+          this.fetchData();
+        }
+      );
+    }
   }
 
   setAllRoles() {
@@ -447,15 +463,23 @@ class RoleForm extends React.Component {
               <p style={childRoleHeading}>
                 Roles that contain (inherit privileges from) {role.role}
               </p>
-              <div>
+              <div style={{ marginLeft: 20 }}>
                 {role.childRoles.map((childRole) => (
                   <span key={childRole.uuid} style={{ marginRight: 8 }}>
-                    <RouterLink to={`/role/edit/${childRole.uuid}`}>
+                    {/* <RouterLink to={`/role/edit/${childRole.uuid}`}>
                       {childRole.childRoleName}
-                    </RouterLink>
-                    <a href={`/role/edit/${childRole.uuid}`}>
+                    </RouterLink> */}
+                    <Button size="small">
+                      <RouterLink
+                        to={`/role/edit/${childRole.uuid}`}
+                        style={{ textDecoration: "none" }}
+                      >
+                        {childRole.childRoleName}
+                      </RouterLink>
+                    </Button>
+                    {/* <a href={`/role/edit/${childRole.uuid}`}>
                       {childRole.childRoleName}
-                    </a>
+                    </a> */}
                   </span>
                 ))}
               </div>
@@ -473,11 +497,11 @@ class RoleForm extends React.Component {
           )}
 
           <div>
-            <p style={checkboxGroupHeading}>
+            <p style={childRoleHeading}>
               Inherited Roles: ({role.role} inherits privileges from these
               roles)
             </p>
-            <div>
+            <div style={{ marginLeft: 20 }}>
               <Grid container spacing={1}>
                 {inheritedRoles.map((el, index) => (
                   <Grid key={el.role} item md={4} xs={12} sm={6}>
@@ -500,11 +524,11 @@ class RoleForm extends React.Component {
           </div>
 
           <div>
-            <p style={checkboxGroupHeading}>
+            <p style={childRoleHeading}>
               Privileges: (Greyed out checkboxes represent privileges inherited
               from other roles, these cannot be removed individually.)
             </p>
-            <div>
+            <div style={{ marginLeft: 20 }}>
               <Grid container spacing={1}>
                 {allPrivileges.map((el, index) => (
                   <Grid key={el.privilege} item md={4} xs={12} sm={6}>
@@ -537,17 +561,10 @@ class RoleForm extends React.Component {
               <span style={inputInfoStyle}>{role.uuid}</span>
             </div>
           )}
-
-          {/* <div style={buttonGroupStyle}>
-            <Controls.SaveButton onClick={() => saveRole()} />
-            <Controls.CancelButton onClick={() => cancelRole()} />
-          </div> */}
           <Grid container style={{ gridGap: 5 }}>
             <Controls.SaveButton onClick={() => saveRole()} />
             <Controls.CancelButton onClick={() => cancelRole()} />
           </Grid>
-
-          <br />
         </Paper>
         {roleId !== "add" && (
           <Controls.DeleteButton

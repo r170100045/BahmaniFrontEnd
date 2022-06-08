@@ -10,6 +10,7 @@ const ColorButton = withStyles((theme) => ({
     "&:hover": {
       backgroundColor: "white",
     },
+    margin: theme.spacing(0, 0, 2, 0),
   },
 }))(Button);
 

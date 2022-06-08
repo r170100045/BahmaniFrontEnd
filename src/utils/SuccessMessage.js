@@ -13,9 +13,14 @@ class SuccessMessage extends React.Component {
             fontSize: "15px",
             backgroundColor: "#99dc99",
             border: "1px solid green",
+            width: "300px",
+            height: 25,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
           }}
         >
-          {`${this.props.action} SUCCESSFULLY`}
+          <span>{`${this.props.action} Successfully`}</span>
         </Paper>
       </Snackbar>
     );
