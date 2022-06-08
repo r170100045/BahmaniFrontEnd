@@ -211,7 +211,7 @@ class PersonAttributeTypeForm extends React.Component {
   // component mount ends
 
   // save starts
-  savePersonAttributeType(successMessage = "updated") {
+  savePersonAttributeType(successMessage = "UPDATED") {
     const { personAttributeTypeId, personAttributeType } = this.state;
 
     this.validate(personAttributeType).then(() => {
@@ -232,7 +232,7 @@ class PersonAttributeTypeForm extends React.Component {
   insertPersonAttributeTypeWithData(personAttributeType) {
     insertPersonAttributeType(personAttributeType)
       .then(() => {
-        this.successAndRedirect("saved");
+        this.successAndRedirect("SAVED");
       })
       .catch((error) => {
         console.log(error);
@@ -260,7 +260,7 @@ class PersonAttributeTypeForm extends React.Component {
     const { personAttributeType } = this.state;
     personAttributeType.retired = true;
     this.setState({ personAttributeType }, () => {
-      this.savePersonAttributeType("retired");
+      this.savePersonAttributeType("RETIRED");
     });
   }
 
@@ -269,7 +269,7 @@ class PersonAttributeTypeForm extends React.Component {
     personAttributeType.retireReason = null;
     personAttributeType.retired = false;
     this.setState({ personAttributeType }, () => {
-      this.savePersonAttributeType("un-retired");
+      this.savePersonAttributeType("UN-RETIRED");
     });
   }
 
@@ -281,7 +281,7 @@ class PersonAttributeTypeForm extends React.Component {
     const { personAttributeTypeId } = this.state;
     deletePersonAttributeTypeById(personAttributeTypeId)
       .then(() => {
-        this.successAndRedirect("deleted");
+        this.successAndRedirect("DELETED");
       })
       .catch((error) => {
         console.log(error);
@@ -443,8 +443,6 @@ class PersonAttributeTypeForm extends React.Component {
 
         {personAttributeTypeId !== "add" && !personAttributeType.retired && (
           <Paper style={paperStyle}>
-            <p style={subHeadingStyle}>Retire Person Attribute Type</p>
-
             <TextField
               error={errors.retireReasonHasError}
               helperText={errors.retireReasonHasError && errors.retireReason}

@@ -5,14 +5,18 @@ import { useEffect, useState } from "react";
 
 import Controls from "../../components/controls/Controls";
 import EditIcon from "@material-ui/icons/Edit";
+import ErrorLoadingData from "../../utils/ErrorLoadingData";
+import LoadingData from "../../utils/LoadingData";
 import { getDrugs } from "../../services/drugService";
 
 const Drugs = () => {
   const [drugs, setDrugs] = useState([]);
   const [filteredDrugsOnRetired, setFilteredDrugsOnRetired] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [showRetired, setShowRetired] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const [redirect, setRedirect] = useState(null);
+  const [httpRequestError, setHttpRequestError] = useState(null);
+  const [httpRequestHasError, setHttpRequestHasError] = useState(false);
 
   const columns = [
     {
@@ -41,8 +45,16 @@ const Drugs = () => {
 
   useEffect(() => {
     const loadDrugs = async () => {
-      const response = await getDrugs();
-      setDrugs(response.data);
+      try {
+        setIsLoading(true);
+        const response = await getDrugs();
+        setDrugs(response.data);
+      } catch (e) {
+        console.log(e);
+        setHttpRequestError("error: getDrugs api call failed : " + e.message);
+        setHttpRequestHasError(true);
+      }
+      setIsLoading(false);
     };
 
     loadDrugs();
@@ -54,7 +66,6 @@ const Drugs = () => {
     } else {
       setFilteredDrugsOnRetired(drugs.filter((drug) => drug.retired === false));
     }
-    setIsLoading(false);
   }, [drugs, showRetired]);
 
   const toggleRetired = () => {
@@ -94,10 +105,12 @@ const Drugs = () => {
 
   if (redirect) return <Redirect to={redirect} />;
 
-  if (isLoading) return <p>loading...</p>;
+  if (isLoading) return <LoadingData />;
 
   return (
     <>
+      {httpRequestHasError && <ErrorLoadingData message={httpRequestError} />}
+
       <div style={{ maxWidth: "96%", margin: "auto" }}>
         <MaterialTable
           title="Drugs"

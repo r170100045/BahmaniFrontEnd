@@ -167,7 +167,7 @@ class PatientRelationshipTypeForm extends React.Component {
   // component mount ends
 
   // save starts
-  saveRelationshipType(successMessage = "updated") {
+  saveRelationshipType(successMessage = "UPDATED") {
     const { relationshipTypeId, relationshipType } = this.state;
     this.validate(relationshipType).then(() => {
       const { error } = this.state;
@@ -187,7 +187,7 @@ class PatientRelationshipTypeForm extends React.Component {
   insertPatientRelationshipTypeWithData(relationshipType) {
     insertPatientRelationshipType(relationshipType)
       .then(() => {
-        this.successAndRedirect("saved");
+        this.successAndRedirect("SAVED");
       })
       .catch((error) => {
         console.log(error);
@@ -215,7 +215,7 @@ class PatientRelationshipTypeForm extends React.Component {
     const { relationshipType } = this.state;
     relationshipType.retired = true;
     this.setState({ relationshipType }, () => {
-      this.saveRelationshipType("retired");
+      this.saveRelationshipType("RETIRED");
     });
   }
 
@@ -224,7 +224,7 @@ class PatientRelationshipTypeForm extends React.Component {
     relationshipType.retireReason = null;
     relationshipType.retired = false;
     this.setState({ relationshipType }, () => {
-      this.saveRelationshipType("un-retired");
+      this.saveRelationshipType("UN-RETIRED");
     });
   }
 
@@ -236,7 +236,7 @@ class PatientRelationshipTypeForm extends React.Component {
     const { relationshipTypeId } = this.state;
     deletePatientRelationshipTypeById(relationshipTypeId)
       .then(() => {
-        this.successAndRedirect("deleted");
+        this.successAndRedirect("DELETED");
       })
       .catch((error) => {
         console.log(error);
@@ -338,13 +338,11 @@ class PatientRelationshipTypeForm extends React.Component {
 
         {relationshipTypeId !== "add" && !relationshipType.retired && (
           <Paper style={paperStyle}>
-            <p style={subHeadingStyle}>Retire Relationship Type</p>
-
             <TextField
               error={errors.retireReasonHasError}
               helperText={errors.retireReasonHasError && errors.retireReason}
               style={inputStyle}
-              label="Reason"
+              label="Reason to retire"
               type="text"
               id="retireReason"
               name="retireReason"

@@ -19,6 +19,7 @@ import {
   checkboxLabelStyle,
   conceptPaperStyle,
   deleteButtonStyle,
+  globalError,
   inputStyle,
   paperStyle,
   subHeadingStyle,
@@ -33,13 +34,18 @@ import {
   getConceptReferenceSources,
   getConceptReferenceTerms,
   insertConcept,
+  insertReferenceTerm,
   updateConceptById,
 } from "../../services/conceptService";
 
 import Controls from "../../components/controls/Controls";
+import Dialog from "@material-ui/core/Dialog";
+import DialogActions from "@material-ui/core/DialogActions";
+import DialogContent from "@material-ui/core/DialogContent";
+import DialogContentText from "@material-ui/core/DialogContentText";
+import DialogTitle from "@material-ui/core/DialogTitle";
 import ErrorLoadingData from "../../utils/ErrorLoadingData";
 import LoadingData from "../../utils/LoadingData";
-import Select from "react-select";
 import SuccessMessage from "../../utils/SuccessMessage";
 import { getDrugs } from "../../services/drugService";
 
@@ -74,18 +80,17 @@ class ConceptForm extends React.Component {
         precise: false,
         displayPrecision: null,
       },
-      conceptAnswersDrugs: [20, 2],
-      conceptAnswersConcepts: [55, 40],
+      conceptAnswerDrugs: [20, 2],
+      conceptAnswerConcepts: [55, 40],
       conceptComplex: null,
       mappings: [
         {
-          conceptReferenceTermId: null,
-          conceptMapTypeId: 2,
+          conceptMapTypeId: 1,
+          conceptReferenceConceptSourceId: 1,
+          conceptReferenceCode: "Confirmed",
+          conceptReferenceName: null,
+          conceptReferenceTermId: 6,
         },
-        // {
-        //   conceptReferenceTermId: 4,
-        //   conceptMapTypeId: 33
-        // }
       ],
       version: null,
       retireReason: "",
@@ -101,17 +106,23 @@ class ConceptForm extends React.Component {
       dataTypeOptions: [],
       mapRelationshipOptions: [],
       mapSourceOptions: [],
-      mapReferenceTermOptions: [],
-      filteredMapReferenceTermOptions: [],
+      mapSourceOptionsForReferenceTerm: [],
       mapCodeOptions: [],
       synonyms: initialConceptState.conceptNames.filter(
         (item) => item.conceptNameType !== "FULLY_SPECIFIED"
       ),
+      openReferenceTermForm: false,
+      referenceTerm: {
+        code: null,
+        name: null,
+        conceptSourceId: null,
+      },
       redirect: null,
       isLoading: true,
       showSuccessMessage: false,
       successMessage: null,
       error: false,
+      errorReferenceTerm: false,
       errors: {
         globalErrorMessage: "Please fix all errors and try again.",
         httpRequest: null,
@@ -120,6 +131,10 @@ class ConceptForm extends React.Component {
         nameHasError: false,
         retireReason: "reason to retire can not be empty",
         retireReasonHasError: false,
+        code: "code can not be empty",
+        codeHasError: false,
+        conceptSourceId: "source can not be empty",
+        conceptSourceIdHasError: false,
       },
     };
 
@@ -147,11 +162,17 @@ class ConceptForm extends React.Component {
       this.removeMappingButtonHandler.bind(this);
     this.conceptMapTypeIdChangeHandler =
       this.conceptMapTypeIdChangeHandler.bind(this);
-    this.getDefaultConceptMapTypeId =
-      this.getDefaultConceptMapTypeId.bind(this);
-    this.conceptSourceIdChangeHandler =
-      this.conceptSourceIdChangeHandler.bind(this);
+    this.conceptReferenceConceptSourceIdChangeHandler =
+      this.conceptReferenceConceptSourceIdChangeHandler.bind(this);
     this.mapCodeChangeHandler = this.mapCodeChangeHandler.bind(this);
+    this.referenceTermChangeHandler =
+      this.referenceTermChangeHandler.bind(this);
+    this.referenceTermSourceChangeHandler =
+      this.referenceTermSourceChangeHandler.bind(this);
+    this.closeReferenceTerm = this.closeReferenceTerm.bind(this);
+    this.openReferenceTermFormHandler =
+      this.openReferenceTermFormHandler.bind(this);
+    this.saveReferenceTerm = this.saveReferenceTerm.bind(this);
   }
 
   // error validation starts
@@ -173,12 +194,25 @@ class ConceptForm extends React.Component {
     return object && object.trim().length > 0;
   }
 
+  nonEmptyInteger(object) {
+    return object && object !== "";
+  }
+
   resetErrorsToFalse() {
     return new Promise((resolve) => {
       const { errors } = this.state;
       errors.nameHasError = false;
       errors.retireReasonHasError = false;
       this.setState({ errors, error: false }, () => resolve());
+    });
+  }
+
+  resetReferenceTermErrorsToFalse() {
+    return new Promise((resolve) => {
+      const { errors } = this.state;
+      errors.codeHasError = false;
+      errors.conceptSourceIdHasError = false;
+      this.setState({ errors, errorReferenceTerm: false }, () => resolve());
     });
   }
 
@@ -224,6 +258,30 @@ class ConceptForm extends React.Component {
       });
     });
   }
+
+  validateReferenceTerm(referenceTerm) {
+    return new Promise((resolve) => {
+      this.resetReferenceTermErrorsToFalse().then(() => {
+        console.log("here");
+        const { errors } = this.state;
+        let errorReferenceTerm = false;
+
+        if (!this.nonEmpty(referenceTerm.code)) {
+          errorReferenceTerm = true;
+          errors.codeHasError = true;
+        }
+
+        if (!this.nonEmptyInteger(referenceTerm.conceptSourceId)) {
+          errorReferenceTerm = true;
+          errors.conceptSourceIdHasError = true;
+        }
+        console.log("errorReferenceTermValidate", errorReferenceTerm);
+        this.setState({ errorReferenceTerm, errors }, () => {
+          resolve();
+        });
+      });
+    });
+  }
   // error validation ends
 
   // component mount starts
@@ -235,10 +293,8 @@ class ConceptForm extends React.Component {
       this.setDataTypeOptions(),
       this.setMapRelationshipOptions(),
       this.setMapSourceOptions(),
-      this.setMapReferenceTermOptions(),
-      this.setFilteredMapReferenceTermOptions(),
-      this.setMapCodeOptions(),
     ])
+      .then(() => this.setMapCodeOptions())
       .then(() => this.setFetchedConcept())
       .then(() => this.setSynonyms())
       .then(() => this.setState({ isLoading: false }));
@@ -348,43 +404,26 @@ class ConceptForm extends React.Component {
     return new Promise((resolve, reject) => {
       getConceptReferenceSources()
         .then((response) => {
-          const mapSourceOptions = [];
-          mapSourceOptions.push({
-            label: "Search All Sources",
-            value: 0,
-          });
+          const mapSourceOptionsForReferenceTerm = [];
+          let mapSourceOptions = [];
+
           Object.keys(response.data).forEach((key) => {
-            mapSourceOptions.push({
+            mapSourceOptionsForReferenceTerm.push({
               label: response.data[key].name,
               value: response.data[key].conceptSourceId,
             });
           });
-          this.setState({ mapSourceOptions }, () => {
-            resolve();
-          });
-        })
-        .catch((e) => reject(e));
-    });
-  }
 
-  setMapReferenceTermOptions() {
-    return new Promise((resolve, reject) => {
-      getConceptReferenceTerms()
-        .then((response) => {
-          this.setState({ mapReferenceTermOptions: response.data }, () => {
-            resolve();
-          });
-        })
-        .catch((e) => reject(e));
-    });
-  }
+          mapSourceOptions = [
+            {
+              label: "Search All Sources",
+              value: 0,
+            },
+            ...mapSourceOptionsForReferenceTerm,
+          ];
 
-  setFilteredMapReferenceTermOptions() {
-    return new Promise((resolve, reject) => {
-      getConceptReferenceTerms()
-        .then((response) => {
           this.setState(
-            { filteredMapReferenceTermOptions: response.data },
+            { mapSourceOptions, mapSourceOptionsForReferenceTerm },
             () => {
               resolve();
             }
@@ -396,19 +435,40 @@ class ConceptForm extends React.Component {
 
   setMapCodeOptions() {
     return new Promise((resolve, reject) => {
-      const { filteredMapReferenceTermOptions } = this.state;
+      getConceptReferenceTerms()
+        .then((response) => {
+          const mapReferenceTermOptions = response.data;
+          const { mapSourceOptions } = this.state;
+          const mapCodeOptions = [];
+          const allSourcesMapCodeOptions = [];
 
-      const mapCodeOptions = [];
-      filteredMapReferenceTermOptions.forEach((item) => {
-        mapCodeOptions.push({
-          label: item.conceptSourceId + " " + item.code,
-          value: item.conceptReferenceTermId,
-        });
-      });
+          mapSourceOptions.forEach((source) => {
+            const mapCodeOptionsForThisSource = [];
+            mapReferenceTermOptions.forEach((referenceTermOption) => {
+              const newMapCodeOption = {
+                label: referenceTermOption.code,
+                value: referenceTermOption.code,
+                conceptReferenceConceptSourceId:
+                  referenceTermOption.conceptSourceId,
+                conceptReferenceTermId:
+                  referenceTermOption.conceptReferenceTermId,
+                name: referenceTermOption.name,
+              };
 
-      this.setState({ mapCodeOptions }, () => {
-        resolve();
-      });
+              if (referenceTermOption.conceptSourceId === source.value) {
+                mapCodeOptionsForThisSource.push(newMapCodeOption);
+              }
+              allSourcesMapCodeOptions.push(newMapCodeOption);
+            });
+            mapCodeOptions.splice(source.value, 0, mapCodeOptionsForThisSource);
+          });
+          mapCodeOptions.splice(0, 1, allSourcesMapCodeOptions);
+
+          this.setState({ mapCodeOptions }, () => {
+            resolve();
+          });
+        })
+        .catch((e) => reject(e));
     });
   }
 
@@ -443,6 +503,7 @@ class ConceptForm extends React.Component {
       this.setState({ synonyms }, () => resolve());
     });
   }
+
   // component mount ends
 
   // save starts
@@ -459,8 +520,55 @@ class ConceptForm extends React.Component {
       });
   }
 
+  modifyConceptForEditRequest(concept) {
+    const conceptSetsForEditRequest = [];
+    concept.conceptSets.forEach((conceptId) => {
+      conceptSetsForEditRequest.push({
+        conceptId: conceptId,
+      });
+    });
+    concept.conceptSets = conceptSetsForEditRequest;
+
+    const conceptAnswersForEditRequest = [];
+    concept.conceptAnswerDrugs.forEach((answerDrug) => {
+      conceptAnswersForEditRequest.push({
+        answerDrug: answerDrug,
+        answerConcept: null,
+      });
+    });
+    concept.conceptAnswerConcepts.forEach((answerConcept) => {
+      conceptAnswersForEditRequest.push({
+        answerDrug: null,
+        answerConcept: answerConcept,
+      });
+    });
+    concept.conceptAnswers = conceptAnswersForEditRequest;
+
+    const conceptHandlerForEditRequest = { handler: concept.conceptComplex };
+    concept.conceptComplex = conceptHandlerForEditRequest;
+
+    const conceptMappingsForEditRequest = [];
+    concept.mappings.forEach((mapping) => {
+      if (
+        mapping.conceptReferenceConceptSourceId !== 0 &&
+        mapping.conceptReferenceCode !== null
+      ) {
+        conceptMappingsForEditRequest.push({
+          conceptMapTypeId: mapping.conceptMapTypeId,
+          conceptReferenceTermId: mapping.conceptReferenceTermId,
+        });
+      }
+    });
+    concept.mappings = conceptMappingsForEditRequest;
+
+    concept.datatypeId = concept.dataTypeId;
+    return concept;
+  }
+
   insertConceptWithData(concept) {
-    insertConcept(concept)
+    const modifiedConcept = this.modifyConceptForEditRequest(concept);
+    console.log("modifiedConcept", modifiedConcept);
+    insertConcept(modifiedConcept)
       .then(() => {
         this.successAndRedirect("SAVED");
       })
@@ -561,11 +669,11 @@ class ConceptForm extends React.Component {
       } else if (selectedValues === 13 && concept.conceptComplex === null) {
         concept.conceptComplex = "";
       } else if (selectedValues === 2) {
-        if (concept.conceptAnswersConcepts === null)
-          concept.conceptAnswersConcepts = [];
+        if (concept.conceptAnswerConcepts === null)
+          concept.conceptAnswerConcepts = [];
 
-        if (concept.conceptAnswersDrugs === null)
-          concept.conceptAnswersDrugs = [];
+        if (concept.conceptAnswerDrugs === null)
+          concept.conceptAnswerDrugs = [];
       }
     }
 
@@ -634,66 +742,115 @@ class ConceptForm extends React.Component {
   //   }
   // }
 
-  conceptSourceIdChangeHandler(selectedOption, index) {
-    const { mapReferenceTermOptions } = this.state;
-    if (selectedOption.value === 0) {
-      this.setState(
-        {
-          filteredMapReferenceTermOptions: mapReferenceTermOptions,
-        },
-        () => {
-          this.setMapCodeOptions();
-        }
-      );
-    } else {
-      this.setState(
-        {
-          filteredMapReferenceTermOptions: mapReferenceTermOptions.filter(
-            (item) => item.conceptSourceId === selectedOption.value
-          ),
-        },
-        () => {
-          this.setMapCodeOptions();
-        }
-      );
-    }
+  conceptReferenceConceptSourceIdChangeHandler(selectedValue, index) {
+    const { concept } = this.state;
+    const mappings = [...concept.mappings];
+    mappings[index].conceptReferenceCode = null;
+    mappings[index].conceptReferenceName = null;
+    mappings[index].conceptReferenceConceptSourceId = selectedValue;
+    concept.mappings = mappings;
+    this.setState({ concept });
   }
 
-  mapCodeChangeHandler(selectedOption, index) {
+  mapCodeChangeHandler(selctedValue, selectedOption, index) {
+    const { conceptReferenceTermId, name } = selectedOption;
     const { concept } = this.state;
-    const maps = [...concept.mappings];
-    maps[index].conceptMapTypeId = selectedOption.value;
+    const mappings = [...concept.mappings];
+    mappings[index].conceptReferenceCode = selctedValue;
+    mappings[index].conceptReferenceTermId = conceptReferenceTermId;
+    mappings[index].conceptReferenceName = name;
+    concept.mappings = mappings;
+    this.setState({ concept });
   }
 
   addMappingButtonHandler() {
     const { concept } = this.state;
-    const maps = [...concept.mappings];
-    maps.push({
+    const mappings = [...concept.mappings];
+    mappings.push({
+      conceptMapTypeId: 1,
+      conceptReferenceConceptSourceId: 0,
+      conceptReferenceCode: null,
+      conceptReferenceName: null,
       conceptReferenceTermId: null,
-      conceptMapTypeId: null,
     });
-    concept.mappings = maps;
+    concept.mappings = mappings;
     this.setState({ concept });
   }
 
   removeMappingButtonHandler(index) {
     const { concept } = this.state;
-    const maps = [...concept.mappings];
-    maps.splice(index, 1);
-    concept.mappings = maps;
+    const mappings = [...concept.mappings];
+    mappings.splice(index, 1);
+    concept.mappings = mappings;
     this.setState({ concept });
   }
 
-  conceptMapTypeIdChangeHandler(selectedOption, index) {
+  conceptMapTypeIdChangeHandler(selectedValue, index) {
     const { concept } = this.state;
-    concept.mappings[index].conceptMapTypeId = selectedOption.value;
+    const mappings = [...concept.mappings];
+    mappings[index].conceptMapTypeId = selectedValue;
+    concept.mappings = mappings;
     this.setState({ concept });
   }
 
-  getDefaultConceptMapTypeId(index) {
-    const { concept, mapRelationshipOptions } = this.state;
-    return mapRelationshipOptions.filter(
-      (option) => option.value === concept.mappings[index].conceptMapTypeId
+  referenceTermChangeHandler(event) {
+    const { name, value } = event.target;
+    const { referenceTerm } = this.state;
+    referenceTerm[name] = value;
+    this.setState({ referenceTerm });
+  }
+
+  referenceTermSourceChangeHandler(selectedValue) {
+    const { referenceTerm } = this.state;
+    referenceTerm.conceptSourceId = selectedValue;
+    this.setState({ referenceTerm });
+  }
+
+  closeReferenceTerm() {
+    this.setState({ openReferenceTermForm: false });
+  }
+
+  openReferenceTermFormHandler() {
+    this.setState({ openReferenceTermForm: true });
+  }
+
+  saveReferenceTerm() {
+    const { referenceTerm } = this.state;
+    this.validateReferenceTerm(referenceTerm).then(() => {
+      const { errorReferenceTerm } = this.state;
+      if (!errorReferenceTerm) {
+        this.setState({ openReferenceTermForm: false });
+        this.insertReferenceTermWithData(referenceTerm);
+      }
+    });
+  }
+
+  insertReferenceTermWithData(referenceTerm) {
+    console.log("referenceTerm", referenceTerm);
+    this.setState(
+      {
+        referenceTerm: {
+          conceptSourceId: null,
+          code: null,
+          name: null,
+        },
+      },
+      () => {
+        insertReferenceTerm(referenceTerm)
+          .then(() => {
+            this.setState({
+              showSuccessMessage: true,
+              successMessage: "SAVED",
+            });
+          })
+          .then(() => this.setState({ isLoading: true }))
+          .then(() => this.setMapCodeOptions())
+          .then(() => this.setState({ isLoading: false }))
+          .catch((error) => {
+            console.log(error);
+            this.setHttpError("insertReferenceTerm", error.message);
+          });
+      }
     );
   }
 
@@ -717,9 +874,13 @@ class ConceptForm extends React.Component {
       addMappingButtonHandler,
       removeMappingButtonHandler,
       conceptMapTypeIdChangeHandler,
-      getDefaultConceptMapTypeId,
-      conceptSourceIdChangeHandler,
+      conceptReferenceConceptSourceIdChangeHandler,
       mapCodeChangeHandler,
+      referenceTermChangeHandler,
+      referenceTermSourceChangeHandler,
+      closeReferenceTerm,
+      openReferenceTermFormHandler,
+      saveReferenceTerm,
     } = this;
 
     const {
@@ -730,12 +891,16 @@ class ConceptForm extends React.Component {
       drugOptions,
       dataTypeOptions,
       mapSourceOptions,
+      mapSourceOptionsForReferenceTerm,
       synonyms,
       mapRelationshipOptions,
       mapCodeOptions,
+      openReferenceTermForm,
+      referenceTerm,
       redirect,
       isLoading,
       error,
+      errorReferenceTerm,
       errors,
       showSuccessMessage,
       successMessage,
@@ -747,8 +912,8 @@ class ConceptForm extends React.Component {
       conceptSets,
       mappings,
       dataTypeId,
-      conceptAnswersConcepts,
-      conceptAnswersDrugs,
+      conceptAnswerConcepts,
+      conceptAnswerDrugs,
     } = concept;
 
     const getFullySpecifiedName = () => {
@@ -761,15 +926,19 @@ class ConceptForm extends React.Component {
 
     if (redirect) return <Redirect to={redirect} />;
 
-    if (showSuccessMessage) return <SuccessMessage action={successMessage} />;
-
-    if (errors.httpRequestHasError)
-      return <ErrorLoadingData message={errors.httpRequest} />;
-
     if (isLoading) return <LoadingData />;
+
+    console.log("conceptBeforeReturn", concept);
 
     return (
       <Paper style={paperStyle}>
+        {errors.httpRequestHasError && (
+          <ErrorLoadingData message={errors.httpRequest} />
+        )}
+        {showSuccessMessage && <SuccessMessage action={successMessage} />}
+
+        {error && <span style={globalError}>{errors.globalErrorMessage}</span>}
+
         {conceptId !== "add" && (
           <button type="button" onClick={() => redirectToViewPage(conceptId)}>
             View
@@ -777,79 +946,9 @@ class ConceptForm extends React.Component {
         )}
 
         <form>
-          <div>
-            <label>Mappings:</label>
-            <div>
-              <Button
-                variant="outlined"
-                onClick={addMappingButtonHandler.bind(this)}
-              >
-                Add Mapping
-              </Button>
-            </div>
-            {mappings.map((item, index) => (
-              <div key={index}>
-                <div>
-                  <div style={{ width: "300px", display: "inline-block" }}>
-                    <Select
-                      id="conceptMapTypeId"
-                      name="conceptMapTypeId"
-                      defaultValue={
-                        item.conceptMapTypeId === 1
-                          ? { label: "SAME-AS", value: 1 }
-                          : getDefaultConceptMapTypeId(index)
-                      }
-                      // defaultValue={() => getDefaultConceptMapTypeId(index)}
-                      onChange={(selectedOption) =>
-                        conceptMapTypeIdChangeHandler(selectedOption, index)
-                      }
-                      options={mapRelationshipOptions}
-                    />
-                  </div>
-                  <div style={{ width: "300px", display: "inline-block" }}>
-                    <Select
-                      id="conceptSourceId"
-                      name="conceptSourceId"
-                      // defaultValue={() => getDefaultConceptSourceId(index)}
-
-                      onChange={(selectedOption) =>
-                        conceptSourceIdChangeHandler(selectedOption, index)
-                      }
-                      options={mapSourceOptions}
-                    />
-                  </div>
-                  <div style={{ width: "300px", display: "inline-block" }}>
-                    <Select
-                      id="code"
-                      name="code"
-                      // defaultValue={() => getDefaultCode(index)}
-                      onChange={(selectedOption) =>
-                        mapCodeChangeHandler(selectedOption, index)
-                      }
-                      options={mapCodeOptions}
-                    />
-                  </div>
-                  <TextField
-                    name="name"
-                    type="name"
-                    id="name"
-                    value={item.name}
-                    onChange={(e) => synonymNameChangeHandler(e, index)}
-                  />
-                  <Button
-                    variant="outlined"
-                    onClick={() => removeMappingButtonHandler(index)}
-                  >
-                    Remove
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <br />
-
           <TextField
+            error={errors.nameHasError}
+            helperText={errors.nameHasError && errors.name}
             label="Fully Specified Name"
             type="text"
             id="fullySpecifiedName"
@@ -1128,14 +1227,14 @@ class ConceptForm extends React.Component {
 
               <MultipleSelect
                 label="Select Concepts"
-                id="conceptAnswersConcepts"
-                name="conceptAnswersConcepts"
+                id="conceptAnswerConcepts"
+                name="conceptAnswerConcepts"
                 placeholder="Enter concept name or id"
-                defaultValues={conceptAnswersConcepts}
+                defaultValues={conceptAnswerConcepts}
                 onChange={(selectedValues) =>
                   conceptSelectTypeInputChangehandler(
                     selectedValues,
-                    "conceptAnswersConcepts"
+                    "conceptAnswerConcepts"
                   )
                 }
                 options={conceptOptions}
@@ -1145,14 +1244,14 @@ class ConceptForm extends React.Component {
 
               <MultipleSelect
                 label="Select Drugs"
-                id="conceptAnswersDrugs"
-                name="conceptAnswersDrugs"
+                id="conceptAnswerDrugs"
+                name="conceptAnswerDrugs"
                 placeholder="Enter concept drug name or id"
-                defaultValues={conceptAnswersDrugs}
+                defaultValues={conceptAnswerDrugs}
                 onChange={(selectedValues) =>
                   conceptSelectTypeInputChangehandler(
                     selectedValues,
-                    "conceptAnswersDrugs"
+                    "conceptAnswerDrugs"
                   )
                 }
                 options={drugOptions}
@@ -1179,6 +1278,145 @@ class ConceptForm extends React.Component {
             </div>
           )}
 
+          <div>
+            <label>Mappings:</label>
+          </div>
+          <Controls.AddButton onClick={() => addMappingButtonHandler()} />
+          <div>
+            <span>Relationship</span>
+            <span>Source</span>
+            <span>Code</span>
+            <span>Name</span>
+          </div>
+
+          {mappings.map((item, index) => (
+            <div
+              key={
+                index +
+                item.conceptMapTypeId +
+                item.conceptReferenceConceptSourceId +
+                item.conceptReferenceCode +
+                item.conceptReferenceName +
+                item.conceptReferenceTermId
+              }
+            >
+              <SingleSelect
+                style={inputStyle}
+                id="conceptMapTypeId"
+                name="conceptMapTypeId"
+                defaultValue={GET_VALUE(item.conceptMapTypeId)}
+                onChange={(selectedValue) =>
+                  conceptMapTypeIdChangeHandler(selectedValue, index)
+                }
+                options={mapRelationshipOptions}
+              />
+              <SingleSelect
+                style={inputStyle}
+                id="conceptReferenceConceptSourceId"
+                name="conceptReferenceConceptSourceId"
+                defaultValue={GET_VALUE(item.conceptReferenceConceptSourceId)}
+                onChange={(selectedValue) =>
+                  conceptReferenceConceptSourceIdChangeHandler(
+                    selectedValue,
+                    index
+                  )
+                }
+                options={mapSourceOptions}
+              />
+              <SingleSelect
+                style={inputStyle}
+                id="conceptReferenceCode"
+                name="conceptReferenceCode"
+                defaultValue={GET_VALUE(item.conceptReferenceCode)}
+                onChange={(selectedValue, selectedOption) =>
+                  mapCodeChangeHandler(selectedValue, selectedOption, index)
+                }
+                options={mapCodeOptions[item.conceptReferenceConceptSourceId]}
+              />
+              <TextField
+                style={inputStyle}
+                id="conceptReferenceName"
+                name="conceptReferenceName"
+                value={GET_VALUE(item.conceptReferenceName)}
+                disabled
+              />
+              <Button
+                variant="outlined"
+                onClick={() => removeMappingButtonHandler(index)}
+              >
+                Remove
+              </Button>
+            </div>
+          ))}
+          <div>
+            <Button
+              variant="outlined"
+              color="primary"
+              onClick={() => openReferenceTermFormHandler()}
+            >
+              Create New Reference Term
+            </Button>
+            <Dialog
+              open={openReferenceTermForm}
+              onClose={() => closeReferenceTerm()}
+              aria-labelledby="form-dialog-title"
+            >
+              <DialogTitle id="form-dialog-title">
+                Create New Reference Term
+              </DialogTitle>
+              <DialogContent>
+                <DialogContentText>Reference Term Details</DialogContentText>
+                {errorReferenceTerm && (
+                  <span style={globalError}>{errors.globalErrorMessage}</span>
+                )}
+
+                <TextField
+                  error={errors.codeHasError}
+                  helperText={errors.codeHasError && errors.code}
+                  style={inputStyle}
+                  label="Code"
+                  id="code"
+                  name="code"
+                  value={GET_VALUE(referenceTerm.code)}
+                  onChange={(e) => referenceTermChangeHandler(e)}
+                  required
+                />
+                <SingleSelect
+                  error={errors.conceptSourceIdHasError}
+                  helperText={
+                    errors.conceptSourceIdHasError && errors.conceptSourceId
+                  }
+                  style={inputStyle}
+                  label="Source"
+                  id="conceptSourceId"
+                  name="conceptSourceId"
+                  defaultValue={GET_VALUE(referenceTerm.conceptSourceId)}
+                  onChange={(selectedValue) =>
+                    referenceTermSourceChangeHandler(selectedValue)
+                  }
+                  options={mapSourceOptionsForReferenceTerm}
+                  required
+                />
+                <TextField
+                  style={inputStyle}
+                  label="Name"
+                  id="name"
+                  name="name"
+                  value={GET_VALUE(referenceTerm.name)}
+                  onChange={(e) => referenceTermChangeHandler(e)}
+                />
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={() => saveReferenceTerm()} color="primary">
+                  Save
+                </Button>
+                <Button onClick={() => closeReferenceTerm()} color="primary">
+                  Cancel
+                </Button>
+              </DialogActions>
+            </Dialog>
+          </div>
+
           <TextField
             style={inputStyle}
             label="Version"
@@ -1204,6 +1442,8 @@ class ConceptForm extends React.Component {
         {conceptId !== "add" && !concept.retired && (
           <Paper style={paperStyle}>
             <TextField
+              error={errors.retireReasonHasError}
+              helperText={errors.retireReasonHasError && errors.retireReason}
               style={inputStyle}
               label="Reason to retire"
               type="text"
@@ -1213,9 +1453,6 @@ class ConceptForm extends React.Component {
               value={GET_VALUE(concept.retireReason)}
               onChange={(e) => conceptChangeHandler(e)}
             />
-            <span>
-              {error && errors.retireReasonHasError && errors.retireReason}
-            </span>
 
             <br />
             <div style={buttonGroupStyle}>

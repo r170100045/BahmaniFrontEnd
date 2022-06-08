@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 
 import Controls from "../../components/controls/Controls";
 import EditIcon from "@material-ui/icons/Edit";
+import ErrorLoadingData from "../../utils/ErrorLoadingData";
+import LoadingData from "../../utils/LoadingData";
 import VisibilityIcon from "@material-ui/icons/Visibility";
 import { getConceptNameDetails } from "../../services/conceptService";
 
@@ -14,7 +16,10 @@ const Concepts = () => {
     []
   );
   const [showRetired, setShowRetired] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const [redirect, setRedirect] = useState(null);
+  const [httpRequestError, setHttpRequestError] = useState(null);
+  const [httpRequestHasError, setHttpRequestHasError] = useState(false);
 
   const columns = [
     {
@@ -43,8 +48,18 @@ const Concepts = () => {
 
   useEffect(() => {
     const loadConcepts = async () => {
-      const response = await getConceptNameDetails();
-      setConcepts(response.data);
+      try {
+        setIsLoading(true);
+        const response = await getConceptNameDetails();
+        setConcepts(response.data);
+      } catch (e) {
+        console.log(e);
+        setHttpRequestError(
+          "error: getConceptNameDetails api call failed : " + e.message
+        );
+        setHttpRequestHasError(true);
+      }
+      setIsLoading(false);
     };
 
     loadConcepts();
@@ -104,8 +119,12 @@ const Concepts = () => {
 
   if (redirect) return <Redirect to={redirect} />;
 
+  if (isLoading) return <LoadingData />;
+
   return (
     <>
+      {httpRequestHasError && <ErrorLoadingData message={httpRequestError} />}
+
       <div style={{ maxWidth: "96%", margin: "auto" }}>
         <MaterialTable
           title="Concepts"

@@ -4,18 +4,25 @@ import { useEffect, useState } from "react";
 
 import Controls from "../../components/controls/Controls";
 import EditIcon from "@material-ui/icons/Edit";
+import ErrorLoadingData from "../../utils/ErrorLoadingData";
+import LoadingData from "../../utils/LoadingData";
 import { getAllPatientRelationshipTypes } from "../../services/patientRelationshipTypeService";
 
 const PatientRelationshipTypes = () => {
   const [patientRelationshipTypes, setPatientRelationshipTypes] = useState([]);
   const [redirect, setRedirect] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [httpRequestError, setHttpRequestError] = useState(null);
+  const [httpRequestHasError, setHttpRequestHasError] = useState(false);
 
   const columns = [
     {
       title: "Names",
       field: "aisToB",
       render: (rowData) => (
-        <p>
+        <p
+          style={{ textDecoration: rowData.retired ? "line-through" : "none" }}
+        >
           {rowData.aisToB}/{rowData.bisToA}
         </p>
       ),
@@ -36,11 +43,17 @@ const PatientRelationshipTypes = () => {
   useEffect(() => {
     const loadPatientRelationshipTypes = async () => {
       try {
+        setIsLoading(true);
         const response = await getAllPatientRelationshipTypes();
         setPatientRelationshipTypes(response.data);
       } catch (e) {
         console.warn(e);
+        setHttpRequestError(
+          "error: getAllPatientRelationshipTypes api call failed : " + e.message
+        );
+        setHttpRequestHasError(true);
       }
+      setIsLoading(false);
     };
 
     loadPatientRelationshipTypes();
@@ -70,8 +83,12 @@ const PatientRelationshipTypes = () => {
 
   if (redirect) return <Redirect to={redirect} />;
 
+  if (isLoading) return <LoadingData />;
+
   return (
     <>
+      {httpRequestHasError && <ErrorLoadingData message={httpRequestError} />}
+
       <div style={{ maxWidth: "96%", margin: "auto" }}>
         <MaterialTable
           title="Patient Relationship Types"

@@ -46,3 +46,6 @@ export const getConceptReferenceSources = () =>
 
 export const getConceptReferenceTerms = () =>
   axios.get(`${CONCEPT_REFERENCE_TERM}`).then((res) => res);
+
+export const insertReferenceTerm = (body) =>
+  axios.post(`${CONCEPT_REFERENCE_TERM}`, body).then((res) => res);

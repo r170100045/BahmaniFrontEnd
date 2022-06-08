@@ -4,11 +4,16 @@ import { useEffect, useState } from "react";
 
 import Controls from "../../components/controls/Controls";
 import EditIcon from "@material-ui/icons/Edit";
+import ErrorLoadingData from "../../utils/ErrorLoadingData";
+import LoadingData from "../../utils/LoadingData";
 import { getAllVisitTypes } from "../../services/visitTypeService";
 
 const VisitTypes = () => {
   const [visitTypes, setVisitTypes] = useState([]);
   const [redirect, setRedirect] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [httpRequestError, setHttpRequestError] = useState(null);
+  const [httpRequestHasError, setHttpRequestHasError] = useState(false);
 
   const columns = [
     {
@@ -38,11 +43,17 @@ const VisitTypes = () => {
   useEffect(() => {
     const loadVisitTypes = async () => {
       try {
+        setIsLoading(true);
         const response = await getAllVisitTypes();
         setVisitTypes(response.data);
       } catch (e) {
-        console.warn(e);
+        console.log(e);
+        setHttpRequestError(
+          "error: getAllVisitTypes api call failed : " + e.message
+        );
+        setHttpRequestHasError(true);
       }
+      setIsLoading(false);
     };
 
     loadVisitTypes();
@@ -72,8 +83,12 @@ const VisitTypes = () => {
 
   if (redirect) return <Redirect to={redirect} />;
 
+  if (isLoading) return <LoadingData />;
+
   return (
     <>
+      {httpRequestHasError && <ErrorLoadingData message={httpRequestError} />}
+
       <div style={{ maxWidth: "96%", margin: "auto" }}>
         <MaterialTable
           title="Visit Types"

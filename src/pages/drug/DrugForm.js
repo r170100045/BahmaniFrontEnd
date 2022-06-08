@@ -209,7 +209,7 @@ class DrugForm extends React.Component {
   // component mount ends
 
   // save starts
-  saveDrug(successMessage = "updated") {
+  saveDrug(successMessage = "UPDATED") {
     const { drugId, drug } = this.state;
     this.validate(drug).then(() => {
       const { error } = this.state;
@@ -223,7 +223,7 @@ class DrugForm extends React.Component {
   insertDrugWithData(drug) {
     insertDrug(drug)
       .then(() => {
-        this.successAndRedirect("saved");
+        this.successAndRedirect("SAVED");
       })
       .catch((error) => {
         console.log(error);
@@ -247,7 +247,7 @@ class DrugForm extends React.Component {
     const { drug } = this.state;
     drug.retired = true;
     this.setState({ drug }, () => {
-      this.saveDrug("retired");
+      this.saveDrug("RETIRED");
     });
   }
 
@@ -256,7 +256,7 @@ class DrugForm extends React.Component {
     drug.retireReason = null;
     drug.retired = false;
     this.setState({ drug }, () => {
-      this.saveDrug("un-retired");
+      this.saveDrug("UN-RETIRED");
     });
   }
 
@@ -268,7 +268,7 @@ class DrugForm extends React.Component {
     const { drugId } = this.state;
     deleteDrugById(drugId)
       .then(() => {
-        this.successAndRedirect("deleted");
+        this.successAndRedirect("DELETED");
       })
       .catch((error) => {
         console.log(error);
@@ -426,7 +426,6 @@ class DrugForm extends React.Component {
 
         {drugId !== "add" && !drug.retired && (
           <Paper style={paperStyle}>
-            <p style={subHeadingStyle}>Retire this Drug</p>
             <TextField
               error={errors.retireReasonHasError}
               helperText={errors.retireReasonHasError && errors.retireReason}

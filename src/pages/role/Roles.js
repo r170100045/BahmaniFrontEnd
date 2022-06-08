@@ -1,14 +1,48 @@
-import { Link, Redirect } from "react-router-dom";
 import MaterialTable, { MTableToolbar } from "material-table";
 import { useEffect, useState } from "react";
 
 import Controls from "../../components/controls/Controls";
 import EditIcon from "@material-ui/icons/Edit";
+import ErrorLoadingData from "../../utils/ErrorLoadingData";
+import LoadingData from "../../utils/LoadingData";
+import { Redirect } from "react-router-dom";
 import { getRoles } from "../../services/roleService";
 
 const Roles = () => {
   const [roles, setRoles] = useState([]);
   const [redirect, setRedirect] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [httpRequestError, setHttpRequestError] = useState(null);
+  const [httpRequestHasError, setHttpRequestHasError] = useState(false);
+
+  const generateRowData = (rowData, columnObj) => {
+    let charCount = 0;
+    let resData = "";
+    let flag = 0;
+    rowData[columnObj].forEach((el, index) => {
+      if (charCount < 20) {
+        if (index === rowData[columnObj].length - 1) {
+          flag = 1;
+          resData += el;
+          charCount += el.length;
+        } else {
+          resData += el;
+          charCount += el.length;
+          if (charCount < 18) resData += ", ";
+        }
+      }
+    });
+    if (flag === 0 && resData !== "") resData += "...";
+    return <p>{resData}</p>;
+  };
+
+  const getRoleData = (rowData) => {
+    return generateRowData(rowData, "parentRoles");
+  };
+
+  const getPrivilegeData = (rowData) => {
+    return generateRowData(rowData, "rolePrivileges");
+  };
 
   const columns = [
     {
@@ -22,32 +56,12 @@ const Roles = () => {
     {
       title: "Inherited Roles",
       field: "parentRoles",
-      render: (rowData) => (
-        <p>
-          {rowData.parentRoles.map((parentRole, index) =>
-            index === rowData.parentRoles.length - 1 ? (
-              <span>{parentRole}</span>
-            ) : (
-              <span>{parentRole + " | "}</span>
-            )
-          )}
-        </p>
-      ),
+      render: (rowData) => getRoleData(rowData),
     },
     {
       title: "Privileges",
       field: "rolePrivileges",
-      render: (rowData) => (
-        <p>
-          {rowData.rolePrivileges.map((rolePrivilege, index) =>
-            index === rowData.rolePrivileges.length - 1 ? (
-              <span>{rolePrivilege}</span>
-            ) : (
-              <span>{rolePrivilege + " | "}</span>
-            )
-          )}
-        </p>
-      ),
+      render: (rowData) => getPrivilegeData(rowData),
     },
   ];
 
@@ -61,11 +75,15 @@ const Roles = () => {
   useEffect(() => {
     const loadRoles = async () => {
       try {
+        setIsLoading(true);
         const response = await getRoles();
         setRoles(response.data);
       } catch (e) {
-        console.warn(e);
+        console.log(e);
+        setHttpRequestError("error: getRoles api call failed : " + e.message);
+        setHttpRequestHasError(true);
       }
+      setIsLoading(false);
     };
 
     loadRoles();
@@ -92,8 +110,12 @@ const Roles = () => {
 
   if (redirect) return <Redirect to={redirect} />;
 
+  if (isLoading) return <LoadingData />;
+
   return (
     <>
+      {httpRequestHasError && <ErrorLoadingData message={httpRequestError} />}
+
       <div style={{ maxWidth: "96%", margin: "auto" }}>
         <MaterialTable
           title="Current Roles"

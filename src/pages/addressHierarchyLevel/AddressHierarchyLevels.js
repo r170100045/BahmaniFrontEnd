@@ -1,13 +1,17 @@
 import { useEffect, useState } from "react";
 
 import { EXAMPLE_ENTRIES } from "../../constants/otherConstants";
+import ErrorLoadingData from "../../utils/ErrorLoadingData";
+import LoadingData from "../../utils/LoadingData";
 import MaterialTable from "material-table";
 import { getAllAddressHierarchyLevels } from "../../services/addressHierarchyLevelService";
 
 const AddressHierarchyLevels = () => {
   const [addressHierarchyLevels, setAddressHierarchyLevels] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [columnData, setColumnData] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
+  const [httpRequestError, setHttpRequestError] = useState(null);
+  const [httpRequestHasError, setHttpRequestHasError] = useState(false);
 
   const columns = [
     {
@@ -43,11 +47,17 @@ const AddressHierarchyLevels = () => {
   useEffect(() => {
     const loadAddressHierarchyLevels = async () => {
       try {
+        setIsLoading(true);
         const response = await getAllAddressHierarchyLevels();
         setAddressHierarchyLevels(response.data);
       } catch (e) {
-        console.warn(e);
+        console.log(e);
+        setHttpRequestError(
+          "error: getAllAddressHierarchyLevels api call failed : " + e.message
+        );
+        setHttpRequestHasError(true);
       }
+      setIsLoading(false);
     };
 
     loadAddressHierarchyLevels();
@@ -68,19 +78,17 @@ const AddressHierarchyLevels = () => {
       setColumnData(columnData);
     };
 
-    try {
-      fillDataInColumns();
-    } catch (e) {
-      console.warn(e);
-    } finally {
-      setIsLoading(false);
-    }
+    setIsLoading(true);
+    fillDataInColumns();
+    setIsLoading(false);
   }, [addressHierarchyLevels]);
 
-  if (isLoading) return <p>loading...</p>;
+  if (isLoading) return <LoadingData />;
 
   return (
     <>
+      {httpRequestHasError && <ErrorLoadingData message={httpRequestError} />}
+
       <div style={{ maxWidth: "96%", margin: "auto" }}>
         <MaterialTable
           title="Address Hierarchy Levels"

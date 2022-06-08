@@ -136,7 +136,7 @@ class PrivilegeForm extends React.Component {
   // error validation ends
 
   // save starts
-  savePrivilege(successMessage = "updated") {
+  savePrivilege(successMessage = "UPDATED") {
     const { privilegeId, privilege } = this.state;
     this.validate(privilege).then(() => {
       const { error } = this.state;
@@ -151,7 +151,7 @@ class PrivilegeForm extends React.Component {
   insertPrivilegeWithData(privilege) {
     insertPrivilege(privilege)
       .then(() => {
-        this.successAndRedirect("saved");
+        this.successAndRedirect("SAVED");
       })
       .catch((error) => {
         console.log(error);
@@ -179,7 +179,7 @@ class PrivilegeForm extends React.Component {
     const { privilegeId } = this.state;
     deletePrivilegeById(privilegeId)
       .then(() => {
-        this.successAndRedirect("deleted");
+        this.successAndRedirect("DELETED");
       })
       .catch((error) => {
         console.log(error);

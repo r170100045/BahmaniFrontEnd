@@ -193,7 +193,8 @@ class UserForm extends React.Component {
   validate(user) {
     return new Promise((resolve) => {
       this.resetErrorsToFalse().then(() => {
-        const { errors, changePassword, password, passwordRetype } = this.state;
+        const { errors, changePassword, password, passwordRetype, userId } =
+          this.state;
         let error = false;
 
         if (!this.nonEmpty(user.person.givenName)) {
@@ -216,7 +217,7 @@ class UserForm extends React.Component {
           errors.usernameHasError = true;
         }
 
-        if (changePassword) {
+        if (changePassword || userId === "add") {
           if (this.isValidPassword(password)) {
             if (password !== passwordRetype) {
               error = true;

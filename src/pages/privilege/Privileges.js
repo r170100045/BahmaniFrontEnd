@@ -4,11 +4,16 @@ import { useEffect, useState } from "react";
 
 import Controls from "../../components/controls/Controls";
 import EditIcon from "@material-ui/icons/Edit";
+import ErrorLoadingData from "../../utils/ErrorLoadingData";
+import LoadingData from "../../utils/LoadingData";
 import { getPrivileges } from "../../services/privilegeService";
 
 const Privileges = () => {
   const [privileges, setPrivileges] = useState([]);
   const [redirect, setRedirect] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [httpRequestError, setHttpRequestError] = useState(null);
+  const [httpRequestHasError, setHttpRequestHasError] = useState(false);
 
   const columns = [
     {
@@ -31,11 +36,17 @@ const Privileges = () => {
   useEffect(() => {
     const loadPrivileges = async () => {
       try {
+        setIsLoading(true);
         const response = await getPrivileges();
         setPrivileges(response.data);
       } catch (e) {
         console.warn(e);
+        setHttpRequestError(
+          "error: getPrivileges api call failed : " + e.message
+        );
+        setHttpRequestHasError(true);
       }
+      setIsLoading(false);
     };
 
     loadPrivileges();
@@ -65,8 +76,12 @@ const Privileges = () => {
 
   if (redirect) return <Redirect to={redirect} />;
 
+  if (isLoading) return <LoadingData />;
+
   return (
     <>
+      {httpRequestHasError && <ErrorLoadingData message={httpRequestError} />}
+
       <div style={{ maxWidth: "96%", margin: "auto" }}>
         <MaterialTable
           title="Privileges"
