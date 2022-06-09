@@ -1,5 +1,24 @@
+import {
+  Button,
+  Grid,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+} from "@material-ui/core";
 import React, { Fragment } from "react";
 import { Redirect, Link as RouterLink, withRouter } from "react-router-dom";
+import {
+  buttonGroupStyle,
+  conceptViewInfo,
+  inputInfoStyle,
+  paperStyle,
+  propertyName,
+  propertyNameBolder,
+} from "../../constants/formStyling";
 import {
   getConceptById,
   getConceptClasses,
@@ -371,203 +390,308 @@ class ConceptView extends React.Component {
 
     if (isLoading) return <LoadingData />;
 
+    console.debug(concept);
     return (
       <Fragment>
-        <button type="button" onClick={() => redirectToEditPage(conceptId)}>
-          Edit
-        </button>
-        <div>
-          <span>ID:</span>
-          <span>{concept.conceptId}</span>
-        </div>
+        <Paper style={paperStyle}>
+          {/* <div style={{ display: "flex", justifyContent: "end" }}>
+            <div style={buttonGroupStyle}>
+              <Button
+                style={{ backgroundColor: "#a7b3ee" }}
+                variant="outlined"
+                type="button"
+                size="small"
+                onClick={() => redirectToEditPage(conceptId)}
+              >
+                Edit
+              </Button>
+            </div>
+          </div> */}
 
-        <div>
-          <span>UUID:</span>
-          <span>{concept.uuid}</span>
-        </div>
+          <div style={{ marginTop: "5px" }}>
+            <span style={propertyNameBolder}>ID:</span>
+            <span style={conceptViewInfo}>{concept.conceptId}</span>
+          </div>
 
-        <div>
-          <span>Fuly Specified Name:</span>
-          <span>{GET_VALUE(fullySpecifiedName)}</span>
-        </div>
+          <div style={{ marginTop: "5px" }}>
+            <span style={propertyNameBolder}>UUID:</span>
+            <span style={conceptViewInfo}>{concept.uuid}</span>
+          </div>
 
-        <div>
-          <span>Synonyms:</span>
-          <span>
-            <ul>
-              {synonyms.map((item, index) => (
-                <li key={index}>{item.name}</li>
-              ))}
-            </ul>
-          </span>
-        </div>
+          <div style={{ marginTop: "5px" }}>
+            <span style={propertyNameBolder}>Fully Specified Name:</span>
+            <span style={conceptViewInfo}>{GET_VALUE(fullySpecifiedName)}</span>
+          </div>
 
-        {/* <div>
+          <div style={{ marginTop: "5px" }}>
+            <span style={propertyNameBolder}>Synonyms:</span>
+            <span>
+              {synonyms.map((item, index) =>
+                index === synonyms.length - 1 ? (
+                  <span key={index} style={{ marginLeft: 5 }}>
+                    {item.name}
+                  </span>
+                ) : (
+                  <span key={index} style={{ marginLeft: 5 }}>
+                    {item.name},
+                  </span>
+                )
+              )}
+            </span>
+          </div>
+
+          {/* <div>
           <span>Search Terms:</span>
           <span> </span>
         </div> */}
 
-        <div>
-          <span>Short Name:</span>
-          <span>{GET_VALUE(concept.shortName)} </span>
-        </div>
+          <div style={{ marginTop: "5px" }}>
+            <span style={propertyNameBolder}>Short Name:</span>
+            <span style={conceptViewInfo}>{GET_VALUE(concept.shortName)} </span>
+          </div>
 
-        <div>
-          <span>Description:</span>
-          <span>{GET_VALUE(concept.description)} </span>
-        </div>
+          <div style={{ marginTop: "5px" }}>
+            <span style={propertyNameBolder}>Description:</span>
+            <span style={conceptViewInfo}>
+              {GET_VALUE(concept.description)}{" "}
+            </span>
+          </div>
 
-        <div>
-          <span>Class:</span>
-          <span>{GET_VALUE(className)} </span>
-        </div>
+          <div style={{ marginTop: "5px" }}>
+            <span style={propertyNameBolder}>Class:</span>
+            <span style={conceptViewInfo}>{GET_VALUE(className)} </span>
+          </div>
 
-        {isSet && (
-          <div>
-            <span>Set Members:</span>
-            <span>
-              <ul>
-                {defaultConceptSets.map((item) => (
-                  <li key={item.uuid}>
-                    {/* <button
-                      onClick={() => redirectToAnotherConceptView(item.uuid)}
+          {isSet && (
+            <div style={{ marginTop: "5px" }}>
+              <span style={propertyNameBolder}>Set Members:</span>
+              {/* <span>
+                <ul>
+                  {defaultConceptSets.map((item) => (
+                    <li key={item.uuid}>
+                      <RouterLink to={`/concept/view/${item.uuid}`}>
+                        {item.label}
+                      </RouterLink>
+                      <a href={`/concept/view/${item.uuid}`}>{item.label}</a>
+                    </li>
+                  ))}
+                </ul>
+              </span> */}
+              <span>
+                {defaultConceptSets.map((item, index) =>
+                  index === defaultConceptSets.length - 1 ? (
+                    <RouterLink
+                      to={`/concept/view/${item.uuid}`}
+                      style={{ textDecoration: "none", marginLeft: 5 }}
                     >
                       {item.label}
-                    </button> */}
-                    <RouterLink to={`/concept/view/${item.uuid}`}>
-                      {item.label}
                     </RouterLink>
-                    <a href={`/concept/view/${item.uuid}`}>{item.label}</a>
-                  </li>
-                ))}
-              </ul>
-            </span>
-          </div>
-        )}
-
-        <div>
-          <span>Data Type:</span>
-          <span>
-            {getDefaultDataType.map((item, index) => (
-              <span key={index}>{item.label}</span>
-            ))}
-          </span>
-        </div>
-
-        {concept.dataTypeId === 1 && concept.conceptNumeric !== null && (
-          <div>
-            <span>Numeric</span>
-            <span>
-              <div>
-                <span>Absolute High</span>
-                <span>{GET_VALUE(concept.conceptNumeric.hiAbsolute)}</span>
-              </div>
-              <div>
-                <span>Crirical High</span>
-                <span>{GET_VALUE(concept.conceptNumeric.hiCritical)}</span>
-              </div>
-              <div>
-                <span>Normal High</span>
-                <span>{GET_VALUE(concept.conceptNumeric.hiNormal)}</span>
-              </div>
-              <div>
-                <span>Normal Low</span>
-                <span>{GET_VALUE(concept.conceptNumeric.lowNormal)}</span>
-              </div>
-              <div>
-                <span>Critical Low</span>
-                <span>{GET_VALUE(concept.conceptNumeric.lowCritical)}</span>
-              </div>
-              <div>
-                <span>Absolute Low</span>
-                <span>{GET_VALUE(concept.conceptNumeric.lowAbsolute)}</span>
-              </div>
-              <div>
-                <span>Units</span>
-                <span>{GET_VALUE(concept.conceptNumeric.units)}</span>
-              </div>
-              <div>
-                <span>Allow Decimal?</span>
-                <span>
-                  {concept.conceptNumeric.precise === true ? "Yes" : "No"}
-                </span>
-              </div>
-              <div>
-                <span>Display Precision</span>
-                <span>
-                  {GET_VALUE(concept.conceptNumeric.displayPrecision)}
-                </span>
-              </div>
-            </span>
-          </div>
-        )}
-
-        {concept.dataTypeId === 2 && (
-          <div>
-            <div>
-              <span>Answer Concepts</span>
-              <ul>
-                {defaultConceptAnswerConcepts.map((item) => (
-                  <li key={item.uuid}>
-                    <RouterLink to={`/concept/view/${item.uuid}`}>
-                      {item.label}
+                  ) : (
+                    <RouterLink
+                      to={`/concept/view/${item.uuid}`}
+                      style={{ textDecoration: "none", marginLeft: 5 }}
+                    >
+                      {item.label} |
                     </RouterLink>
-                    <a href={`/concept/view/${item.uuid}`}>{item.label}</a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <span>Answer Drugs</span>
-              <ul>
-                {defaultConceptAnswerDrugs.map((item) => (
-                  <li key={item.conceptUuid}>
-                    <RouterLink to={`/concept/view/${item.conceptUuid}`}>
-                      {item.label}
-                    </RouterLink>
-                    <a href={`/concept/view/${item.conceptUuid}`}>
-                      {item.label}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        )}
-
-        {concept.dataTypeId === 13 && (
-          <div>
-            <span>Handler</span>
-            <span>{GET_VALUE(concept.conceptComplex)}</span>
-          </div>
-        )}
-
-        <div>
-          <span>Mappings:</span>
-          {concept.mappings.length > 0 && (
-            <div>
-              <div>
-                <span>Relationship</span>
-                <span>Source</span>
-                <span>Code</span>
-                <span>Name</span>
-              </div>
-              {defaultMappings.map((mapping, index) => (
-                <div key={mapping + index}>
-                  <span>{GET_VALUE(mapping.relationship)}</span>
-                  <span>{GET_VALUE(mapping.source)}</span>
-                  <span>{GET_VALUE(mapping.code)}</span>
-                  <span>{GET_VALUE(mapping.name)}</span>
-                </div>
-              ))}
+                  )
+                )}
+              </span>
             </div>
           )}
-        </div>
 
-        <div>
-          <span>Version:</span>
-          <span>{concept.version}</span>
-        </div>
+          <div style={{ marginTop: "5px" }}>
+            <span style={propertyNameBolder}>Data Type:</span>
+            <span>
+              {getDefaultDataType.map((item, index) => (
+                <span style={conceptViewInfo} key={index}>
+                  {item.label}
+                </span>
+              ))}
+            </span>
+          </div>
+
+          {concept.dataTypeId === 1 && concept.conceptNumeric !== null && (
+            <div style={conceptViewInfo}>
+              <span style={propertyNameBolder}>Numeric Details:</span>
+              <div style={{ marginLeft: 20 }}>
+                <div>
+                  <span style={propertyNameBolder}>Absolute High:</span>
+                  <span style={conceptViewInfo}>
+                    {GET_VALUE(concept.conceptNumeric.hiAbsolute)}
+                  </span>
+                </div>
+                <div>
+                  <span style={propertyNameBolder}>Crirical High:</span>
+                  <span style={conceptViewInfo}>
+                    {GET_VALUE(concept.conceptNumeric.hiCritical)}
+                  </span>
+                </div>
+                <div>
+                  <span style={propertyNameBolder}>Normal High:</span>
+                  <span style={conceptViewInfo}>
+                    {GET_VALUE(concept.conceptNumeric.hiNormal)}
+                  </span>
+                </div>
+                <div>
+                  <span style={propertyNameBolder}>Normal Low:</span>
+                  <span style={conceptViewInfo}>
+                    {GET_VALUE(concept.conceptNumeric.lowNormal)}
+                  </span>
+                </div>
+                <div>
+                  <span style={propertyNameBolder}>Critical Low:</span>
+                  <span style={conceptViewInfo}>
+                    {GET_VALUE(concept.conceptNumeric.lowCritical)}
+                  </span>
+                </div>
+                <div>
+                  <span style={propertyNameBolder}>Absolute Low:</span>
+                  <span style={conceptViewInfo}>
+                    {GET_VALUE(concept.conceptNumeric.lowAbsolute)}
+                  </span>
+                </div>
+                <div>
+                  <span style={propertyNameBolder}>Units:</span>
+                  <span style={conceptViewInfo}>
+                    {GET_VALUE(concept.conceptNumeric.units)}
+                  </span>
+                </div>
+                <div>
+                  <span style={propertyNameBolder}>Allow Decimal?</span>
+                  <span style={conceptViewInfo}>
+                    {concept.conceptNumeric.precise === true ? "Yes" : "No"}
+                  </span>
+                </div>
+                <div>
+                  <span style={propertyNameBolder}>Display Precision:</span>
+                  <span style={conceptViewInfo}>
+                    {GET_VALUE(concept.conceptNumeric.displayPrecision)}
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {concept.dataTypeId === 2 && (
+            <div style={{ marginLeft: 20 }}>
+              {defaultConceptAnswerConcepts.length > 0 && (
+                <div>
+                  <span style={propertyNameBolder}>
+                    Coded: Answer Concepts:
+                  </span>
+                  {defaultConceptAnswerConcepts.map((item, index) =>
+                    index === defaultConceptAnswerConcepts.length - 1 ? (
+                      <span key={item.uuid} style={{ marginLeft: 5 }}>
+                        <RouterLink
+                          to={`/concept/view/${item.uuid}`}
+                          style={{ textDecoration: "none" }}
+                        >
+                          {item.label}
+                        </RouterLink>
+                      </span>
+                    ) : (
+                      <span key={item.uuid} style={{ marginLeft: 5 }}>
+                        <RouterLink
+                          to={`/concept/view/${item.uuid}`}
+                          style={{ textDecoration: "none" }}
+                        >
+                          {item.label} |
+                        </RouterLink>
+                      </span>
+                    )
+                  )}
+                </div>
+              )}
+
+              {defaultConceptAnswerDrugs.length > 0 && (
+                <div>
+                  <span style={propertyNameBolder}>Coded: Answer Drugs:</span>
+                  {defaultConceptAnswerDrugs.map((item, index) =>
+                    index === defaultConceptAnswerDrugs.length - 1 ? (
+                      <span key={item.uuid} style={{ marginLeft: 5 }}>
+                        <RouterLink
+                          to={`/concept/view/${item.conceptUuid}`}
+                          style={{ textDecoration: "none" }}
+                        >
+                          {item.label}
+                        </RouterLink>
+                      </span>
+                    ) : (
+                      <span key={item.uuid} style={{ marginLeft: 5 }}>
+                        <RouterLink
+                          to={`/concept/view/${item.conceptUuid}`}
+                          style={{ textDecoration: "none" }}
+                        >
+                          {item.label} |
+                        </RouterLink>
+                      </span>
+                    )
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
+          {concept.dataTypeId === 13 && (
+            <div style={{ marginLeft: 20 }}>
+              <span style={propertyNameBolder}>Complex Handler:</span>
+              <span style={conceptViewInfo}>
+                {GET_VALUE(concept.conceptComplex)}
+              </span>
+            </div>
+          )}
+
+          <div style={{ marginTop: 5 }}>
+            <span style={propertyNameBolder}>Mappings:</span>
+            <div style={{ marginLeft: 20 }}>
+              {concept.mappings.length > 0 && (
+                <TableContainer
+                  container
+                  direction="column"
+                  alignItems="center"
+                >
+                  <Table size="small">
+                    <TableHead>
+                      <TableRow
+                        container
+                        direction="row"
+                        justifyContent="space-between"
+                      >
+                        <TableCell>Relationship</TableCell>
+                        <TableCell>Source</TableCell>
+                        <TableCell>Code</TableCell>
+                        <TableCell>Name</TableCell>
+                      </TableRow>
+                    </TableHead>
+
+                    <TableBody>
+                      {defaultMappings.map((mapping, index) => (
+                        <TableRow
+                          container
+                          direction="row"
+                          justifyContent="space-between"
+                          key={mapping + index}
+                        >
+                          <TableCell>
+                            {GET_VALUE(mapping.relationship)}
+                          </TableCell>
+                          <TableCell>{GET_VALUE(mapping.source)}</TableCell>
+                          <TableCell>{GET_VALUE(mapping.code)}</TableCell>
+                          <TableCell>{GET_VALUE(mapping.name)}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              )}
+            </div>
+          </div>
+
+          <div style={{ marginTop: "5px" }}>
+            <span style={propertyNameBolder}>Version:</span>
+            <span style={conceptViewInfo}>{concept.version}</span>
+          </div>
+        </Paper>
       </Fragment>
     );
   }

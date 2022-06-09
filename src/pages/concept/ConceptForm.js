@@ -6,6 +6,11 @@ import {
   IconButton,
   InputAdornment,
   Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
   TextField,
 } from "@material-ui/core";
 import {
@@ -850,6 +855,11 @@ class ConceptForm extends React.Component {
           .then(() => this.setState({ isLoading: true }))
           .then(() => this.setMapCodeOptions())
           .then(() => this.setState({ isLoading: false }))
+          .then(() =>
+            setTimeout(() => {
+              this.setState({ showSuccessMessage: false });
+            }, 500)
+          )
           .catch((error) => {
             console.log(error);
             this.setHttpError("insertReferenceTerm", error.message);
@@ -1291,33 +1301,29 @@ class ConceptForm extends React.Component {
 
           <div>
             <div style={{ fontSize: "1rem", marginTop: "15px" }}>Mappings:</div>
-            <div style={{ marginLeft: "20px" }}>
-              <div>
-                <span>Relationship</span>
-                <span>Source</span>
-                <span>Code</span>
-                <span>Name</span>
-              </div>
+            <Table size="small">
+              <TableHead>
+                <TableRow>
+                  <TableCell>Relationship</TableCell>
+                  <TableCell>Source</TableCell>
+                  <TableCell>Code</TableCell>
+                  <TableCell>Name</TableCell>
+                </TableRow>
+              </TableHead>
 
-              {mappings.map((item, index) => (
-                <div
-                  key={
-                    index +
-                    item.conceptMapTypeId +
-                    item.conceptReferenceConceptSourceId +
-                    item.conceptReferenceCode +
-                    item.conceptReferenceName +
-                    item.conceptReferenceTermId
-                  }
-                >
-                  <Grid
-                    container
-                    direction="row"
-                    justifyContent="space-between"
-                    alignItems="center"
-                    md={2}
+              <TableBody>
+                {mappings.map((item, index) => (
+                  <TableRow
+                    key={
+                      index +
+                      item.conceptMapTypeId +
+                      item.conceptReferenceConceptSourceId +
+                      item.conceptReferenceCode +
+                      item.conceptReferenceName +
+                      item.conceptReferenceTermId
+                    }
                   >
-                    <Grid item>
+                    <TableCell style={{ width: "25%" }}>
                       <SingleSelect
                         id="conceptMapTypeId"
                         name="conceptMapTypeId"
@@ -1327,8 +1333,9 @@ class ConceptForm extends React.Component {
                         }
                         options={mapRelationshipOptions}
                       />
-                    </Grid>
-                    <Grid item>
+                    </TableCell>
+
+                    <TableCell style={{ width: "25%" }}>
                       <SingleSelect
                         id="conceptReferenceConceptSourceId"
                         name="conceptReferenceConceptSourceId"
@@ -1343,8 +1350,9 @@ class ConceptForm extends React.Component {
                         }
                         options={mapSourceOptions}
                       />
-                    </Grid>
-                    <Grid item>
+                    </TableCell>
+
+                    <TableCell style={{ width: "25%" }}>
                       <SingleSelect
                         id="conceptReferenceCode"
                         name="conceptReferenceCode"
@@ -1360,9 +1368,8 @@ class ConceptForm extends React.Component {
                           mapCodeOptions[item.conceptReferenceConceptSourceId]
                         }
                       />
-                    </Grid>
-
-                    <Grid item>
+                    </TableCell>
+                    <TableCell style={{ width: "25%" }}>
                       <TextField
                         id="conceptReferenceName"
                         name="conceptReferenceName"
@@ -1381,94 +1388,99 @@ class ConceptForm extends React.Component {
                           ),
                         }}
                       />
-                    </Grid>
-                  </Grid>
-
-                  {/* <Button
+                    </TableCell>
+                    {/* <Button
                     variant="outlined"
                     onClick={() => removeMappingButtonHandler(index)}
                   >
                     Remove
                   </Button> */}
-                </div>
-              ))}
-              <div>
-                <Grid container style={{ gridGap: 5 }}>
-                  <Button
-                    variant="outlined"
-                    color="primary"
-                    size="small"
-                    onClick={() => addMappingButtonHandler()}
-                  >
-                    Add New Mapping
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    color="primary"
-                    size="small"
-                    onClick={() => openReferenceTermFormHandler()}
-                  >
-                    Create New Reference Term
-                  </Button>
-                </Grid>
-              </div>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
 
-              <Dialog
-                open={openReferenceTermForm}
-                onClose={() => closeReferenceTerm()}
-                aria-labelledby="form-dialog-title"
-              >
-                <DialogTitle id="form-dialog-title">
+            <div>
+              <Grid container style={{ gridGap: 5 }}>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={() => addMappingButtonHandler()}
+                >
+                  Add New Mapping
+                </Button>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={() => openReferenceTermFormHandler()}
+                >
                   Create New Reference Term
-                </DialogTitle>
-                <DialogContent>
-                  <DialogContentText>Reference Term Details</DialogContentText>
-                  {errorReferenceTerm && (
-                    <span style={globalError}>{errors.globalErrorMessage}</span>
-                  )}
-
-                  <TextField
-                    error={errors.codeHasError}
-                    helperText={errors.codeHasError && errors.code}
-                    style={inputStyle}
-                    label="Code"
-                    id="code"
-                    name="code"
-                    value={GET_VALUE(referenceTerm.code)}
-                    onChange={(e) => referenceTermChangeHandler(e)}
-                    required
-                  />
-                  <SingleSelect
-                    error={errors.conceptSourceIdHasError}
-                    helperText={
-                      errors.conceptSourceIdHasError && errors.conceptSourceId
-                    }
-                    style={inputStyle}
-                    label="Source"
-                    id="conceptSourceId"
-                    name="conceptSourceId"
-                    defaultValue={GET_VALUE(referenceTerm.conceptSourceId)}
-                    onChange={(selectedValue) =>
-                      referenceTermSourceChangeHandler(selectedValue)
-                    }
-                    options={mapSourceOptionsForReferenceTerm}
-                    required
-                  />
-                  <TextField
-                    style={inputStyle}
-                    label="Name"
-                    id="name"
-                    name="name"
-                    value={GET_VALUE(referenceTerm.name)}
-                    onChange={(e) => referenceTermChangeHandler(e)}
-                  />
-                </DialogContent>
-                <DialogActions>
-                  <Controls.SaveButton onClick={() => saveReferenceTerm()} />
-                  <Controls.CancelButton onClick={() => closeReferenceTerm()} />
-                </DialogActions>
-              </Dialog>
+                </Button>
+              </Grid>
             </div>
+
+            <Dialog
+              open={openReferenceTermForm}
+              onClose={() => closeReferenceTerm()}
+              aria-labelledby="form-dialog-title"
+            >
+              <DialogTitle id="form-dialog-title">
+                Create New Reference Term
+              </DialogTitle>
+              <DialogContent>
+                <DialogContentText>Reference Term Details</DialogContentText>
+                {errorReferenceTerm && (
+                  <span style={globalError}>{errors.globalErrorMessage}</span>
+                )}
+
+                <TextField
+                  error={errors.codeHasError}
+                  helperText={errors.codeHasError && errors.code}
+                  style={inputStyle}
+                  label="Code"
+                  id="code"
+                  name="code"
+                  value={GET_VALUE(referenceTerm.code)}
+                  onChange={(e) => referenceTermChangeHandler(e)}
+                  required
+                />
+                <SingleSelect
+                  error={errors.conceptSourceIdHasError}
+                  helperText={
+                    errors.conceptSourceIdHasError && errors.conceptSourceId
+                  }
+                  style={inputStyle}
+                  label="Source"
+                  id="conceptSourceId"
+                  name="conceptSourceId"
+                  defaultValue={GET_VALUE(referenceTerm.conceptSourceId)}
+                  onChange={(selectedValue) =>
+                    referenceTermSourceChangeHandler(selectedValue)
+                  }
+                  options={mapSourceOptionsForReferenceTerm}
+                  required
+                />
+                <TextField
+                  style={inputStyle}
+                  label="Name"
+                  id="name"
+                  name="name"
+                  value={GET_VALUE(referenceTerm.name)}
+                  onChange={(e) => referenceTermChangeHandler(e)}
+                />
+              </DialogContent>
+              <DialogActions
+                style={{
+                  display: "flex",
+                  justifyContent: "start",
+                  marginLeft: "17px",
+                  marginBottom: "10px",
+                }}
+              >
+                <Controls.SaveButton onClick={() => saveReferenceTerm()} />
+                <Controls.CancelButton onClick={() => closeReferenceTerm()} />
+              </DialogActions>
+            </Dialog>
           </div>
 
           <TextField

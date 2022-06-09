@@ -50,6 +50,9 @@ export const inputInfoStyle = {
   fontStyle: "italic",
   color: "rgba(0, 0, 0, 0.54)",
 };
+export const conceptViewInfo = {
+  marginLeft: 5,
+};
 export const checkboxGroupHeading = {
   fontSize: "1.25rem",
   height: "0.25rem",
@@ -73,6 +76,10 @@ export const userBioData = {
 };
 export const propertyName = {
   fontSize: "1rem",
+};
+export const propertyNameBolder = {
+  fontSize: "1rem",
+  fontWeight: "bold",
 };
 export const createUser = {
   marginBottom: "15px",
