@@ -516,7 +516,7 @@ class ConceptForm extends React.Component {
   // component mount ends
 
   // save starts
-  saveConcept(successMessage = "UPDATED") {
+  saveConcept(successMessage = "Updated") {
     const { conceptId, concept } = this.state;
     this.validate(concept)
       .then(() => this.mergeConceptnames())
@@ -579,7 +579,7 @@ class ConceptForm extends React.Component {
     console.log("modifiedConcept", modifiedConcept);
     insertConcept(modifiedConcept)
       .then(() => {
-        this.successAndRedirect("SAVED");
+        this.successAndRedirect("Saved");
       })
       .catch((error) => {
         console.log(error);
@@ -616,7 +616,7 @@ class ConceptForm extends React.Component {
     const { concept } = this.state;
     concept.retired = true;
     this.setState({ concept }, () => {
-      this.saveConcept("RETIRED");
+      this.saveConcept("Retired");
     });
   }
 
@@ -625,7 +625,7 @@ class ConceptForm extends React.Component {
     concept.retireReason = null;
     concept.retired = false;
     this.setState({ concept }, () => {
-      this.saveConcept("UN-RETIRED");
+      this.saveConcept("Un-Retired");
     });
   }
 
@@ -637,7 +637,7 @@ class ConceptForm extends React.Component {
     const { conceptId } = this.state;
     deleteConceptById(conceptId)
       .then(() => {
-        this.successAndRedirect("DELETED");
+        this.successAndRedirect("Deleted");
       })
       .catch((error) => {
         console.log(error);
@@ -849,7 +849,7 @@ class ConceptForm extends React.Component {
           .then(() => {
             this.setState({
               showSuccessMessage: true,
-              successMessage: "SAVED",
+              successMessage: "Saved",
             });
           })
           .then(() => this.setState({ isLoading: true }))
@@ -1301,105 +1301,106 @@ class ConceptForm extends React.Component {
 
           <div>
             <div style={{ fontSize: "1rem", marginTop: "15px" }}>Mappings:</div>
-            <Table size="small">
-              <TableHead>
-                <TableRow>
-                  <TableCell>Relationship</TableCell>
-                  <TableCell>Source</TableCell>
-                  <TableCell>Code</TableCell>
-                  <TableCell>Name</TableCell>
-                </TableRow>
-              </TableHead>
+            {mappings.length > 0 && (
+              <Table size="small">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Relationship</TableCell>
+                    <TableCell>Source</TableCell>
+                    <TableCell>Code</TableCell>
+                    <TableCell>Name</TableCell>
+                  </TableRow>
+                </TableHead>
 
-              <TableBody>
-                {mappings.map((item, index) => (
-                  <TableRow
-                    key={
-                      index +
-                      item.conceptMapTypeId +
-                      item.conceptReferenceConceptSourceId +
-                      item.conceptReferenceCode +
-                      item.conceptReferenceName +
-                      item.conceptReferenceTermId
-                    }
-                  >
-                    <TableCell style={{ width: "25%" }}>
-                      <SingleSelect
-                        id="conceptMapTypeId"
-                        name="conceptMapTypeId"
-                        defaultValue={GET_VALUE(item.conceptMapTypeId)}
-                        onChange={(selectedValue) =>
-                          conceptMapTypeIdChangeHandler(selectedValue, index)
-                        }
-                        options={mapRelationshipOptions}
-                      />
-                    </TableCell>
+                <TableBody>
+                  {mappings.map((item, index) => (
+                    <TableRow
+                      key={
+                        index +
+                        item.conceptMapTypeId +
+                        item.conceptReferenceConceptSourceId +
+                        item.conceptReferenceCode +
+                        item.conceptReferenceName +
+                        item.conceptReferenceTermId
+                      }
+                    >
+                      <TableCell style={{ width: "25%" }}>
+                        <SingleSelect
+                          id="conceptMapTypeId"
+                          name="conceptMapTypeId"
+                          defaultValue={GET_VALUE(item.conceptMapTypeId)}
+                          onChange={(selectedValue) =>
+                            conceptMapTypeIdChangeHandler(selectedValue, index)
+                          }
+                          options={mapRelationshipOptions}
+                        />
+                      </TableCell>
 
-                    <TableCell style={{ width: "25%" }}>
-                      <SingleSelect
-                        id="conceptReferenceConceptSourceId"
-                        name="conceptReferenceConceptSourceId"
-                        defaultValue={GET_VALUE(
-                          item.conceptReferenceConceptSourceId
-                        )}
-                        onChange={(selectedValue) =>
-                          conceptReferenceConceptSourceIdChangeHandler(
-                            selectedValue,
-                            index
-                          )
-                        }
-                        options={mapSourceOptions}
-                      />
-                    </TableCell>
+                      <TableCell style={{ width: "25%" }}>
+                        <SingleSelect
+                          id="conceptReferenceConceptSourceId"
+                          name="conceptReferenceConceptSourceId"
+                          defaultValue={GET_VALUE(
+                            item.conceptReferenceConceptSourceId
+                          )}
+                          onChange={(selectedValue) =>
+                            conceptReferenceConceptSourceIdChangeHandler(
+                              selectedValue,
+                              index
+                            )
+                          }
+                          options={mapSourceOptions}
+                        />
+                      </TableCell>
 
-                    <TableCell style={{ width: "25%" }}>
-                      <SingleSelect
-                        id="conceptReferenceCode"
-                        name="conceptReferenceCode"
-                        defaultValue={GET_VALUE(item.conceptReferenceCode)}
-                        onChange={(selectedValue, selectedOption) =>
-                          mapCodeChangeHandler(
-                            selectedValue,
-                            selectedOption,
-                            index
-                          )
-                        }
-                        options={
-                          mapCodeOptions[item.conceptReferenceConceptSourceId]
-                        }
-                      />
-                    </TableCell>
-                    <TableCell style={{ width: "25%" }}>
-                      <TextField
-                        id="conceptReferenceName"
-                        name="conceptReferenceName"
-                        value={GET_VALUE(item.conceptReferenceName)}
-                        disabled
-                        InputProps={{
-                          endAdornment: (
-                            <InputAdornment position="end">
-                              <DeleteIcon
-                                style={{ cursor: "pointer", color: "red" }}
-                                onClick={() =>
-                                  removeMappingButtonHandler(index)
-                                }
-                              />
-                            </InputAdornment>
-                          ),
-                        }}
-                      />
-                    </TableCell>
-                    {/* <Button
+                      <TableCell style={{ width: "25%" }}>
+                        <SingleSelect
+                          id="conceptReferenceCode"
+                          name="conceptReferenceCode"
+                          defaultValue={GET_VALUE(item.conceptReferenceCode)}
+                          onChange={(selectedValue, selectedOption) =>
+                            mapCodeChangeHandler(
+                              selectedValue,
+                              selectedOption,
+                              index
+                            )
+                          }
+                          options={
+                            mapCodeOptions[item.conceptReferenceConceptSourceId]
+                          }
+                        />
+                      </TableCell>
+                      <TableCell style={{ width: "25%" }}>
+                        <TextField
+                          id="conceptReferenceName"
+                          name="conceptReferenceName"
+                          value={GET_VALUE(item.conceptReferenceName)}
+                          disabled
+                          InputProps={{
+                            endAdornment: (
+                              <InputAdornment position="end">
+                                <DeleteIcon
+                                  style={{ cursor: "pointer", color: "red" }}
+                                  onClick={() =>
+                                    removeMappingButtonHandler(index)
+                                  }
+                                />
+                              </InputAdornment>
+                            ),
+                          }}
+                        />
+                      </TableCell>
+                      {/* <Button
                     variant="outlined"
                     onClick={() => removeMappingButtonHandler(index)}
                   >
                     Remove
                   </Button> */}
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
             <div>
               <Grid container style={{ gridGap: 5 }}>
                 <Button

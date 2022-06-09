@@ -209,7 +209,7 @@ class DrugForm extends React.Component {
   // component mount ends
 
   // save starts
-  saveDrug(successMessage = "UPDATED") {
+  saveDrug(successMessage = "Updated") {
     const { drugId, drug } = this.state;
     this.validate(drug).then(() => {
       const { error } = this.state;
@@ -223,7 +223,7 @@ class DrugForm extends React.Component {
   insertDrugWithData(drug) {
     insertDrug(drug)
       .then(() => {
-        this.successAndRedirect("SAVED");
+        this.successAndRedirect("Saved");
       })
       .catch((error) => {
         console.log(error);
@@ -247,7 +247,7 @@ class DrugForm extends React.Component {
     const { drug } = this.state;
     drug.retired = true;
     this.setState({ drug }, () => {
-      this.saveDrug("RETIRED");
+      this.saveDrug("Retired");
     });
   }
 
@@ -256,7 +256,7 @@ class DrugForm extends React.Component {
     drug.retireReason = null;
     drug.retired = false;
     this.setState({ drug }, () => {
-      this.saveDrug("UN-RETIRED");
+      this.saveDrug("Un-Retired");
     });
   }
 
@@ -268,7 +268,7 @@ class DrugForm extends React.Component {
     const { drugId } = this.state;
     deleteDrugById(drugId)
       .then(() => {
-        this.successAndRedirect("DELETED");
+        this.successAndRedirect("Deleted");
       })
       .catch((error) => {
         console.log(error);

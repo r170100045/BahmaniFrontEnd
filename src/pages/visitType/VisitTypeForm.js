@@ -144,7 +144,7 @@ class VisitTypeForm extends React.Component {
   // component mount ends
 
   // save starts
-  saveVisitType(successMessage = "UPDATED") {
+  saveVisitType(successMessage = "Updated") {
     const { visitTypeId, visitType } = this.state;
     this.validate(visitType).then(() => {
       const { error } = this.state;
@@ -159,7 +159,7 @@ class VisitTypeForm extends React.Component {
   insertVisitTypeWithData(visitType) {
     insertVisitType(visitType)
       .then(() => {
-        this.successAndRedirect("SAVED");
+        this.successAndRedirect("Saved");
       })
       .catch((error) => {
         console.log(error);
@@ -183,7 +183,7 @@ class VisitTypeForm extends React.Component {
     const { visitType } = this.state;
     visitType.retired = true;
     this.setState({ visitType }, () => {
-      this.saveVisitType("RETIRED");
+      this.saveVisitType("Retired");
     });
   }
 
@@ -192,7 +192,7 @@ class VisitTypeForm extends React.Component {
     visitType.retireReason = null;
     visitType.retired = false;
     this.setState({ visitType }, () => {
-      this.saveVisitType("UN-RETIRED");
+      this.saveVisitType("Un-Retired");
     });
   }
 
@@ -204,7 +204,7 @@ class VisitTypeForm extends React.Component {
     const { visitTypeId } = this.state;
     deleteVisitTypeById(visitTypeId)
       .then(() => {
-        this.successAndRedirect("DELETED");
+        this.successAndRedirect("Deleted");
       })
       .catch((error) => {
         console.log(error);

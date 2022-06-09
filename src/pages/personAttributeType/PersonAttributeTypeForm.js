@@ -211,7 +211,7 @@ class PersonAttributeTypeForm extends React.Component {
   // component mount ends
 
   // save starts
-  savePersonAttributeType(successMessage = "UPDATED") {
+  savePersonAttributeType(successMessage = "Updated") {
     const { personAttributeTypeId, personAttributeType } = this.state;
 
     this.validate(personAttributeType).then(() => {
@@ -232,7 +232,7 @@ class PersonAttributeTypeForm extends React.Component {
   insertPersonAttributeTypeWithData(personAttributeType) {
     insertPersonAttributeType(personAttributeType)
       .then(() => {
-        this.successAndRedirect("SAVED");
+        this.successAndRedirect("Saved");
       })
       .catch((error) => {
         console.log(error);
@@ -260,7 +260,7 @@ class PersonAttributeTypeForm extends React.Component {
     const { personAttributeType } = this.state;
     personAttributeType.retired = true;
     this.setState({ personAttributeType }, () => {
-      this.savePersonAttributeType("RETIRED");
+      this.savePersonAttributeType("Retired");
     });
   }
 
@@ -269,7 +269,7 @@ class PersonAttributeTypeForm extends React.Component {
     personAttributeType.retireReason = null;
     personAttributeType.retired = false;
     this.setState({ personAttributeType }, () => {
-      this.savePersonAttributeType("UN-RETIRED");
+      this.savePersonAttributeType("Un-Retired");
     });
   }
 
@@ -281,7 +281,7 @@ class PersonAttributeTypeForm extends React.Component {
     const { personAttributeTypeId } = this.state;
     deletePersonAttributeTypeById(personAttributeTypeId)
       .then(() => {
-        this.successAndRedirect("DELETED");
+        this.successAndRedirect("Deleted");
       })
       .catch((error) => {
         console.log(error);

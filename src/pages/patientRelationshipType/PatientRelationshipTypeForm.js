@@ -167,7 +167,7 @@ class PatientRelationshipTypeForm extends React.Component {
   // component mount ends
 
   // save starts
-  saveRelationshipType(successMessage = "UPDATED") {
+  saveRelationshipType(successMessage = "Updated") {
     const { relationshipTypeId, relationshipType } = this.state;
     this.validate(relationshipType).then(() => {
       const { error } = this.state;
@@ -187,7 +187,7 @@ class PatientRelationshipTypeForm extends React.Component {
   insertPatientRelationshipTypeWithData(relationshipType) {
     insertPatientRelationshipType(relationshipType)
       .then(() => {
-        this.successAndRedirect("SAVED");
+        this.successAndRedirect("Saved");
       })
       .catch((error) => {
         console.log(error);
@@ -215,7 +215,7 @@ class PatientRelationshipTypeForm extends React.Component {
     const { relationshipType } = this.state;
     relationshipType.retired = true;
     this.setState({ relationshipType }, () => {
-      this.saveRelationshipType("RETIRED");
+      this.saveRelationshipType("Retired");
     });
   }
 
@@ -224,7 +224,7 @@ class PatientRelationshipTypeForm extends React.Component {
     relationshipType.retireReason = null;
     relationshipType.retired = false;
     this.setState({ relationshipType }, () => {
-      this.saveRelationshipType("UN-RETIRED");
+      this.saveRelationshipType("Un-Retired");
     });
   }
 
@@ -236,7 +236,7 @@ class PatientRelationshipTypeForm extends React.Component {
     const { relationshipTypeId } = this.state;
     deletePatientRelationshipTypeById(relationshipTypeId)
       .then(() => {
-        this.successAndRedirect("DELETED");
+        this.successAndRedirect("Deleted");
       })
       .catch((error) => {
         console.log(error);

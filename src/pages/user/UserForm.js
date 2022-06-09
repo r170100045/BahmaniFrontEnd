@@ -27,7 +27,14 @@ import {
   subHeadingStyle,
   userBioData,
 } from "../../constants/formStyling";
-import { getPersonById, getUserById } from "../../services/userService";
+import {
+  getPersonById,
+  getUserById,
+  insertPerson,
+  insertUser,
+  updatePersonById,
+  updateUserById,
+} from "../../services/userService";
 
 import Controls from "../../components/controls/Controls";
 import ErrorLoadingData from "../../utils/ErrorLoadingData";
@@ -282,7 +289,10 @@ class UserForm extends React.Component {
                 resolve();
               });
             })
-            .catch((e) => reject(e));
+            .catch((error) => {
+              console.log(error);
+              this.setHttpError("getPersonById", error.message);
+            });
         } else {
           resolve();
         }
@@ -294,25 +304,32 @@ class UserForm extends React.Component {
               resolve();
             });
           })
-          .catch((e) => reject(e));
+          .catch((error) => {
+            console.log(error);
+            this.setHttpError("getUserById", error.message);
+          });
       }
     });
   }
 
   setRoles() {
-    getRoles()
-      .then((response) => {
-        const roles = [];
-        Object.keys(response.data).forEach((key) => {
-          roles.push({
-            role: response.data[key].role,
-            checked: false,
+    return new Promise((resolve, reject) => {
+      getRoles()
+        .then((response) => {
+          const roles = [];
+          Object.keys(response.data).forEach((key) => {
+            roles.push({
+              role: response.data[key].role,
+              checked: false,
+            });
           });
+          this.setState({ roles }, () => resolve());
+        })
+        .catch((error) => {
+          console.log(error);
+          this.setHttpError("getRoles", error.message);
         });
-        return roles;
-      })
-      .then((roles) => this.setState({ roles }))
-      .catch((e) => console.log(e));
+    });
   }
 
   setUserRoles() {
@@ -331,7 +348,7 @@ class UserForm extends React.Component {
   // component mount ends
 
   // save starts
-  saveUser(successMessage = "UPDATED") {
+  saveUser(successMessage = "Updated") {
     const { userId, user, changePassword, password } = this.state;
 
     this.validate(user).then(() => {
@@ -344,28 +361,121 @@ class UserForm extends React.Component {
     });
   }
 
+  savePerson(user) {
+    return new Promise((resolve, reject) => {
+      const { personId, userId } = this.state;
+      const { person } = user;
+
+      if (userId === "add" && personId === "dummy") {
+        const personForPostRequest = {
+          gender: person.gender,
+          personNames: [
+            {
+              givenName: person.givenName,
+              middleName: person.middleName,
+              familyName: person.familyName,
+            },
+          ],
+        };
+
+        insertPerson(personForPostRequest)
+          .then((resp) => {
+            getPersonById(resp.data.uuid)
+              .then((response) => {
+                const personId = {
+                  uuid: response.data.uuid,
+                  gender: response.data.gender,
+                  personNames: [
+                    {
+                      uuid: response.data.personNameUuid,
+                      givenName: response.data.givenName,
+                      middleName: response.data.middleName,
+                      familyName: response.data.familyName,
+                    },
+                  ],
+                };
+                user.personId = personId;
+                this.setState({ user }, () => resolve());
+              })
+              .catch((error) => {
+                console.log(error);
+                this.setHttpError("getPersonById", error.message);
+              });
+          })
+          .catch((error) => {
+            console.log(error);
+            this.setHttpError("insertPerson", error.message);
+          });
+      }
+      // if (userId !== "add" || personId !== "dummy") {
+      else {
+        const personForPutRequest = {
+          gender: person.gender,
+          personNames: [
+            {
+              uuid: person.personNameUuid,
+              givenName: person.givenName,
+              middleName: person.middleName,
+              familyName: person.familyName,
+            },
+          ],
+        };
+
+        updatePersonById(person.uuid, personForPutRequest)
+          .then(() => {
+            const personId = {
+              uuid: person.uuid,
+              // gender: person.gender,
+              personNames: [
+                {
+                  uuid: person.personNameUuid,
+                  // givenName: person.givenName,
+                  // middleName: person.middleName,
+                  // familyName: person.familyName,
+                },
+              ],
+            };
+            user.personId = personId;
+            this.setState({ user }, () => resolve());
+          })
+          .catch((error) => {
+            console.log(error);
+            this.setHttpError("updatePersonById", error.message);
+          });
+      }
+    });
+  }
+
   insertUserWithData(user) {
-    console.log("user", user);
-    // insertUser(user)
-    //   .then(() => {
-    //     this.successAndRedirect("SAVED");
-    //   })
-    //   .catch((error) => {
-    //     console.log(error);
-    //     this.setHttpError("insertUser", error.message);
-    //   });
+    this.savePerson(user).then(() => {
+      const { user: userModified } = this.state;
+      console.log("userModified", userModified);
+
+      insertUser(userModified)
+        .then(() => {
+          this.successAndRedirect("Saved");
+        })
+        .catch((error) => {
+          console.log(error);
+          this.setHttpError("insertUser", error.message);
+        });
+    });
   }
 
   updateUserWithData(userId, user, successMessage) {
-    console.log("user", user);
-    // updateUserById(userId, user)
-    //   .then(() => {
-    //     this.successAndRedirect(successMessage);
-    //   })
-    //   .catch((error) => {
-    //     console.log(error);
-    //     this.setHttpError("updateUserById", error.message);
-    //   });
+    this.savePerson(user).then(() => {
+      const { user: userModified } = this.state;
+      console.log("userModified", userModified);
+
+      updateUserById(userId, userModified)
+        .then(() => {
+          this.successAndRedirect(successMessage);
+        })
+        .catch((error) => {
+          console.log(error);
+          this.setHttpError("updateUserById", error.message);
+        });
+    });
   }
   // save ends
 
@@ -373,7 +483,7 @@ class UserForm extends React.Component {
     const { user } = this.state;
     user.retired = true;
     this.setState({ user }, () => {
-      this.saveUser("DISABLED");
+      this.saveUser("Disabled");
     });
   }
 
@@ -382,7 +492,7 @@ class UserForm extends React.Component {
     user.retireReason = null;
     user.retired = false;
     this.setState({ user }, () => {
-      this.saveUser("ENABLED");
+      this.saveUser("Enabled");
     });
   }
 
@@ -395,7 +505,7 @@ class UserForm extends React.Component {
     console.log("userId", userId);
     // deleteUserById(userId)
     //   .then(() => {
-    //     this.successAndRedirect("DELETED");
+    //     this.successAndRedirect("Deleted");
     //   })
     //   .catch((error) => {
     //     console.log(error);
@@ -879,7 +989,7 @@ class UserForm extends React.Component {
             <p style={subHeadingStyle}>Enable User</p>
             <div style={buttonGroupStyle}>
               <Controls.RetireButton
-                retired={user.retired}
+                disabled={user.retired}
                 onClick={() => enableUser()}
               />
             </div>

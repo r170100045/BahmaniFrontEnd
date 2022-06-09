@@ -294,7 +294,7 @@ class RoleForm extends React.Component {
   // error validation ends
 
   // save starts
-  saveRole(successMessage = "UPDATED") {
+  saveRole(successMessage = "Updated") {
     const { roleId, role } = this.state;
     this.validate(role).then(() => {
       const { error } = this.state;
@@ -309,7 +309,7 @@ class RoleForm extends React.Component {
     console.log("create", role);
     insertRole(role)
       .then(() => {
-        this.successAndRedirect("SAVED");
+        this.successAndRedirect("Saved");
       })
       .catch((error) => {
         console.log(error);
@@ -339,7 +339,7 @@ class RoleForm extends React.Component {
     const { roleId } = this.state;
     deleteRoleById(roleId)
       .then(() => {
-        this.successAndRedirect("DELETED");
+        this.successAndRedirect("Deleted");
       })
       .catch((error) => {
         console.log(error);
