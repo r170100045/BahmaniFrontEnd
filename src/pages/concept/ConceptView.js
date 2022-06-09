@@ -44,8 +44,8 @@ class ConceptView extends React.Component {
         precise: false,
         displayPrecision: null,
       },
-      conceptAnswersDrugs: [20, 2],
-      conceptAnswersConcepts: [55, 40],
+      conceptAnswerDrugs: [20, 2],
+      conceptAnswerConcepts: [55, 40],
       conceptComplex: null,
       mappings: [
         {
@@ -329,39 +329,39 @@ class ConceptView extends React.Component {
     };
     const defaultConceptSets = getDefaultConceptSets();
 
-    const getDefaultConceptAnswersConcepts = () => {
-      const { conceptAnswersConcepts } = this.state.concept;
+    const getDefaultConceptAnswerConcepts = () => {
+      const { conceptAnswerConcepts } = this.state.concept;
 
-      let defaultConceptAnswersConcepts = [];
-      conceptAnswersConcepts.forEach((conceptIdValue) => {
+      let defaultConceptAnswerConcepts = [];
+      conceptAnswerConcepts.forEach((conceptIdValue) => {
         const eachValueOptions = conceptOptions.filter(
           (conceptOption) => conceptOption.value === conceptIdValue
         );
-        defaultConceptAnswersConcepts = [
-          ...defaultConceptAnswersConcepts,
+        defaultConceptAnswerConcepts = [
+          ...defaultConceptAnswerConcepts,
           ...eachValueOptions,
         ];
       });
-      return defaultConceptAnswersConcepts;
+      return defaultConceptAnswerConcepts;
     };
-    const defaultConceptAnswersConcepts = getDefaultConceptAnswersConcepts();
+    const defaultConceptAnswerConcepts = getDefaultConceptAnswerConcepts();
 
-    const getDefaultConceptAnswersDrugs = () => {
-      const { conceptAnswersDrugs } = this.state.concept;
+    const getDefaultConceptAnswerDrugs = () => {
+      const { conceptAnswerDrugs } = this.state.concept;
 
-      let defaultConceptAnswersDrugs = [];
-      conceptAnswersDrugs.forEach((drugIdValue) => {
+      let defaultConceptAnswerDrugs = [];
+      conceptAnswerDrugs.forEach((drugIdValue) => {
         const eachValueOptions = drugOptions.filter(
           (drugOption) => drugOption.value === drugIdValue
         );
-        defaultConceptAnswersDrugs = [
-          ...defaultConceptAnswersDrugs,
+        defaultConceptAnswerDrugs = [
+          ...defaultConceptAnswerDrugs,
           ...eachValueOptions,
         ];
       });
-      return defaultConceptAnswersDrugs;
+      return defaultConceptAnswerDrugs;
     };
-    const defaultConceptAnswersDrugs = getDefaultConceptAnswersDrugs();
+    const defaultConceptAnswerDrugs = getDefaultConceptAnswerDrugs();
 
     const getDefaultDataType = dataTypeOptions.filter(
       (dataTypeOption) => dataTypeOption.value === concept.dataTypeId
@@ -507,7 +507,7 @@ class ConceptView extends React.Component {
             <div>
               <span>Answer Concepts</span>
               <ul>
-                {defaultConceptAnswersConcepts.map((item) => (
+                {defaultConceptAnswerConcepts.map((item) => (
                   <li key={item.uuid}>
                     <RouterLink to={`/concept/view/${item.uuid}`}>
                       {item.label}
@@ -520,7 +520,7 @@ class ConceptView extends React.Component {
             <div>
               <span>Answer Drugs</span>
               <ul>
-                {defaultConceptAnswersDrugs.map((item) => (
+                {defaultConceptAnswerDrugs.map((item) => (
                   <li key={item.conceptUuid}>
                     <RouterLink to={`/concept/view/${item.conceptUuid}`}>
                       {item.label}
