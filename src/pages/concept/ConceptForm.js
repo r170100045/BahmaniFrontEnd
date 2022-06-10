@@ -538,9 +538,10 @@ class ConceptForm extends React.Component {
     });
     concept.conceptSets = conceptSetsForEditRequest;
 
+    const conceptDrugsForEditRequest = [];
     const conceptAnswersForEditRequest = [];
     concept.conceptAnswerDrugs.forEach((answerDrug) => {
-      conceptAnswersForEditRequest.push({
+      conceptDrugsForEditRequest.push({
         answerDrug: answerDrug,
         answerConcept: null,
       });
@@ -551,6 +552,7 @@ class ConceptForm extends React.Component {
         answerConcept: answerConcept,
       });
     });
+    concept.conceptDrugs = conceptDrugsForEditRequest;
     concept.conceptAnswers = conceptAnswersForEditRequest;
 
     const conceptHandlerForEditRequest = { handler: concept.conceptComplex };
@@ -942,8 +944,6 @@ class ConceptForm extends React.Component {
 
     if (isLoading) return <LoadingData />;
 
-    console.log("conceptBeforeReturn", concept);
-
     return (
       <Paper style={paperStyle}>
         {errors.httpRequestHasError && (
@@ -1117,7 +1117,8 @@ class ConceptForm extends React.Component {
                   <TextField
                     style={inputStyle}
                     label="Absolute High"
-                    type="text"
+                    type="number"
+                    step="any"
                     id="hiAbsolute"
                     name="hiAbsolute"
                     value={GET_VALUE(
@@ -1130,7 +1131,8 @@ class ConceptForm extends React.Component {
                 <TextField
                   style={inputStyle}
                   label="Critical High"
-                  type="text"
+                  type="number"
+                  step="any"
                   id="hiCritical"
                   name="hiCritical"
                   value={GET_VALUE(
@@ -1141,7 +1143,8 @@ class ConceptForm extends React.Component {
                 <TextField
                   style={inputStyle}
                   label="Normal High"
-                  type="text"
+                  type="number"
+                  step="any"
                   id="hiNormal"
                   name="hiNormal"
                   value={GET_VALUE(
@@ -1152,7 +1155,8 @@ class ConceptForm extends React.Component {
                 <TextField
                   style={inputStyle}
                   label="Absolute Low"
-                  type="text"
+                  type="number"
+                  step="any"
                   id="lowAbsolute"
                   name="lowAbsolute"
                   value={GET_VALUE(
@@ -1164,7 +1168,8 @@ class ConceptForm extends React.Component {
                 <TextField
                   style={inputStyle}
                   label="Critical Low"
-                  type="text"
+                  type="number"
+                  step="any"
                   id="lowCritical"
                   name="lowCritical"
                   value={GET_VALUE(
@@ -1176,7 +1181,8 @@ class ConceptForm extends React.Component {
                 <TextField
                   style={inputStyle}
                   label="Normal Low"
-                  type="text"
+                  type="number"
+                  step="any"
                   id="lowNormal"
                   name="lowNormal"
                   value={GET_VALUE(
@@ -1200,7 +1206,8 @@ class ConceptForm extends React.Component {
                 <TextField
                   style={inputStyle}
                   label="Display Precision"
-                  type="text"
+                  type="number"
+                  step="any"
                   id="displayPrecision"
                   name="displayPrecision"
                   value={GET_VALUE(

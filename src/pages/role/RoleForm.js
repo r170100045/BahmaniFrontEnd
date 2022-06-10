@@ -566,12 +566,12 @@ class RoleForm extends React.Component {
             <Controls.CancelButton onClick={() => cancelRole()} />
           </Grid>
         </Paper>
-        {roleId !== "add" && (
+        {/* {roleId !== "add" && (
           <Controls.DeleteButton
             style={deleteButtonStyle}
             onClick={() => deleteRole()}
           />
-        )}
+        )} */}
       </React.Fragment>
     );
   }

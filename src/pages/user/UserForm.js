@@ -275,6 +275,7 @@ class UserForm extends React.Component {
                 middleName: null,
                 familyName: null,
                 gender: null,
+                personNameUuid: null,
               };
 
               personObj.uuid = response.data.uuid;
@@ -282,6 +283,7 @@ class UserForm extends React.Component {
               personObj.middleName = response.data.middleName;
               personObj.familyName = response.data.familyName;
               personObj.gender = response.data.gender;
+              personObj.personNameUuid = response.data.personNameUuid;
 
               const { user } = this.state;
               user.person = personObj;
@@ -622,6 +624,7 @@ class UserForm extends React.Component {
 
     if (isLoading) return <LoadingData />;
 
+    console.log("user", user);
     return (
       <React.Fragment>
         <Paper style={paperStyle}>
@@ -907,30 +910,29 @@ class UserForm extends React.Component {
                       <span style={propertyName}>UUID: </span>
                       <span style={inputInfoStyle}>{user.uuid}</span>
                     </div>
-                    <div>
-                      <span style={groupHeading}>User Properties</span>
-                      <div style={{ marginLeft: 20 }}>
-                        {/* <div>
-                      <span>Name </span>
-                      <span>Value</span>
-                    </div> */}
-                        {user.userProperty.map((uProperty, index) => (
-                          <div key={index}>
-                            <TextField
-                              style={inputStyle}
-                              label={uProperty.property}
-                              type="text"
-                              id={uProperty.property}
-                              name={uProperty.property}
-                              onChange={(e) =>
-                                userPropertyChangeHandler(e, index)
-                              }
-                              value={GET_VALUE(uProperty.propertyValue)}
-                            />
-                          </div>
-                        ))}
+
+                    {user.userProperty.length > 0 && (
+                      <div>
+                        <span style={groupHeading}>User Properties</span>
+                        <div style={{ marginLeft: 20 }}>
+                          {user.userProperty.map((uProperty, index) => (
+                            <div key={index}>
+                              <TextField
+                                style={inputStyle}
+                                label={uProperty.property}
+                                type="text"
+                                id={uProperty.property}
+                                name={uProperty.property}
+                                onChange={(e) =>
+                                  userPropertyChangeHandler(e, index)
+                                }
+                                value={GET_VALUE(uProperty.propertyValue)}
+                              />
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                    </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -1025,12 +1027,12 @@ class UserForm extends React.Component {
           </Button>
         )} */}
 
-        {userId !== "add" && (
+        {/* {userId !== "add" && (
           <Controls.DeleteButton
             style={deleteButtonStyle}
             onClick={() => deleteUser()}
           />
-        )}
+        )} */}
       </React.Fragment>
     );
   }

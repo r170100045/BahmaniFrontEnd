@@ -2,7 +2,7 @@ import { VISIT_TYPE } from "../constants/serviceConstants";
 import axios from "axios";
 
 export const insertVisitType = (data) =>
-  axios.post(`${VISIT_TYPE}/hello`, data).then((res) => res);
+  axios.post(`${VISIT_TYPE}`, data).then((res) => res);
 
 export const getAllVisitTypes = () =>
   axios.get(`${VISIT_TYPE}`).then((res) => res);

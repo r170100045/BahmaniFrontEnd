@@ -109,6 +109,10 @@ class ConceptView extends React.Component {
   }
 
   componentDidMount() {
+    this.fetchData();
+  }
+
+  fetchData() {
     Promise.all([
       this.setClassOptions(),
       this.setConceptOptions(),
@@ -121,6 +125,17 @@ class ConceptView extends React.Component {
       .then(() => this.setDefaultMappings())
       .then(() => this.setSynonyms())
       .then(() => this.setState({ isLoading: false }));
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.match.params.id !== this.props.match.params.id) {
+      this.setState(
+        { conceptId: this.props.match.params.id, isLoading: true },
+        () => {
+          this.fetchData();
+        }
+      );
+    }
   }
 
   setDataTypeOptions() {
@@ -465,18 +480,7 @@ class ConceptView extends React.Component {
           {isSet && (
             <div style={{ marginTop: "5px" }}>
               <span style={propertyNameBolder}>Set Members:</span>
-              {/* <span>
-                <ul>
-                  {defaultConceptSets.map((item) => (
-                    <li key={item.uuid}>
-                      <RouterLink to={`/concept/view/${item.uuid}`}>
-                        {item.label}
-                      </RouterLink>
-                      <a href={`/concept/view/${item.uuid}`}>{item.label}</a>
-                    </li>
-                  ))}
-                </ul>
-              </span> */}
+
               <span>
                 {defaultConceptSets.map((item, index) =>
                   index === defaultConceptSets.length - 1 ? (
