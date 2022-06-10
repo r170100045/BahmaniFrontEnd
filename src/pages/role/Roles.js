@@ -70,6 +70,9 @@ const Roles = () => {
     pageSizeOptions: [3, 5, 10, 20],
     emptyRowsWhenPaging: false,
     actionsColumnIndex: -1,
+    actionsCellStyle: {
+      paddingRight: "16px",
+    },
   };
 
   useEffect(() => {
@@ -102,7 +105,7 @@ const Roles = () => {
 
   const actions = [
     {
-      icon: () => <EditIcon color="primary" style={{ marginRight: 20 }} />,
+      icon: () => <EditIcon color="primary" />,
       tooltip: "Edit",
       onClick: (event, rowData) => setRedirect(`/role/edit/${rowData.uuid}`),
     },

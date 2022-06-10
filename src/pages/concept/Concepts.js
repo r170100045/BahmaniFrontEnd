@@ -44,6 +44,9 @@ const Concepts = () => {
     pageSizeOptions: [3, 5, 10, 20],
     emptyRowsWhenPaging: false,
     actionsColumnIndex: -1,
+    actionsCellStyle: {
+      paddingRight: "16px",
+    },
   };
 
   useEffect(() => {
@@ -112,9 +115,7 @@ const Concepts = () => {
     //   onClick: (event, rowData) => setRedirect(`/concept/edit/${rowData.uuid}`),
     // },
     {
-      icon: () => (
-        <VisibilityIcon color="primary" style={{ marginRight: 20 }} />
-      ),
+      icon: () => <VisibilityIcon color="primary" />,
       tooltip: "View",
       onClick: (event, rowData) => setRedirect(`/concept/view/${rowData.uuid}`),
     },

@@ -42,6 +42,9 @@ const AddressHierarchyLevels = () => {
     pageSizeOptions: [10, 20],
     emptyRowsWhenPaging: false,
     actionsColumnIndex: -1,
+    actionsCellStyle: {
+      paddingRight: "16px",
+    },
   };
 
   useEffect(() => {

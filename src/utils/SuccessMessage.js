@@ -6,7 +6,10 @@ import { green } from "@material-ui/core/colors";
 class SuccessMessage extends React.Component {
   render() {
     return (
-      <Snackbar open anchorOrigin={{ vertical: "bottom", horizontal: "right" }}>
+      <Snackbar
+        open
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
         <Paper
           style={{
             padding: "15px",

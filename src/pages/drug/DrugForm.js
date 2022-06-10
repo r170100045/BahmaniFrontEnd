@@ -462,11 +462,10 @@ class DrugForm extends React.Component {
         )}
 
         {drugId !== "add" && (
-          <div style={paperStyle}>
-            <div style={buttonGroupStyle}>
-              <Controls.DeleteButton onClick={() => deleteDrug()} />
-            </div>
-          </div>
+          <Controls.DeleteButton
+            style={deleteButtonStyle}
+            onClick={() => deleteDrug()}
+          />
         )}
       </React.Fragment>
     );

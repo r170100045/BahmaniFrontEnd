@@ -28,7 +28,10 @@ class ErrorLoadingData extends React.Component {
 
       //   </Paper>
       // </div>
-      <Snackbar open anchorOrigin={{ vertical: "bottom", horizontal: "right" }}>
+      <Snackbar
+        open
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
         <Paper
           style={{
             padding: "15px",

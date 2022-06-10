@@ -906,7 +906,7 @@ class UserForm extends React.Component {
 
                 {userId !== "add" && (
                   <div>
-                    <div>
+                    <div style={{ marginTop: 10 }}>
                       <span style={propertyName}>UUID: </span>
                       <span style={inputInfoStyle}>{user.uuid}</span>
                     </div>

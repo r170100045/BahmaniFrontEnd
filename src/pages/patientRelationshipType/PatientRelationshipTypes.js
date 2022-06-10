@@ -38,6 +38,9 @@ const PatientRelationshipTypes = () => {
     pageSizeOptions: [3, 5, 10, 20],
     emptyRowsWhenPaging: false,
     actionsColumnIndex: -1,
+    actionsCellStyle: {
+      paddingRight: "16px",
+    },
   };
 
   useEffect(() => {
@@ -74,7 +77,7 @@ const PatientRelationshipTypes = () => {
 
   const actions = [
     {
-      icon: () => <EditIcon color="primary" style={{ marginRight: 20 }} />,
+      icon: () => <EditIcon color="primary" />,
       tooltip: "Edit",
       onClick: (event, rowData) =>
         setRedirect(`/patientRelationshipType/edit/${rowData.uuid}`),
