@@ -7,22 +7,21 @@ class ErrorLoadingData extends React.Component {
     return (
       <Snackbar
         open
+        autoHideDuration={3000}
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
       >
         <Paper
           style={{
-            padding: "15px",
-            fontSize: "15px",
-            backgroundColor: "rgb(228 154 157)",
-            border: "1px solid red",
-            width: "300px",
-            height: 25,
+            padding: "0.5rem 3rem",
+            backgroundColor: "#BB5555",
+            height: "3rem",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
+            color: "white",
           }}
         >
-          <span>Something went wrong!</span>
+          Something went wrong!
         </Paper>
       </Snackbar>
     );

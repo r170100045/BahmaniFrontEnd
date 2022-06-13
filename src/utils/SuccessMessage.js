@@ -11,15 +11,13 @@ class SuccessMessage extends React.Component {
       >
         <Paper
           style={{
-            padding: "15px",
-            fontSize: "15px",
-            backgroundColor: "#99dc99",
-            border: "1px solid green",
-            width: "300px",
-            height: 25,
+            padding: "0.5rem 3rem",
+            backgroundColor: "#558855",
+            height: "3rem",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
+            color: "white",
           }}
         >
           <span>{`${this.props.action} Successfully`}</span>
