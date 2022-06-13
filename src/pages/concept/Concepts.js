@@ -1,10 +1,9 @@
 import { FormControlLabel, Switch } from "@material-ui/core";
-import { Link, Redirect } from "react-router-dom";
+import { Redirect } from "react-router-dom";
 import MaterialTable, { MTableToolbar } from "material-table";
 import { useEffect, useState } from "react";
 
 import Controls from "../../components/controls/Controls";
-import EditIcon from "@material-ui/icons/Edit";
 import ErrorLoadingData from "../../utils/ErrorLoadingData";
 import LoadingData from "../../utils/LoadingData";
 import VisibilityIcon from "@material-ui/icons/Visibility";
@@ -129,16 +128,14 @@ const Concepts = () => {
     <>
       {httpRequestHasError && <ErrorLoadingData message={httpRequestError} />}
 
-      <div style={{ maxWidth: "96%", margin: "auto" }}>
-        <MaterialTable
-          title="Concepts"
-          data={filteredConceptsOnRetired}
-          columns={columns}
-          components={components}
-          options={options}
-          actions={actions}
-        />
-      </div>
+      <MaterialTable
+        title="Concepts"
+        data={filteredConceptsOnRetired}
+        columns={columns}
+        components={components}
+        options={options}
+        actions={actions}
+      />
     </>
   );
 };

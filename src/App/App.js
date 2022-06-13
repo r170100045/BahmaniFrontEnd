@@ -1,7 +1,7 @@
 import "./App.css";
 
 import { CssBaseline, makeStyles } from "@material-ui/core";
-import { Route, Switch } from "react-router-dom";
+import { Route, Switch, Redirect } from "react-router-dom";
 
 import AddressHierarchyLevelPage from "../pages/addressHierarchyLevel/AddressHierarchyLevelPage";
 import ConceptPage from "../pages/concept/ConceptPage";
@@ -12,15 +12,20 @@ import PersonAttributeTypePage from "../pages/personAttributeType/PersonAttribut
 import PrivilegePage from "../pages/privilege/PrivilegePage";
 import RolePage from "../pages/role/RolePage";
 import SideMenu from "../components/SideMenu";
-import UserAddPrompt from "../pages/user/UserAddPrompt";
 import UserPage from "../pages/user/UserPage";
 import VisitTypePage from "../pages/visitType/VisitTypePage";
 
 const useStyles = makeStyles({
   appMain: {
-    paddingLeft: "200px",
-    width: "100%",
-    backgroundColor: "#B7CADB",
+    display: "flex",
+    backgroundColor: "#EFEFEF",
+    height: "calc(100vh - 64px)",
+    overflowY: "auto",
+    alignItems: "flex-start",
+  },
+  appBody: {
+    flex: 1,
+    margin: "1rem",
   },
 });
 
@@ -28,38 +33,43 @@ export default function App() {
   const classes = useStyles();
   return (
     <>
-      <SideMenu />
       <Header />
       <div className={classes.appMain}>
-        <Switch>
-          <Route path="/patientRelationshipType/:action/:id">
-            <PatientRelationshipTypePage />
-          </Route>
-          <Route path="/personAttributeType/:action/:id">
-            <PersonAttributeTypePage />
-          </Route>
-          <Route path="/addressHierarchyLevel/:action/:id">
-            <AddressHierarchyLevelPage />
-          </Route>
-          <Route path="/visitType/:action/:id">
-            <VisitTypePage />
-          </Route>
-          <Route path="/drug/:action/:id">
-            <DrugPage />
-          </Route>
-          <Route path="/concept/:action/:id">
-            <ConceptPage />
-          </Route>
-          <Route path="/user/:action/:id/:personId">
-            <UserPage />
-          </Route>
-          <Route path="/role/:action/:id">
-            <RolePage />
-          </Route>
-          <Route path="/privilege/:action/:id">
-            <PrivilegePage />
-          </Route>
-        </Switch>
+        <SideMenu />
+        <div className={classes.appBody}>
+          <Switch>
+            <Route path="/patientRelationshipType/:action/:id">
+              <PatientRelationshipTypePage />
+            </Route>
+            <Route path="/personAttributeType/:action/:id">
+              <PersonAttributeTypePage />
+            </Route>
+            <Route path="/addressHierarchyLevel/:action/:id">
+              <AddressHierarchyLevelPage />
+            </Route>
+            <Route path="/visitType/:action/:id">
+              <VisitTypePage />
+            </Route>
+            <Route path="/drug/:action/:id">
+              <DrugPage />
+            </Route>
+            <Route path="/concept/:action/:id">
+              <ConceptPage />
+            </Route>
+            <Route path="/user/:action/:id/:personId">
+              <UserPage />
+            </Route>
+            <Route path="/role/:action/:id">
+              <RolePage />
+            </Route>
+            <Route path="/privilege/:action/:id">
+              <PrivilegePage />
+            </Route>
+            <Route path="">
+              <Redirect to="/addressHierarchyLevel/view/all" />
+            </Route>
+          </Switch>
+        </div>
       </div>
       <CssBaseline />
     </>

@@ -1,5 +1,5 @@
 import { FormControlLabel, Switch } from "@material-ui/core";
-import { Link, Redirect } from "react-router-dom";
+import { Redirect } from "react-router-dom";
 import MaterialTable, { MTableToolbar } from "material-table";
 import { useEffect, useState } from "react";
 
@@ -115,16 +115,14 @@ const Drugs = () => {
     <>
       {httpRequestHasError && <ErrorLoadingData message={httpRequestError} />}
 
-      <div style={{ maxWidth: "96%", margin: "auto" }}>
-        <MaterialTable
-          title="Drugs"
-          data={filteredDrugsOnRetired}
-          columns={columns}
-          components={components}
-          options={options}
-          actions={actions}
-        />
-      </div>
+      <MaterialTable
+        title="Drugs"
+        data={filteredDrugsOnRetired}
+        columns={columns}
+        components={components}
+        options={options}
+        actions={actions}
+      />
     </>
   );
 };

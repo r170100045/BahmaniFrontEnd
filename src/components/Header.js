@@ -13,7 +13,6 @@ export default function Header() {
     <AppBar
       position="static"
       className={classes.root}
-      style={{ height: "10vh" }}
     >
       <Toolbar>
         <Grid container>

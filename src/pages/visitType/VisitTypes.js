@@ -1,4 +1,4 @@
-import { Link, Redirect } from "react-router-dom";
+import { Redirect } from "react-router-dom";
 import MaterialTable, { MTableToolbar } from "material-table";
 import { useEffect, useState } from "react";
 
@@ -92,16 +92,14 @@ const VisitTypes = () => {
     <>
       {httpRequestHasError && <ErrorLoadingData message={httpRequestError} />}
 
-      <div style={{ maxWidth: "96%", margin: "auto" }}>
-        <MaterialTable
-          title="Visit Types"
-          data={visitTypes}
-          columns={columns}
-          options={options}
-          components={components}
-          actions={actions}
-        />
-      </div>
+      <MaterialTable
+        title="Visit Types"
+        data={visitTypes}
+        columns={columns}
+        options={options}
+        components={components}
+        actions={actions}
+      />
     </>
   );
 };

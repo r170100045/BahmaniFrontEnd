@@ -1,19 +1,11 @@
 import React from "react";
-import { blue } from "@material-ui/core/colors";
 import { makeStyles } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
-  pageHeight: {
-    overflow: "auto",
-    height: "90vh",
-  },
   pageTitle: {
-    textAlign: "left",
-    fontSize: "20px",
-    margin: "auto 24px ",
-    padding: "10px",
+    fontSize: "1.5rem",
+    margin: "1rem 0",
     textTransform: "capitalize",
-    fontWeight: "bolder",
     color: "#0c0b0b",
   },
 }));
@@ -33,13 +25,11 @@ function CommonPage(props) {
 
   return (
     <>
-      <div className={classes.pageHeight}>
-        <p className={classes.pageTitle}>{title}</p>
-        {action === "view" && id === "all" && viewAll}
-        {action === "view" && id !== "all" && viewEach}
-        {action === "edit" && id === "add" && personId === "add" && addPrompt}
-        {personId !== "add" && action === "edit" && addOrEdit}
-      </div>
+      <div className={classes.pageTitle}>{title}</div>
+      {action === "view" && id === "all" && viewAll}
+      {action === "view" && id !== "all" && viewEach}
+      {action === "edit" && id === "add" && personId === "add" && addPrompt}
+      {personId !== "add" && action === "edit" && addOrEdit}
     </>
   );
 }

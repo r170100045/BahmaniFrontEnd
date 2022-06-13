@@ -92,14 +92,12 @@ const AddressHierarchyLevels = () => {
     <>
       {httpRequestHasError && <ErrorLoadingData message={httpRequestError} />}
 
-      <div style={{ maxWidth: "96%", margin: "auto" }}>
-        <MaterialTable
-          title="Address Hierarchy Levels"
-          data={columnData}
-          columns={columns}
-          options={options}
-        />
-      </div>
+      <MaterialTable
+        title="Address Hierarchy Levels"
+        data={columnData}
+        columns={columns}
+        options={options}
+      />
     </>
   );
 };

@@ -119,16 +119,14 @@ const Roles = () => {
     <>
       {httpRequestHasError && <ErrorLoadingData message={httpRequestError} />}
 
-      <div style={{ maxWidth: "96%", margin: "auto" }}>
-        <MaterialTable
-          title="Current Roles"
-          data={roles}
-          columns={columns}
-          options={options}
-          components={components}
-          actions={actions}
-        />
-      </div>
+      <MaterialTable
+        title="Current Roles"
+        data={roles}
+        columns={columns}
+        options={options}
+        components={components}
+        actions={actions}
+      />
     </>
   );
 };
