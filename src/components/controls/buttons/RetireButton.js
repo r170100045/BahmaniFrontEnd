@@ -1,4 +1,4 @@
-import { Button, makeStyles, withStyles } from "@material-ui/core";
+import { Button, withStyles } from "@material-ui/core";
 
 import AlarmOffIcon from "@material-ui/icons/AlarmOff";
 import AlarmOnIcon from "@material-ui/icons/AlarmOn";

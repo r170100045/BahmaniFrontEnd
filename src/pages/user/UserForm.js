@@ -14,12 +14,9 @@ import {
 import { Redirect, withRouter } from "react-router-dom";
 import {
   buttonGroupStyle,
-  checkboxGroupHeading,
   checkboxLabelStyle,
-  deleteButtonStyle,
   globalError,
   groupHeading,
-  inputError,
   inputInfoStyle,
   inputStyle,
   paperStyle,
@@ -41,7 +38,6 @@ import ErrorLoadingData from "../../utils/ErrorLoadingData";
 import { GET_VALUE } from "../../constants/otherConstants";
 import LoadingData from "../../utils/LoadingData";
 import React from "react";
-import RetireButton from "../../components/controls/buttons/RetireButton";
 import SuccessMessage from "../../utils/SuccessMessage";
 import { getRoles } from "../../services/roleService";
 
@@ -584,7 +580,6 @@ class UserForm extends React.Component {
       disableUser,
       enableUser,
       cancelUser,
-      deleteUser,
       toggleAdvancedOptions,
       stateChangeHandler,
       userRoleChangeHandler,

@@ -4,7 +4,6 @@ import {
   buttonGroupStyle,
   deleteButtonStyle,
   globalError,
-  inputError,
   inputStyle,
   paperStyle,
   subHeadingStyle,

@@ -1,11 +1,9 @@
-import { Button, Grid, Paper, TextField } from "@material-ui/core";
+import { Grid, Paper, TextField } from "@material-ui/core";
 import { Redirect, withRouter } from "react-router-dom";
 import {
   buttonGroupStyle,
-  buttonStyle,
   deleteButtonStyle,
   globalError,
-  inputError,
   inputStyle,
   paperStyle,
   subHeadingStyle,

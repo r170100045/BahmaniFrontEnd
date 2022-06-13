@@ -1,6 +1,4 @@
 import {
-  Button,
-  Grid,
   Paper,
   Table,
   TableBody,
@@ -12,11 +10,8 @@ import {
 import React, { Fragment } from "react";
 import { Redirect, Link as RouterLink, withRouter } from "react-router-dom";
 import {
-  buttonGroupStyle,
   conceptViewInfo,
-  inputInfoStyle,
   paperStyle,
-  propertyName,
   propertyNameBolder,
 } from "../../constants/formStyling";
 import {
@@ -325,12 +320,11 @@ class ConceptView extends React.Component {
       conceptOptions,
       drugOptions,
       dataTypeOptions,
-      conceptId,
       defaultMappings,
       redirect,
       isLoading,
     } = this.state;
-    const { redirectToEditPage, redirectToAnotherConceptView } = this;
+
     const { conceptNames, isSet } = concept;
 
     const getFullySpecifiedName = () => {

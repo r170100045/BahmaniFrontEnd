@@ -1,4 +1,4 @@
-import { Button, Paper, makeStyles, withStyles } from "@material-ui/core";
+import { Button, withStyles } from "@material-ui/core";
 
 import DeleteIcon from "@material-ui/icons/Delete";
 import { red } from "@material-ui/core/colors";

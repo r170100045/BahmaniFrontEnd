@@ -1,9 +1,7 @@
 import {
   Checkbox,
-  FormControl,
   FormControlLabel,
   Grid,
-  Input,
   Paper,
   TextField,
 } from "@material-ui/core";
@@ -14,7 +12,6 @@ import {
   checkboxLabelStyle,
   deleteButtonStyle,
   globalError,
-  inputError,
   inputInfoStyle,
   inputStyle,
   paperStyle,

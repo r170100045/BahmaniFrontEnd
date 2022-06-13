@@ -3,7 +3,6 @@ import {
   Checkbox,
   FormControlLabel,
   Grid,
-  IconButton,
   InputAdornment,
   Paper,
   Table,
@@ -19,18 +18,14 @@ import {
   GET_VALUE,
 } from "../../constants/otherConstants";
 import { MultipleSelect, SingleSelect } from "react-select-material-ui";
-import React, { Fragment } from "react";
+import React from "react";
 import { Redirect, withRouter } from "react-router-dom";
 import {
   buttonGroupStyle,
   checkboxLabelStyle,
-  conceptPaperStyle,
-  deleteButtonStyle,
   globalError,
   inputStyle,
   paperStyle,
-  propertyName,
-  subHeadingStyle,
 } from "../../constants/formStyling";
 import {
   deleteConceptById,
@@ -872,12 +867,8 @@ class ConceptForm extends React.Component {
 
   render() {
     const {
-      saveConceptAndContinue,
       saveConcept,
-      retireConcept,
-      unretireConcept,
       cancelConcept,
-      deleteConcept,
       redirectToViewPage,
       conceptChangeHandler,
       fullySpecifiedNameChangeHandler,

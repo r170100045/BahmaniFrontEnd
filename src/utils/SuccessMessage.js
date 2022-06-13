@@ -1,7 +1,6 @@
 import { Paper, Snackbar } from "@material-ui/core";
 
 import React from "react";
-import { green } from "@material-ui/core/colors";
 
 class SuccessMessage extends React.Component {
   render() {

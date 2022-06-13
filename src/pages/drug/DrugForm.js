@@ -9,16 +9,12 @@ import { FILTER_OPTIONS, GET_VALUE } from "../../constants/otherConstants";
 import { Redirect, withRouter } from "react-router-dom";
 import {
   buttonGroupStyle,
-  buttonStyle,
   checkboxLabelStyle,
   deleteButtonStyle,
   globalError,
-  inputError,
   inputStyle,
-  labelStyle,
   paperStyle,
   subHeadingStyle,
-  unretireStyleHeading,
 } from "../../constants/formStyling";
 import {
   deleteDrugById,

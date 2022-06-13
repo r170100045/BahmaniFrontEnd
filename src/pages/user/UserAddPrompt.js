@@ -1,18 +1,15 @@
 import { Button, Paper } from "@material-ui/core";
-import { Redirect, Link as RouterLink, withRouter } from "react-router-dom";
+import { Redirect, withRouter } from "react-router-dom";
 import {
   createUser,
   inputInfoStyle,
-  inputStyle,
   paperStyle,
-  subHeadingStyle,
 } from "../../constants/formStyling";
 
 import Controls from "../../components/controls/Controls";
 import { FILTER_OPTIONS } from "../../constants/otherConstants";
 import LoadingData from "../../utils/LoadingData";
 import React from "react";
-import Select from "react-select";
 import { SingleSelect } from "react-select-material-ui";
 import { getPersons } from "../../services/userService";
 

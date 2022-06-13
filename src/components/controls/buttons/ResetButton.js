@@ -1,4 +1,4 @@
-import { Button, makeStyles, withStyles } from "@material-ui/core";
+import { Button, withStyles } from "@material-ui/core";
 
 import RotateLeftIcon from "@material-ui/icons/RotateLeft";
 import { yellow } from "@material-ui/core/colors";

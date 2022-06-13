@@ -1,20 +1,9 @@
-import {
-  Button,
-  Grid,
-  Input,
-  Paper,
-  TextField,
-  TextareaAutosize,
-} from "@material-ui/core";
+import { Grid, Paper, TextField } from "@material-ui/core";
 import { Redirect, withRouter } from "react-router-dom";
 import {
-  buttonGroupStyle,
-  buttonStyle,
   deleteButtonStyle,
   globalError,
-  inputError,
   inputStyle,
-  labelStyle,
   paperStyle,
 } from "../../constants/formStyling";
 import {

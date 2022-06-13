@@ -1,7 +1,6 @@
 import {
   Button,
   Checkbox,
-  FormControl,
   FormControlLabel,
   Grid,
   Paper,
@@ -9,14 +8,9 @@ import {
 } from "@material-ui/core";
 import { Redirect, Link as RouterLink, withRouter } from "react-router-dom";
 import {
-  buttonGroupStyle,
-  checkboxGroupHeading,
   checkboxLabelStyle,
   childRoleHeading,
-  conceptPaperStyle,
-  deleteButtonStyle,
   globalError,
-  inputError,
   inputInfoStyle,
   inputStyle,
   paperStyle,
@@ -398,7 +392,6 @@ class RoleForm extends React.Component {
     const {
       saveRole,
       cancelRole,
-      deleteRole,
       roleChangeHandler,
       roleRolePrivilegesChangeHandler,
       inheritedRoleChangeHandler,
